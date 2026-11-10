@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONLY YOU - Gantt Produzione Europa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #d1d5db;
+      color: #333;
+      user-select: none;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .gantt-grid {
+      display: grid;
+      grid-template-columns: 120px repeat(13, minmax(78px, 1fr));
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #9ca3af;
+      border-radius: 3px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #e5e7eb;
+    }
+    .flash-new-row {
+      animation: flashGreen 2.2s cubic-bezier(0.1, 1, 0.1, 1);
+    }
+    @keyframes flashGreen {
+      0% { background-color: #86efac; }
+      100% { background-color: #f0fdf4; }
+    }
+    .barcode-laser {
+      animation: laserSweep 1.2s infinite alternate ease-in-out;
+    }
+    @keyframes laserSweep {
+      0% { top: 10%; opacity: 0.9; }
+      100% { top: 88%; opacity: 0.9; }
+    }
+  </style>
+</head>
+<body class="flex flex-col h-screen">
+
+  <!-- ========================================================= -->
+  <!-- TOP APPLICATION BAR (1:1 FROM SCREENSHOT 1)               -->
+  <!-- ========================================================= -->
+  <header class="bg-[#e5e7eb] border-b border-gray-400 px-6 py-2.5 flex items-center justify-between shadow-2xs select-none">
+    <div class="flex items-center space-x-8">
+      <button class="text-xs font-bold text-gray-800 hover:text-black tracking-wider flex items-center gap-1.5 px-2 py-0.5 rounded hover:bg-gray-300/60 transition">
+        BACK
+      </button>
+      <div class="text-xs font-bold text-gray-700 tracking-wider uppercase">
+        COMPANY EUROPA
+      </div>
+    </div>
+
+    <!-- Right Side Logo from Screenshot: ONLY YOU -->
+    <div class="flex items-center space-x-2">
+      <!-- Rainbow circle logo -->
+      <div class="w-6 h-6 rounded-full border-2 border-transparent bg-gradient-to-tr from-orange-400 via-pink-500 to-cyan-400 p-[1.5px] flex items-center justify-center">
+        <div class="w-full h-full bg-white rounded-full"></div>
+      </div>
+      <span class="font-extrabold tracking-tight text-gray-800 text-base">ONLY <span class="font-light text-gray-500 text-xs">YOU</span></span>
+    </div>
+  </header>
+
+  <!-- ========================================================= -->
+  <!-- MAIN GANTT WORKSPACE (1:1 FROM SCREENSHOT 1)              -->
+  <!-- ========================================================= -->
+  <main class="flex-1 flex flex-col bg-white overflow-hidden m-2 border border-gray-400 shadow-sm rounded-xs">
+    
+    <!-- Top Tab: Gantt Produzione - Europa -->
+    <div class="bg-[#e5e7eb] border-b border-gray-300 px-3 pt-2 flex items-center justify-between">
+      <div class="flex items-center">
+        <div class="bg-white border-t border-l border-r border-gray-300 px-3.5 py-1.5 text-xs font-bold text-gray-800 rounded-t flex items-center gap-3 shadow-2xs">
+          <span>Gantt Produzione - Europa</span>
+          <i class="fa-solid fa-xmark text-gray-400 hover:text-gray-700 text-[10px] cursor-pointer"></i>
+        </div>
+      </div>
+      <div class="text-[11px] text-gray-500 flex items-center gap-2 pr-2">
+        <span class="text-gray-400">Suggerimento:</span> Fai clic sull'ordine <strong class="text-gray-700">LINEA 1A</strong> per aprire la schermata di produzione
+      </div>
+    </div>
+
+    <!-- Sub-tab links: Time line / Carico Lavoro -->
+    <div class="px-3 py-1 bg-white border-b border-gray-200 flex items-center gap-5 text-xs font-semibold text-gray-700">
+      <span class="text-blue-600 border-b-2 border-blue-600 pb-1 cursor-pointer">Time line</span>
+      <span class="text-gray-500 hover:text-gray-800 pb-1 cursor-pointer">Carico Lavoro</span>
+    </div>
+
+    <!-- Filter & Toolbar (Matching screenshot 1 exactly) -->
+    <div class="px-3 py-1.5 bg-[#f3f4f6] border-b border-gray-300 flex flex-wrap items-center justify-between text-xs gap-2">
+      <div class="flex items-center gap-2">
+        <!-- Navigation controls -->
+        <div class="flex items-center bg-white border border-gray-300 rounded px-1 py-0.5 shadow-2xs">
+          <button class="text-gray-500 hover:text-black px-1"><i class="fa-solid fa-caret-left text-xs"></i></button>
+          <span class="w-2 h-2 rounded-full bg-blue-500 mx-1"></span>
+          <button class="text-gray-500 hover:text-black px-1"><i class="fa-solid fa-caret-right text-xs"></i></button>
+        </div>
+
+        <!-- Confection dropdown -->
+        <select class="bg-white border border-gray-300 rounded px-2 py-0.5 text-gray-700 text-xs">
+          <option>Confection A</option>
+          <option>Confection B</option>
+        </select>
+
+        <!-- Mostra dettagli dropdown -->
+        <select class="bg-white border border-gray-300 rounded px-2 py-0.5 text-gray-700 text-xs">
+          <option>Mostra dettagli</option>
+          <option>Nascondi dettagli</option>
+        </select>
+
+        <!-- Tutti dropdown -->
+        <select class="bg-white border border-gray-300 rounded px-2 py-0.5 text-gray-700 text-xs">
+          <option>Tutti</option>
+          <option>In lavorazione</option>
+        </select>
+
+        <!-- Recalculation Button -->
+        <button onclick="recalculateGantt()" class="bg-[#d94343] hover:bg-[#c23535] text-white px-3 py-0.5 rounded font-bold shadow-2xs transition text-xs">
+          Recalculation
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button class="bg-white border border-gray-300 px-2 py-0.5 rounded text-gray-700 hover:bg-gray-100">Today</button>
+        <div class="flex items-center border border-gray-300 rounded bg-white overflow-hidden">
+          <button class="px-2 py-0.5 text-gray-600 hover:bg-gray-100 border-r border-gray-200"><i class="fa-solid fa-caret-left text-xs"></i></button>
+          <button class="px-2 py-0.5 text-gray-600 hover:bg-gray-100"><i class="fa-solid fa-caret-right text-xs"></i></button>
+        </div>
+
+        <div class="bg-white border border-gray-300 rounded px-2 py-0.5 text-gray-600 flex items-center gap-1.5 text-xs">
+          <i class="fa-regular fa-calendar text-gray-400"></i>
+          <span>Sunday, October 11, 2026 - Wednesday, November 04, 2026</span>
+        </div>
+
+        <div class="relative">
+          <input type="text" placeholder="Smart filter" class="bg-white border border-gray-300 rounded pl-2 pr-6 py-0.5 text-gray-700 text-xs w-28 focus:w-36 transition-all">
+          <i class="fa-solid fa-magnifying-glass absolute right-2 top-1.5 text-[10px] text-gray-400"></i>
+        </div>
+        <button class="text-gray-500 hover:text-black p-1"><i class="fa-solid fa-rotate text-xs"></i></button>
+      </div>
+    </div>
+
+    <!-- GANTT TIMELINE GRID -->
+    <div class="flex-1 overflow-x-auto overflow-y-auto bg-white custom-scroll relative">
+      <div class="min-w-[1180px]">
+        
+        <!-- Date Header Row -->
+        <div class="gantt-grid bg-white border-b border-gray-300 text-center text-xs font-bold text-gray-700">
+          <div class="border-r border-gray-300 p-2 text-left bg-gray-50 font-bold uppercase tracking-wider text-[10px] text-gray-500">
+            <!-- Blank top left cell -->
+          </div>
+          <div class="border-r border-gray-200 p-1"><div>20/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
+          <div class="border-r border-gray-200 p-1"><div>21/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
+          <div class="border-r border-gray-200 p-1"><div>22/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
+          <div class="border-r border-gray-200 p-1"><div>23/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
+          <div class="border-r border-gray-200 p-1"><div>24/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
+          <div class="border-r border-gray-200 p-1"><div>25/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
+          <div class="border-r border-gray-200 p-1 bg-blue-50/40 border-t-2 border-t-blue-500 text-blue-900">
+            <div>26/10/2026</div><div class="text-[10px] text-blue-600 font-bold">00:00</div>
+          </div>
+          <div class="border-r border-gray-200 p-1"><div>27/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
+          <div class="border-r border-gray-200 p-1"><div>28/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
+          <div class="border-r border-gray-200 p-1"><div>29/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
+          <div class="border-r border-gray-200 p-1"><div>30/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
+          <div class="border-r border-gray-200 p-1"><div>31/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
+          <div class="p-1"><div>01/11/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
+        </div>
+
+        <!-- LINEA 1A (Order 26022404 001) -->
+        <div class="gantt-grid border-b border-gray-200 h-14 items-center hover:bg-gray-50/50 transition relative">
+          <div class="border-r border-gray-300 px-3 py-2 font-bold text-xs text-gray-800 bg-white h-full flex items-center">
+            LINEA 1A
+          </div>
+
+          <!-- Vertical grid line backgrounds -->
+          <div class="col-span-13 grid grid-cols-13 h-full absolute left-[120px] right-0 pointer-events-none">
+            <div class="border-r border-gray-100 h-full"></div>
+            <div class="border-r border-gray-100 h-full"></div>
+            <div class="border-r border-gray-100 h-full"></div>
+            <div class="border-r border-gray-100 h-full"></div>
+            <div class="border-r border-gray-100 h-full"></div>
+            <div class="border-r border-gray-100 h-full"></div>
+            <div class="border-r border-blue-100 h-full bg-blue-50/15"></div>
+            <div class="border-r border-gray-100 h-full"></div>
+            <div class="border-r border-gray-100 h-full"></div>
+            <div class="border-r border-gray-100 h-full"></div>
+            <div class="border-r border-gray-100 h-full"></div>
+            <div class="border-r border-gray-100 h-full"></div>
+            <div class="h-full"></div>
+          </div>
+
+          <!-- The Orange Order Bar (Clickable to open Production window) -->
+          <div class="col-span-13 pl-0.5 pr-20 z-10 flex flex-col justify-center">
+            <div onclick="openProductionModal()" title="Fai clic per aprire la schermata di Produzione"
+                 class="relative bg-[#f58220] hover:bg-[#e07519] text-white rounded-xs border border-[#d96b14] cursor-pointer overflow-hidden p-1 shadow-2xs group transition"
+                 style="width: 82%;">
+              
+              <!-- Subtle Blue Border underline matching screenshot -->
+              <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-sky-400"></div>
+
+              <div class="flex items-center justify-between text-xs font-bold px-2">
+                <span class="tracking-wide">26022404 001</span>
+                <span class="text-[10px] opacity-90 font-normal">
+                  Prodotto: <strong id="ganttQtyDisplay" class="font-bold underline">666</strong> / 2099 pz
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LINEA 2A -->
+        <div class="gantt-grid border-b border-gray-200 h-12 items-center">
+          <div class="border-r border-gray-300 px-3 py-2 font-bold text-xs text-gray-700 bg-white h-full flex items-center">LINEA 2A</div>
+          <div class="col-span-13"></div>
+        </div>
+
+        <!-- LINEA 3A -->
+        <div class="gantt-grid border-b border-gray-200 h-12 items-center">
+          <div class="border-r border-gray-300 px-3 py-2 font-bold text-xs text-gray-700 bg-white h-full flex items-center">LINEA 3A</div>
+          <div class="col-span-13"></div>
+        </div>
+
+        <!-- LINEA 4A -->
+        <div class="gantt-grid border-b border-gray-200 h-12 items-center">
+          <div class="border-r border-gray-300 px-3 py-2 font-bold text-xs text-gray-700 bg-white h-full flex items-center">LINEA 4A</div>
+          <div class="col-span-13"></div>
+        </div>
+
+        <!-- LINEA 5A (Order 26017829 001) -->
+        <div class="gantt-grid border-b border-gray-200 h-14 items-center relative">
+          <div class="border-r border-gray-300 px-3 py-2 font-bold text-xs text-gray-700 bg-white h-full flex items-center">LINEA 5A</div>
+          
+          <div class="col-span-13 pl-0.5 pr-2 z-10 flex flex-col justify-center">
+            <div class="relative bg-[#f58220] text-white rounded-xs border border-[#d96b14] p-1" style="width: 100%;">
+              <div class="flex items-center justify-end text-xs font-bold pr-3">
+                <span>26017829 001</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+
+  <!-- ========================================================= -->
+  <!-- MODAL: "Production" (1:1 REPLICA OF SCREENSHOT 2)         -->
+  <!-- WITH NEW AUTOMATED BARCODE & SCALE FEATURE BUILT ON TOP   -->
+  <!-- ========================================================= -->
+  <div id="productionWindow" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-[#f0f2f5] border border-gray-400 shadow-2xl rounded-xs w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden">
+      
+      <!-- Top Title Bar (Exact from screenshot 2) -->
+      <div class="bg-[#ebeef2] border-b border-gray-300 px-3 py-1.5 flex items-center justify-between select-none">
+        <h2 class="text-sm font-semibold text-gray-800">Production</h2>
+        <button onclick="closeProductionModal()" class="text-gray-500 hover:text-black text-sm px-1.5 py-0.5 rounded hover:bg-gray-300">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Tabs Bar (Exact from screenshot 2: Produzione / Planning) -->
+      <div class="bg-[#e2e6eb] px-3 pt-1.5 border-b border-gray-300 flex items-center justify-between">
+        <div class="flex items-center gap-1">
+          <div class="bg-white border-t border-l border-r border-gray-300 px-4 py-1.5 text-xs font-semibold text-gray-800 rounded-t shadow-2xs">
+            Produzione
+          </div>
+          <div class="px-4 py-1.5 text-xs text-gray-600 hover:text-black cursor-pointer">
+            Planning
+          </div>
+        </div>
+
+        <!-- NEW FEATURE BADGE ON TOP OF HIS APPLICATION -->
+        <div class="flex items-center gap-2 pb-1">
+          <span class="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Nuova Funzione: Inserimento Automatico da Barcode & Bilancia
+          </span>
+        </div>
+      </div>
+
+      <!-- MAIN MODAL CONTENT: LEFT FORM + CENTER TABLE + RIGHT KPI -->
+      <div class="flex-1 overflow-y-auto p-4 flex flex-col lg:flex-row gap-4 bg-white custom-scroll">
+        
+        <!-- LEFT COLUMN: COMMESSA FORM (Matching Screenshot 2) -->
+        <div class="w-full lg:w-56 space-y-2.5 text-xs shrink-0 border-r border-gray-200 pr-3">
+          <div>
+            <label class="block text-gray-600 mb-0.5">Commessa</label>
+            <input type="text" value="26022404_001" readonly class="w-full border border-gray-300 rounded-xs px-2 py-1 bg-white font-semibold text-gray-800">
+          </div>
+
+          <div>
+            <label class="block text-gray-600 mb-0.5">Articolo</label>
+            <input type="text" value="PL00075" readonly class="w-full border border-gray-300 rounded-xs px-2 py-1 bg-white font-semibold text-gray-800">
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="flex-1">
+              <label class="block text-gray-600 mb-0.5">Linea</label>
+              <input type="text" value="1A" readonly class="w-full border border-gray-300 rounded-xs px-2 py-1 bg-white font-semibold text-gray-800">
+            </div>
+            <div>
+              <label class="block text-gray-600 mb-0.5">Abbatimento</label>
+              <span class="text-emerald-600 font-bold text-sm block pt-1">90%</span>
+            </div>
+          </div>
+
+          <div class="pt-1 leading-tight">
+            <div class="font-bold text-gray-900 text-xs">Capi (2099)</div>
+            <div class="font-bold text-gray-900 text-xs">Produzione Giornaliera (235)</div>
+          </div>
+
+          <div>
+            <label class="block text-gray-600 mb-0.5">Data Produzione</label>
+            <div class="relative">
+              <input id="inputDataProduzione" type="text" value="26/10/2026" class="w-full border border-gray-300 rounded-xs px-2 py-1 text-xs">
+              <i class="fa-regular fa-calendar absolute right-2 top-2 text-gray-400"></i>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-gray-600 mb-0.5">Turni</label>
+            <select class="w-full border border-gray-300 rounded-xs px-2 py-1 text-xs bg-white">
+              <option>I</option>
+              <option>II</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-4 text-xs text-gray-700 pt-0.5">
+            <label class="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" name="planType" checked class="text-orange-500"> By date
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" name="planType"> By hour
+            </label>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-gray-600 text-[11px] mb-0.5">COLORE</label>
+              <select id="selectColore" class="w-full border border-gray-300 rounded-xs px-1.5 py-1 text-xs bg-white">
+                <option>V00006</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-gray-600 text-[11px] mb-0.5">Taglie</label>
+              <select id="selectTaglie" class="w-full border border-gray-300 rounded-xs px-1.5 py-1 text-xs bg-white">
+                <option>M</option>
+                <option>S</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>XXL</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-gray-600 mb-0.5">Quantità</label>
+            <input id="inputQuantita" type="text" placeholder="" class="w-full border border-gray-300 rounded-xs px-2 py-1 text-xs">
+          </div>
+
+          <div>
+            <label class="block text-gray-600 mb-0.5">Numero delle risorse</label>
+            <input type="text" value="3" class="w-full border border-gray-300 rounded-xs px-2 py-1 text-xs bg-white">
+          </div>
+
+          <!-- Buttons at bottom of left panel -->
+          <div class="flex gap-2 pt-1">
+            <button onclick="manualInsertOk()" class="bg-[#0070d2] hover:bg-blue-700 text-white px-4 py-1 rounded-xs text-xs font-semibold shadow-2xs">
+              Ok
+            </button>
+            <button class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-xs text-xs border border-gray-300">
+              Cancel
+            </button>
+          </div>
+
+          <!-- Note about manual mode vs automated mode -->
+          <div class="text-[10px] text-gray-400 italic pt-1 border-t border-gray-200">
+            * In precedenza l'operatore inseriva questi dati manualmente premendo "Ok".
+          </div>
+        </div>
+
+        <!-- CENTER COLUMN: THE PRODUCTION TABLE + AUTOMATION OVERLAY -->
+        <div class="flex-1 flex flex-col min-w-0">
+
+          <!-- ======================================================== -->
+          <!-- NEW BARCODE & SCALE BAR DIRECTLY INTEGRATED IN THE WINDOW -->
+          <!-- ======================================================== -->
+          <div class="mb-3 bg-[#f8fafc] text-gray-800 rounded p-3 border border-gray-300 shadow-2xs">
+            
+            <!-- Top bar with Quick Demo Presets: 1 Good One + 1 Bad One -->
+            <div class="flex flex-wrap items-center justify-between mb-2 pb-2 border-b border-gray-200 gap-2">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs font-bold tracking-wide uppercase text-gray-800">Verifica Barcode & Bilancia:</span>
+              </div>
+
+              <!-- Dedicated One-Click Scenario Buttons requested by user -->
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] text-gray-500 font-semibold uppercase">Simulazioni per il Cliente:</span>
+                <button onclick="runScenarioGood()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+                  <i class="fa-solid fa-circle-check text-xs"></i> 1. Test Buono (10 pz - Peso OK)
+                </button>
+                <button onclick="runScenarioBad()" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+                  <i class="fa-solid fa-triangle-exclamation text-xs"></i> 2. Test Anomalia (Manca 1 Capo - Bloccato)
+                </button>
+              </div>
+
+              <span id="scannerStatusText" class="text-[11px] font-mono text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded border border-amber-300">
+                Pronto. Seleziona uno scenario sopra o scansiona.
+              </span>
+            </div>
+
+            <!-- Integrated Barcode Reader & Weight Gate Simulator -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+              
+              <!-- STEP 1: BARCODE SCANNER (WHITE BACKGROUND) -->
+              <div class="md:col-span-4 bg-white p-2.5 rounded border border-gray-300 shadow-2xs flex flex-col justify-between">
+                
+                <!-- Action Button on Top -->
+                <button id="btnScansiona" onclick="executeBarcodeScan()" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded font-bold text-xs transition flex items-center justify-center gap-2 shadow-2xs mb-2">
+                  <i class="fa-solid fa-barcode text-sm"></i>
+                  <span class="tracking-wide uppercase">1. SCANSIONA BARCODE</span>
+                </button>
+
+                <div class="flex justify-between items-center text-[10px] text-gray-600 mb-1">
+                  <span class="font-bold text-gray-700">Codice Busta:</span>
+                  <span class="text-emerald-700 font-mono font-bold" id="scannedTagSize">#P-067 • Taglia M (10 Capi)</span>
+                </div>
+                
+                <input id="barcodePayloadInput" type="text" value="ORD:26022404_001|COL:V00006|SZ:M|QTY:10|SN:067" 
+                       class="w-full bg-gray-50 border border-gray-300 rounded px-2 py-1 text-xs text-gray-800 font-mono outline-none text-center focus:bg-white focus:border-blue-500">
+
+                <div class="flex justify-between items-center mt-2 text-[10px]">
+                  <div class="flex gap-1.5 text-gray-500">
+                    <span>Taglia:</span>
+                    <button onclick="setBarcodeSize('S')" class="text-blue-600 hover:underline">S</button>
+                    <button onclick="setBarcodeSize('M')" class="text-blue-600 hover:underline font-bold text-blue-900">M</button>
+                    <button onclick="setBarcodeSize('L')" class="text-blue-600 hover:underline">L</button>
+                  </div>
+                  <button onclick="prepareNextPack()" class="text-amber-700 hover:text-amber-900 flex items-center gap-1 font-semibold">
+                    <i class="fa-solid fa-rotate-right text-[10px]"></i> Prossimo Pacco
+                  </button>
+                </div>
+              </div>
+
+              <!-- STEP 2: SCALE WEIGHT SIMULATION (WHITE BACKGROUND) -->
+              <div class="md:col-span-4 bg-white p-2.5 rounded border border-gray-300 shadow-2xs flex flex-col justify-between">
+                <div class="flex justify-between items-center text-[10px] text-gray-600 mb-1">
+                  <span class="font-bold text-gray-700"><i class="fa-solid fa-weight-scale text-amber-600"></i> FASE 2: Bilancia (Target: 2.500g)</span>
+                  <span id="scaleWeightStatus" class="text-gray-500 font-bold font-mono">In attesa</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span id="scaleDigitalDisplay" class="font-mono text-xl font-black text-emerald-600 bg-gray-50 px-2 py-1 rounded border border-gray-300">
+                    2.508 kg
+                  </span>
+                  <div class="flex flex-col gap-1 flex-1">
+                    <button onclick="simulateWeight(2508)" class="text-[9px] bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 px-1.5 py-0.5 rounded text-left font-semibold">
+                      ✓ Peso Conforme (2.508 kg = 10 pz)
+                    </button>
+                    <button onclick="simulateWeight(2240)" class="text-[9px] bg-red-50 hover:bg-red-100 text-red-800 border border-red-300 px-1.5 py-0.5 rounded text-left font-semibold">
+                      ✗ Peso Errato (2.240 kg = 9 pz!)
+                    </button>
+                  </div>
+                </div>
+                <div id="scaleDetailNote" class="text-[10px] text-gray-500 mt-1.5 italic text-center">
+                  Tolleranza consentita: da 2.450g a 2.550g
+                </div>
+              </div>
+
+              <!-- STEP 3: GREEN VALIDATE BUTTON (ONLY ACTIVE IF BARCODE READ + WEIGHT CORRECT) -->
+              <div class="md:col-span-4 flex flex-col justify-center" onclick="handleValidateAreaClick()">
+                <button id="btnValidateScale" onclick="event.stopPropagation(); validateAndInsertRecord();" disabled
+                        class="w-full bg-gray-100 border border-gray-300 text-gray-400 p-2.5 rounded font-bold text-xs shadow-2xs transition flex flex-col items-center justify-center gap-0.5 cursor-not-allowed">
+                  <div class="flex items-center gap-1.5">
+                    <i id="btnValidateIcon" class="fa-solid fa-lock text-xs"></i>
+                    <span id="btnValidateLabel">VALIDA E INSERISCI</span>
+                  </div>
+                  <span id="btnValidateSubtext" class="text-[9px] font-normal opacity-90">Prima scansiona il barcode</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- THE DATA TABLE (Exact Columns from Screenshot 2) -->
+          <div class="flex-1 border border-gray-300 rounded-xs overflow-hidden flex flex-col">
+            <div class="custom-scroll overflow-y-auto max-h-[410px]">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead class="bg-[#f0f2f5] text-gray-800 sticky top-0 border-b border-gray-300 font-semibold select-none">
+                  <tr>
+                    <th class="p-2 border-r border-gray-300">Production date</th>
+                    <th class="p-2 border-r border-gray-300">Start production</th>
+                    <th class="p-2 border-r border-gray-300">End production</th>
+                    <th class="p-2 border-r border-gray-300 text-right">Quantità</th>
+                    <th class="p-2 border-r border-gray-300">COLORE</th>
+                    <th class="p-2">TAGLIE</th>
+                  </tr>
+                </thead>
+                <tbody id="tableBodyRows" class="divide-y divide-gray-200 text-xs text-gray-800 font-mono">
+                  
+                  <!-- Existing rows from the screenshot -->
+                  <tr>
+                    <td class="p-1.5 border-r border-gray-200 font-sans">01/09/2026</td>
+                    <td class="p-1.5 border-r border-gray-200">01/09/2026 8:30</td>
+                    <td class="p-1.5 border-r border-gray-200">01/09/2026 11:09</td>
+                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">69</td>
+                    <td class="p-1.5 border-r border-gray-200">V00006</td>
+                    <td class="p-1.5">XS</td>
+                  </tr>
+                  <tr class="bg-gray-50/50">
+                    <td class="p-1.5 border-r border-gray-200 font-sans">01/09/2026</td>
+                    <td class="p-1.5 border-r border-gray-200">01/09/2026 8:30</td>
+                    <td class="p-1.5 border-r border-gray-200">01/09/2026 11:31</td>
+                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">80</td>
+                    <td class="p-1.5 border-r border-gray-200">V00006</td>
+                    <td class="p-1.5">S</td>
+                  </tr>
+                  <tr>
+                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
+                    <td class="p-1.5 border-r border-gray-200">02/09/2026 8:30</td>
+                    <td class="p-1.5 border-r border-gray-200">02/09/2026 9:52</td>
+                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">41</td>
+                    <td class="p-1.5 border-r border-gray-200">V00006</td>
+                    <td class="p-1.5">L</td>
+                  </tr>
+                  <tr class="bg-gray-50/50">
+                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
+                    <td class="p-1.5 border-r border-gray-200">02/09/2026 8:30</td>
+                    <td class="p-1.5 border-r border-gray-200">02/09/2026 9:52</td>
+                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">41</td>
+                    <td class="p-1.5 border-r border-gray-200">V00006</td>
+                    <td class="p-1.5">XL</td>
+                  </tr>
+                  <tr>
+                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
+                    <td class="p-1.5 border-r border-gray-200">02/09/2026 9:52</td>
+                    <td class="p-1.5 border-r border-gray-200">02/09/2026 10:00</td>
+                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">4</td>
+                    <td class="p-1.5 border-r border-gray-200">V00006</td>
+                    <td class="p-1.5">XS</td>
+                  </tr>
+                  <tr class="bg-gray-50/50">
+                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
+                    <td class="p-1.5 border-r border-gray-200">02/09/2026 9:52</td>
+                    <td class="p-1.5 border-r border-gray-200">02/09/2026 11:12</td>
+                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">30</td>
+                    <td class="p-1.5 border-r border-gray-200">V00006</td>
+                    <td class="p-1.5">S</td>
+                  </tr>
+                  <tr>
+                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
+                    <td class="p-1.5 border-r border-gray-200">02/09/2026 10:00</td>
+                    <td class="p-1.5 border-r border-gray-200">02/09/2026 10:18</td>
+                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">9</td>
+                    <td class="p-1.5 border-r border-gray-200">V00006</td>
+                    <td class="p-1.5">M</td>
+                  </tr>
+                  <tr class="bg-gray-50/50">
+                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
+                    <td class="p-1.5 border-r border-gray-200">02/09/2026 10:18</td>
+                    <td class="p-1.5 border-r border-gray-200">02/09/2026 10:58</td>
+                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">10</td>
+                    <td class="p-1.5 border-r border-gray-200">V00006</td>
+                    <td class="p-1.5">XXL</td>
+                  </tr>
+                  <tr>
+                    <td class="p-1.5 border-r border-gray-200 font-sans">11/09/2026</td>
+                    <td class="p-1.5 border-r border-gray-200">11/09/2026 8:30</td>
+                    <td class="p-1.5 border-r border-gray-200">11/09/2026 9:06</td>
+                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">18</td>
+                    <td class="p-1.5 border-r border-gray-200">V00006</td>
+                    <td class="p-1.5">XXL</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: TOTALS & KPI (Exact layout from screenshot 2) -->
+        <div class="w-full lg:w-56 flex flex-col justify-between text-xs shrink-0 pl-1">
+          <div class="space-y-4 font-mono text-xs text-gray-800">
+            
+            <div class="space-y-1">
+              <div class="flex justify-between">
+                <span>QTY PIANIFICATA:</span>
+                <strong>2099</strong>
+              </div>
+              <div class="flex justify-between text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded">
+                <span>QTY PRODOTTA:</span>
+                <strong id="kpiQtyProdotta" class="font-extrabold text-sm">666</strong>
+              </div>
+              <div class="flex justify-between text-gray-500">
+                <span>QTY OVER:</span>
+                <strong>0</strong>
+              </div>
+              <div class="flex justify-between text-orange-700 bg-orange-50 px-1 py-0.5 rounded">
+                <span>DIFF:</span>
+                <strong id="kpiQtyDiff" class="font-bold">1433</strong>
+              </div>
+            </div>
+
+            <div class="space-y-1 text-gray-700 pt-2 border-t border-gray-200">
+              <div class="flex justify-between">
+                <span>TOTALE QTY COMMESSA:</span>
+                <strong>2099</strong>
+              </div>
+              <div class="flex justify-between">
+                <span>TOTALE QTY PIANIFICATA:</span>
+                <strong>2099</strong>
+              </div>
+              <div class="flex justify-between">
+                <span>DIFF:</span>
+                <strong>0</strong>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-gray-200 font-sans text-xs">
+              <div class="text-gray-700 font-semibold mb-1">Qty pianificata per linie:</div>
+              <div class="flex items-center gap-2">
+                <span>• 1A - <strong>2099</strong></span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Button: Chiudi commessa (Exact from screenshot 2) -->
+          <div class="pt-4 text-right">
+            <button onclick="closeProductionModal()" class="bg-[#f0a500] hover:bg-[#d99500] text-black font-bold px-4 py-2 rounded-xs shadow-2xs text-xs">
+              Chiudi commessa
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Audio Tone Synthesis for Scanner Beep & Scale Chime -->
+  <script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep(type = 'success') {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'success') {
+        osc.frequency.setValueAtTime(1760, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.12);
+      } else if (type === 'chime') {
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(1320, audioCtx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.28);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.28);
+      } else {
+        osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      }
+    }
+
+    // STATE VARIABLES
+    const TOTAL_ORDER = 2099;
+    const PACK_SIZE = 10;
+    const TARGET_WEIGHT = 2500;
+    const TOLERANCE = 50;
+
+    let currentQtyProdotta = 666;
+    let currentWeightG = 2508;
+    let selectedSize = 'M';
+    let selectedColor = 'V00006';
+    let currentSerial = 67;
+    let barcodeRead = false;
+    let scannedSerialsSet = new Set(['065', '066']); // Previously registered packets
+
+    function openProductionModal() {
+      document.getElementById('productionWindow').classList.remove('hidden');
+    }
+
+    function closeProductionModal() {
+      document.getElementById('productionWindow').classList.add('hidden');
+    }
+
+    function setBarcodeSize(sz) {
+      selectedSize = sz;
+      const snStr = String(currentSerial).padStart(3, '0');
+      document.getElementById('scannedTagSize').textContent = `#P-${snStr} • Taglia ${sz}`;
+      document.getElementById('barcodePayloadInput').value = `ORD:26022404_001|COL:${selectedColor}|SZ:${sz}|QTY:10|SN:${snStr}`;
+      document.getElementById('selectTaglie').value = sz;
+      barcodeRead = false;
+      updateValidationState();
+    }
+
+    function prepareNextPack() {
+      currentSerial++;
+      barcodeRead = false;
+      const snStr = String(currentSerial).padStart(3, '0');
+      document.getElementById('scannedTagSize').textContent = `#P-${snStr} • Taglia ${selectedSize}`;
+      document.getElementById('barcodePayloadInput').value = `ORD:26022404_001|COL:${selectedColor}|SZ:${selectedSize}|QTY:10|SN:${snStr}`;
+      
+      const btnScan = document.getElementById('btnScansiona');
+      btnScan.disabled = false;
+      btnScan.className = "w-full bg-blue-600 hover:bg-blue-500 text-white py-2 px-3 rounded font-bold text-xs transition flex items-center justify-center gap-2 shadow-md mb-2";
+      btnScan.innerHTML = `<i class="fa-solid fa-barcode text-sm"></i> <span class="tracking-wide uppercase">1. SCANSIONA BARCODE</span>`;
+
+      const status = document.getElementById('scannerStatusText');
+      status.textContent = `Pacco #P-${snStr} pronto. FASE 1: Clicca Scansiona`;
+      status.className = "text-[11px] font-mono text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded border border-amber-300";
+
+      simulateWeight(2508);
+      updateValidationState();
+    }
+
+    function simulateWeight(grams) {
+      currentWeightG = grams;
+      const kg = (grams / 1000).toFixed(3);
+      const display = document.getElementById('scaleDigitalDisplay');
+      const status = document.getElementById('scaleWeightStatus');
+
+      display.textContent = `${kg} kg`;
+
+      const isWeightOk = grams >= (TARGET_WEIGHT - TOLERANCE) && grams <= (TARGET_WEIGHT + TOLERANCE);
+      if (isWeightOk) {
+        display.className = "font-mono text-xl font-black text-emerald-600 bg-gray-50 px-2 py-1 rounded border border-gray-300";
+        status.textContent = `${grams}g (CONFORME)`;
+        status.className = "text-emerald-700 font-bold font-mono";
+      } else {
+        playBeep('error');
+        display.className = "font-mono text-xl font-black text-red-600 bg-red-50 px-2 py-1 rounded border border-red-300";
+        status.textContent = `${grams}g (ANOMALIA)`;
+        status.className = "text-red-700 font-bold font-mono";
+      }
+
+      updateValidationState();
+    }
+
+    // SCENARIO DEMO 1: BUONO (10 PEZZI CONFORMI A BARCODE E BILANCIA)
+    function runScenarioGood() {
+      if (scannedSerialsSet.has(String(currentSerial).padStart(3, '0'))) {
+        prepareNextPack();
+      }
+      simulateWeight(2508);
+      executeBarcodeScan();
+
+      const note = document.getElementById('scaleDetailNote');
+      note.innerHTML = `<strong class="text-emerald-700">✓ SCENARIO CONFORME:</strong> 10 pezzi rilevati (2.508 kg). Pulsante verde abilitato per l'inserimento.`;
+
+      const status = document.getElementById('scannerStatusText');
+      status.textContent = `✓ TEST BUONO: Barcode e Bilancia perfettamente allineati (10 pz). Clicca il pulsante verde!`;
+      status.className = "text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-300 font-bold";
+    }
+
+    // SCENARIO DEMO 2: ANOMALIA / MISMATCH (BARCODE DA 10 PZ MA BILANCIA RILEVA SOLO 9 PZ)
+    function runScenarioBad() {
+      if (scannedSerialsSet.has(String(currentSerial).padStart(3, '0'))) {
+        prepareNextPack();
+      }
+      simulateWeight(2240); // 9 capi
+      executeBarcodeScan();
+
+      const note = document.getElementById('scaleDetailNote');
+      note.innerHTML = `<strong class="text-red-700">✗ SCENARIO ANOMALIA:</strong> Il barcode richiede 10 capi (~2.500g), ma la bilancia ne rileva solo 9 (2.240 kg)!`;
+
+      const status = document.getElementById('scannerStatusText');
+      status.textContent = `✗ TEST ANOMALIA: Mismatch peso! Barcode 10pz ≠ Bilancia 9pz (2.240kg). Inserimento BLOCCATO!`;
+      status.className = "text-[11px] font-mono text-red-700 bg-red-50 px-2.5 py-0.5 rounded border border-red-300 font-bold animate-pulse";
+    }
+
+    // FASE 1: Scansione Barcode (Legge i dati dal barcode MA NON inserisce la riga nel database!)
+    function executeBarcodeScan() {
+      const snStr = String(currentSerial).padStart(3, '0');
+
+      // Controllo anti-duplicato se il barcode è già stato consumato
+      if (scannedSerialsSet.has(snStr)) {
+        playBeep('error');
+        const status = document.getElementById('scannerStatusText');
+        status.textContent = `✗ DUPLICATO BLOCCATO: Pacco #P-${snStr} già registrato!`;
+        status.className = "text-[11px] font-mono text-red-700 bg-red-50 px-2.5 py-0.5 rounded border border-red-300 animate-pulse font-bold";
+        return;
+      }
+
+      playBeep('success');
+      barcodeRead = true;
+
+      // Compila automaticamente la form a sinistra per mostrare che non serve digitare
+      document.getElementById('inputDataProduzione').value = "26/10/2026";
+      document.getElementById('selectColore').value = selectedColor;
+      document.getElementById('selectTaglie').value = selectedSize;
+      document.getElementById('inputQuantita').value = PACK_SIZE;
+
+      // Disabilita pulsante scansiona per evitare letture ripetute dello stesso collo
+      const btnScan = document.getElementById('btnScansiona');
+      btnScan.disabled = true;
+      btnScan.className = "w-full bg-gray-100 text-gray-500 py-2 px-3 rounded font-bold text-xs transition flex items-center justify-center gap-2 mb-2 cursor-not-allowed border border-gray-300";
+      btnScan.innerHTML = `<i class="fa-solid fa-check text-emerald-600"></i> <span class="tracking-wide uppercase text-emerald-700">BARCODE ACQUISITO</span>`;
+
+      const status = document.getElementById('scannerStatusText');
+      status.textContent = `✓ Barcode #P-${snStr} acquisito. FASE 2: Convalida su Bilancia`;
+      status.className = "text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-300";
+
+      updateValidationState();
+    }
+
+    // Aggiorna lo stato del pulsante di convalida bilancia (DIVENTA VERDE SOLO SE PESO OK)
+    function updateValidationState() {
+      const btn = document.getElementById('btnValidateScale');
+      const icon = document.getElementById('btnValidateIcon');
+      const label = document.getElementById('btnValidateLabel');
+      const subtext = document.getElementById('btnValidateSubtext');
+
+      const isWeightOk = currentWeightG >= (TARGET_WEIGHT - TOLERANCE) && currentWeightG <= (TARGET_WEIGHT + TOLERANCE);
+
+      if (!barcodeRead) {
+        btn.disabled = true;
+        btn.className = "w-full bg-gray-100 border border-gray-300 text-gray-400 p-2.5 rounded font-bold text-xs shadow-2xs transition flex flex-col items-center justify-center gap-0.5 cursor-not-allowed";
+        icon.className = "fa-solid fa-lock text-xs";
+        label.textContent = "VALIDA E INSERISCI";
+        subtext.textContent = "Prima scansiona il barcode (Fase 1)";
+      } else if (barcodeRead && !isWeightOk) {
+        // Peso errato: pulsante rosso/disabilitato, impossibile inserire!
+        btn.disabled = true;
+        btn.className = "w-full bg-red-50 border border-red-300 text-red-700 p-2.5 rounded font-bold text-xs shadow-2xs transition flex flex-col items-center justify-center gap-0.5 cursor-not-allowed";
+        icon.className = "fa-solid fa-triangle-exclamation text-xs text-red-600";
+        label.textContent = "PESO NON CONFORME";
+        subtext.textContent = `Atteso 2.500g (Rilevato: ${currentWeightG}g)`;
+      } else if (barcodeRead && isWeightOk) {
+        // Barcode letto E peso perfetto: PULSANTE VERDE ABILITATO!
+        btn.disabled = false;
+        btn.className = "w-full bg-emerald-600 hover:bg-emerald-700 text-white p-2.5 rounded font-extrabold text-xs shadow-md transition flex flex-col items-center justify-center gap-0.5 cursor-pointer border border-emerald-600 ring-2 ring-emerald-400/40 animate-pulse";
+        icon.className = "fa-solid fa-circle-check text-xs text-white";
+        label.textContent = "✓ CONVALIDA E INSERISCI (+10 PZ)";
+        subtext.textContent = `Peso OK (${currentWeightG}g) • Clicca per registrare`;
+      }
+    }
+
+    function handleValidateAreaClick() {
+      const btn = document.getElementById('btnValidateScale');
+      if (btn.disabled) {
+        validateAndInsertRecord();
+      }
+    }
+
+    // FASE 2: Convalida su Bilancia (L'INSERIMENTO AVVIENE SOLO QUI, UNA SOLA VOLTA!)
+    function validateAndInsertRecord() {
+      const isWeightOk = currentWeightG >= (TARGET_WEIGHT - TOLERANCE) && currentWeightG <= (TARGET_WEIGHT + TOLERANCE);
+
+      if (!barcodeRead) {
+        playBeep('error');
+        alert("Attenzione: Effettua prima la scansione del codice a barre (Fase 1).");
+        return;
+      }
+
+      if (!isWeightOk) {
+        playBeep('error');
+        alert(`BLOCCO DI SICUREZZA PRODUZIONE!\n\nIl barcode specifica una busta da 10 pezzi (~2.500g).\nIl peso rilevato dalla bilancia è di ${currentWeightG}g (mancano pezzi!).\n\nL'inserimento nella tabella di produzione è BLOCCATO finché il peso non è conforme.`);
+        return;
+      }
+
+      const snStr = String(currentSerial).padStart(3, '0');
+
+      if (scannedSerialsSet.has(snStr)) {
+        playBeep('error');
+        alert("Pacco già registrato! Impossibile duplicare l'inserimento.");
+        return;
+      }
+
+      // Convalida confermata!
+      playBeep('chime');
+      scannedSerialsSet.add(snStr);
+      currentQtyProdotta += PACK_SIZE;
+
+      // Inserisce la riga nella tabella di produzione
+      insertProductionTableRow(selectedColor, selectedSize, PACK_SIZE, currentWeightG, snStr);
+
+      // Aggiorna KPI e Gantt
+      updateTotals();
+
+      // Disabilita immediatamente per bloccare click multipli
+      barcodeRead = false;
+      const btn = document.getElementById('btnValidateScale');
+      btn.disabled = true;
+      btn.className = "w-full bg-gray-100 border border-gray-300 text-gray-500 p-2.5 rounded font-bold text-xs shadow-2xs transition flex flex-col items-center justify-center gap-0.5 cursor-not-allowed";
+      document.getElementById('btnValidateIcon').className = "fa-solid fa-check-double text-xs text-emerald-600";
+      document.getElementById('btnValidateLabel').textContent = `PACCO #P-${snStr} REGISTRATO!`;
+      document.getElementById('btnValidateSubtext').textContent = "+10 capi inseriti • Duplicati bloccati";
+
+      const status = document.getElementById('scannerStatusText');
+      status.textContent = `✓ Inserito pacco #P-${snStr} (+10pz). Preparazione prossimo pacco...`;
+      status.className = "text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-300";
+
+      // Prepara il prossimo pacco
+      setTimeout(() => {
+        prepareNextPack();
+      }, 3000);
+    }
+
+    function manualInsertOk() {
+      const q = parseInt(document.getElementById('inputQuantita').value) || 10;
+      const col = document.getElementById('selectColore').value;
+      const sz = document.getElementById('selectTaglie').value;
+      
+      currentQtyProdotta += q;
+      insertProductionTableRow(col, sz, q, null);
+      updateTotals();
+      playBeep('success');
+    }
+
+    function insertProductionTableRow(col, sz, q, weight) {
+      const tbody = document.getElementById('tableBodyRows');
+      const now = new Date();
+      const dateStr = "26/10/2026";
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const fullTime = `${dateStr} ${timeStr}`;
+
+      const tr = document.createElement('tr');
+      tr.className = "flash-new-row font-mono text-xs text-gray-800";
+      tr.innerHTML = `
+        <td class="p-1.5 border-r border-gray-200 font-sans font-bold text-emerald-800">${dateStr}</td>
+        <td class="p-1.5 border-r border-gray-200">${fullTime}</td>
+        <td class="p-1.5 border-r border-gray-200">${fullTime}</td>
+        <td class="p-1.5 border-r border-gray-200 text-right font-black text-emerald-700 bg-emerald-100/50">+${q}</td>
+        <td class="p-1.5 border-r border-gray-200">${col}</td>
+        <td class="p-1.5 font-bold">${sz} ${weight ? `<span class="text-[9px] bg-emerald-200 text-emerald-900 px-1 rounded ml-1 font-sans">AUTO (${weight}g)</span>` : ''}</td>
+      `;
+      tbody.insertBefore(tr, tbody.firstChild);
+    }
+
+    function updateTotals() {
+      const diff = TOTAL_ORDER - currentQtyProdotta;
+      document.getElementById('kpiQtyProdotta').textContent = currentQtyProdotta;
+      document.getElementById('kpiQtyDiff').textContent = diff;
+      document.getElementById('ganttQtyDisplay').textContent = currentQtyProdotta;
+    }
+
+    function recalculateGantt() {
+      playBeep('success');
+      alert(`Ricalcolo completato con successo!\nCommessa 26022404_001 su LINEA 1A aggiornata con ${currentQtyProdotta} capi prodotti convalidati.`);
+    }
+
+    // Open the modal by default so the client sees the exact production window right away
+    window.addEventListener('DOMContentLoaded', () => {
+      openProductionModal();
+    });
+  </script>
+</body>
+</html>
