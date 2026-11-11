@@ -2,7 +2,7 @@
 <html lang="it" class="light">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
   <title>ONLY YOU — Sinottico Produzione Europa</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -26,12 +26,12 @@
     * {
       box-sizing: border-box;
       user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      overflow: hidden;
-      height: 100vh;
       margin: 0;
+      overflow-x: hidden;
     }
 
     /* Custom Scrollbars */
@@ -58,7 +58,7 @@
       z-index: 10;
     }
     .machine-card:active {
-      transform: translateY(0px) scale(0.99);
+      transform: translateY(0px) scale(0.98);
     }
 
     /* Status themes for machine cards (Light & Dark aware) */
@@ -154,34 +154,36 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col h-screen transition-colors duration-200">
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col min-h-dvh lg:h-screen lg:overflow-hidden transition-colors duration-200">
 
   <!-- ===================================================================== -->
-  <!-- TOP APPLICATION HEADER                                                -->
+  <!-- TOP APPLICATION HEADER (iPhone 15 & Desktop Responsive)               -->
   <!-- ===================================================================== -->
-  <header class="h-11 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 flex items-center justify-between shrink-0 shadow-2xs z-30">
+  <header class="sticky top-0 h-11 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-2.5 sm:px-4 flex items-center justify-between shrink-0 shadow-2xs z-30">
     <!-- Left: Back button & Breadcrumb -->
-    <div class="flex items-center gap-3">
-      <button onclick="showToast('Ritorno al menu principale...')" class="flex items-center gap-2 px-2.5 py-1 rounded-md text-xs font-bold tracking-wide text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition">
+    <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+      <button onclick="showToast('Ritorno al menu principale...')" class="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-bold tracking-wide text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition shrink-0">
         <i class="fa-solid fa-arrow-left text-[11px] text-slate-500"></i>
         <span>BACK</span>
       </button>
-      <div class="h-4 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
-      <div class="flex items-center gap-2 text-xs">
-        <span class="px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200/60 dark:border-indigo-800/60">MES 4.0</span>
-        <span class="text-slate-400">/</span>
-        <span class="font-semibold text-slate-700 dark:text-slate-200">Sinottico Produzione — Stabilimento Europa</span>
+      <div class="h-4 w-[1px] bg-slate-200 dark:bg-slate-700 shrink-0"></div>
+      <div class="flex items-center gap-1.5 text-xs truncate">
+        <span class="px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200/60 dark:border-indigo-800/60 text-[10px] sm:text-xs shrink-0">MES 4.0</span>
+        <span class="text-slate-400 hidden sm:inline">/</span>
+        <span class="font-semibold text-slate-700 dark:text-slate-200 truncate hidden sm:inline">Sinottico Produzione — Stabilimento Europa</span>
+        <span class="font-bold text-slate-700 dark:text-slate-200 text-[11px] sm:hidden truncate">Sinottico</span>
       </div>
     </div>
 
     <!-- Right: Company, Live Sim, Theme Toggle, ONLY YOU Logo -->
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
       <!-- Live Simulation Toggle -->
-      <button id="liveSimBtn" onclick="toggleLiveSimulation()" class="no-print flex items-center gap-2 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70 hover:bg-emerald-100 transition cursor-pointer" title="Simula aggiornamenti telemetrici in tempo reale">
+      <button id="liveSimBtn" onclick="toggleLiveSimulation()" class="no-print flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70 hover:bg-emerald-100 transition cursor-pointer" title="Simula aggiornamenti telemetrici in tempo reale">
         <span class="relative flex h-2 w-2">
           <span id="livePulse" class="pulse-ring relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
         </span>
-        <span id="liveSimText">LIVE TELEMETRY</span>
+        <span id="liveSimText" class="hidden sm:inline">LIVE TELEMETRY</span>
+        <span class="sm:hidden font-bold">LIVE</span>
       </button>
 
       <!-- Dark / Light Mode Toggle -->
@@ -189,20 +191,20 @@
         <i id="themeIcon" class="fa-solid fa-moon text-xs"></i>
       </button>
 
-      <div class="h-4 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
+      <div class="h-4 w-[1px] bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
 
       <!-- Company Europa + ONLY YOU Brand -->
-      <div class="flex items-center gap-3">
-        <span class="text-[11px] font-bold tracking-wider uppercase text-slate-600 dark:text-slate-300">COMPANY EUROPA</span>
-        <div class="flex items-center gap-1.5 pl-1">
-          <div class="w-6 h-6 rounded-full p-[2px] bg-gradient-to-tr from-amber-400 via-rose-500 to-cyan-400 flex items-center justify-center shadow-xs">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <span class="text-[11px] font-bold tracking-wider uppercase text-slate-600 dark:text-slate-300 hidden md:inline">COMPANY EUROPA</span>
+        <div class="flex items-center gap-1.5">
+          <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full p-[2px] bg-gradient-to-tr from-amber-400 via-rose-500 to-cyan-400 flex items-center justify-center shadow-xs">
             <div class="w-full h-full bg-white dark:bg-slate-900 rounded-full flex items-center justify-center">
               <div class="w-1.5 h-1.5 rounded-full bg-gradient-to-tr from-rose-500 to-cyan-500"></div>
             </div>
           </div>
           <div class="leading-none tracking-tight">
-            <span class="font-extrabold text-sm text-slate-900 dark:text-white">ONLY</span>
-            <span class="font-normal text-[11px] text-slate-400 dark:text-slate-400 ml-0.5">YOU</span>
+            <span class="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-white">ONLY</span>
+            <span class="font-normal text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-400 ml-0.5">YOU</span>
           </div>
         </div>
       </div>
@@ -210,12 +212,12 @@
   </header>
 
   <!-- ===================================================================== -->
-  <!-- BODY LAYOUT: LEFT MODULE RAIL + MAIN WORKSPACE                        -->
+  <!-- BODY LAYOUT: LEFT MODULE RAIL (Desktop) + MAIN WORKSPACE              -->
   <!-- ===================================================================== -->
-  <div class="flex-1 flex overflow-hidden">
+  <div class="flex-1 flex flex-col md:flex-row lg:overflow-hidden">
 
-    <!-- LEFT NAVIGATION RAIL (Matching the 10 module icons in screenshot) -->
-    <aside class="no-print w-12 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col items-center py-2.5 gap-1.5 shrink-0 z-20">
+    <!-- LEFT NAVIGATION RAIL (Hidden on iPhone 15 for full-bleed mobile layout, visible on md+) -->
+    <aside class="no-print hidden md:flex w-12 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-col items-center py-2.5 gap-1.5 shrink-0 z-20">
       <button onclick="showToast('Modulo: Anagrafica Macchine')" class="w-8 h-8 rounded-lg flex items-center justify-center text-amber-800/70 dark:text-amber-400/70 hover:bg-amber-50 dark:hover:bg-slate-800 transition" title="Anagrafica Macchine">
         <i class="fa-solid fa-industry text-sm"></i>
       </button>
@@ -258,40 +260,47 @@
     <!-- ===================================================================== -->
     <!-- MAIN WORKSPACE CONTAINER                                              -->
     <!-- ===================================================================== -->
-    <main class="flex-1 flex flex-col overflow-hidden bg-slate-100/70 dark:bg-slate-950 p-2 gap-2">
+    <main class="flex-1 flex flex-col lg:overflow-hidden bg-slate-100/70 dark:bg-slate-950 p-2 gap-2 pb-6 lg:pb-2">
 
       <!-- TOP TAB STRIP & TOOLBAR CARD -->
       <section class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-lg shadow-2xs shrink-0 overflow-hidden">
         
         <!-- Tab Bar -->
-        <div class="bg-slate-100/90 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-800 px-3 pt-1.5 flex items-center justify-between">
-          <div class="flex items-center gap-1">
+        <div class="bg-slate-100/90 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-800 px-2.5 sm:px-3 pt-1.5 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center justify-between w-full sm:w-auto gap-1">
             <!-- Active Tab -->
-            <div class="bg-white dark:bg-slate-900 border-t border-l border-r border-slate-200 dark:border-slate-700 px-3.5 py-1.5 rounded-t-md flex items-center gap-2.5 text-xs font-bold text-slate-800 dark:text-slate-100 shadow-2xs relative -mb-[1px]">
+            <div class="bg-white dark:bg-slate-900 border-t border-l border-r border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-t-md flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-100 shadow-2xs relative -mb-[1px]">
               <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
               <span>Sinottico - Europa</span>
               <button onclick="showToast('Scheda principale attiva')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-1">
                 <i class="fa-solid fa-xmark text-[11px]"></i>
               </button>
             </div>
+
+            <!-- Mobile Filter Accordion Button (iPhone 15 convenience) -->
+            <button onclick="toggleMobileFilters()" class="sm:hidden flex items-center gap-1.5 px-2.5 py-1 mb-1 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-700 dark:text-slate-200 shadow-2xs">
+              <i class="fa-solid fa-sliders text-indigo-500 text-[10px]"></i>
+              <span>Date & Turni</span>
+              <i id="mobileFilterChevron" class="fa-solid fa-chevron-down text-[9px] text-slate-400 transition-transform"></i>
+            </button>
           </div>
 
           <!-- Right Quick Search & Timestamp -->
-          <div class="flex items-center gap-3 pb-1">
-            <div class="relative">
+          <div class="flex items-center justify-between w-full sm:w-auto gap-2 pb-1.5 sm:pb-1">
+            <div class="relative flex-1 sm:flex-initial">
               <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400"></i>
               <input
                 id="searchInput"
                 type="text"
                 oninput="applyFilters()"
-                placeholder="Cerca macchina (es. 0028, F15)..."
-                class="pl-7 pr-6 py-0.5 text-[11px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-indigo-500 w-48 transition"
+                placeholder="Cerca macchina, famiglia, operatore..."
+                class="pl-7 pr-6 py-1 sm:py-0.5 text-xs sm:text-[11px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-indigo-500 w-full sm:w-52 transition"
               />
               <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 hover:text-slate-600">
                 <i class="fa-solid fa-circle-xmark"></i>
               </button>
             </div>
-            <div class="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+            <div class="hidden md:flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 font-medium shrink-0">
               <i class="fa-regular fa-clock text-[10px] text-indigo-500"></i>
               <span>Last update:</span>
               <span id="lastUpdateTop" class="font-mono font-semibold text-slate-700 dark:text-slate-200">11-11-2026 10:30:53</span>
@@ -299,170 +308,176 @@
           </div>
         </div>
 
-        <!-- Filter & Action Bar (1:1 structure with Screenshot, modernized) -->
-        <div class="px-3.5 py-2 flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900">
+        <!-- Filter & Action Bar (Responsive for iPhone 15 & Desktop) -->
+        <div class="px-2.5 sm:px-3.5 py-2 flex flex-col lg:flex-row lg:flex-wrap lg:items-center justify-between gap-2.5 bg-white dark:bg-slate-900">
           
-          <!-- Left: Start & End Date Pickers -->
-          <div class="flex items-center gap-2.5">
-            <div class="flex flex-col">
-              <label class="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-0.5">Start</label>
-              <div class="relative flex items-center">
-                <input
-                  type="text"
-                  id="startDateInput"
-                  value="14/09/2026"
-                  class="w-28 px-2.5 py-1 text-xs font-mono font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-500"
-                />
-                <i class="fa-regular fa-calendar text-[10px] text-slate-400 absolute right-2 pointer-events-none"></i>
+          <!-- Collapsible Date & Turni Section on Mobile (Always visible on sm+) -->
+          <div id="mobileCollapsibleFilters" class="hidden sm:flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2.5 w-full lg:w-auto pb-2 sm:pb-0 border-b sm:border-b-0 border-slate-100 dark:border-slate-800">
+            <!-- Left: Start & End Date Pickers -->
+            <div class="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
+              <div class="flex flex-col">
+                <label class="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-0.5">Start</label>
+                <div class="relative flex items-center">
+                  <input
+                    type="text"
+                    id="startDateInput"
+                    value="14/09/2026"
+                    class="w-full sm:w-28 px-2.5 py-1 text-xs font-mono font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-500"
+                  />
+                  <i class="fa-regular fa-calendar text-[10px] text-slate-400 absolute right-2 pointer-events-none"></i>
+                </div>
+              </div>
+              <div class="flex flex-col">
+                <label class="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-0.5">End</label>
+                <div class="relative flex items-center">
+                  <input
+                    type="text"
+                    id="endDateInput"
+                    value="14/09/2026"
+                    class="w-full sm:w-28 px-2.5 py-1 text-xs font-mono font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-500"
+                  />
+                  <i class="fa-regular fa-calendar text-[10px] text-slate-400 absolute right-2 pointer-events-none"></i>
+                </div>
               </div>
             </div>
-            <div class="flex flex-col">
-              <label class="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-0.5">End</label>
-              <div class="relative flex items-center">
-                <input
-                  type="text"
-                  id="endDateInput"
-                  value="14/09/2026"
-                  class="w-28 px-2.5 py-1 text-xs font-mono font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-500"
-                />
-                <i class="fa-regular fa-calendar text-[10px] text-slate-400 absolute right-2 pointer-events-none"></i>
+
+            <!-- Center: Shifts (Turni) + Squadre Checkboxes -->
+            <div class="flex flex-col gap-1.5 bg-slate-50/80 dark:bg-slate-800/50 px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-200/70 dark:border-slate-800 w-full sm:w-auto">
+              <!-- Row 1: Shifts -->
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium text-slate-700 dark:text-slate-300">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 w-12">Turni:</span>
+                <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
+                  <input type="checkbox" checked onchange="onShiftChange()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
+                  <span class="font-mono text-[11px]">05:00 - 13:30</span>
+                </label>
+                <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
+                  <input type="checkbox" onchange="onShiftChange()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
+                  <span class="font-mono text-[11px]">13:30 - 22:00</span>
+                </label>
+                <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
+                  <input type="checkbox" onchange="onShiftChange()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
+                  <span class="font-mono text-[11px]">22:00 - 05:00</span>
+                </label>
+              </div>
+              <!-- Row 2: Squadre -->
+              <div class="flex flex-wrap items-center gap-x-3.5 gap-y-1 text-[11px] font-medium text-slate-700 dark:text-slate-300">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 w-12">Squadre:</span>
+                <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
+                  <input type="checkbox" id="chkSq1" checked onchange="applyFilters()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
+                  <span>Sq 1</span>
+                </label>
+                <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
+                  <input type="checkbox" id="chkSq2" checked onchange="applyFilters()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
+                  <span>Sq 2</span>
+                </label>
+                <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
+                  <input type="checkbox" id="chkSq3" checked onchange="applyFilters()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
+                  <span>Sq 3</span>
+                </label>
+                <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
+                  <input type="checkbox" id="chkSq4" checked onchange="applyFilters()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
+                  <span>Sq 4</span>
+                </label>
               </div>
             </div>
           </div>
 
-          <!-- Center: Shifts (Turni) + Squadre Checkboxes -->
-          <div class="flex flex-col gap-1.5 bg-slate-50/80 dark:bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-200/70 dark:border-slate-800">
-            <!-- Row 1: Shifts -->
-            <div class="flex items-center gap-3 text-[11px] font-medium text-slate-700 dark:text-slate-300">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 w-12">Turni:</span>
-              <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
-                <input type="checkbox" checked onchange="onShiftChange()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
-                <span class="font-mono text-[11px]">05:00 - 13:30</span>
-              </label>
-              <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
-                <input type="checkbox" onchange="onShiftChange()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
-                <span class="font-mono text-[11px]">13:30 - 22:00</span>
-              </label>
-              <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
-                <input type="checkbox" onchange="onShiftChange()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
-                <span class="font-mono text-[11px]">22:00 - 05:00</span>
-              </label>
+          <!-- Always-Visible Mobile/Desktop Row: "Mostra" Status Pills + Action Buttons -->
+          <div class="flex flex-wrap items-center justify-between gap-2 w-full lg:w-auto">
+            <!-- "Mostra" Status Filter Pills -->
+            <div class="flex items-center gap-1.5 sm:gap-2 bg-slate-50/80 dark:bg-slate-800/50 px-2.5 py-1.5 rounded-lg border border-slate-200/70 dark:border-slate-800">
+              <span class="text-[11px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 mr-0.5">Mostra</span>
+              
+              <!-- Green Filter -->
+              <button id="filterBtn-green" onclick="toggleStatusFilter('green')" class="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 text-[11px] font-bold hover:scale-105 transition cursor-pointer shadow-2xs" title="Ottimale (>= 91%)">
+                <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+                <span id="count-green" class="font-mono">4</span>
+              </button>
+
+              <!-- Yellow Filter -->
+              <button id="filterBtn-yellow" onclick="toggleStatusFilter('yellow')" class="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-full bg-amber-50 dark:bg-amber-950/70 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200 text-[11px] font-bold hover:scale-105 transition cursor-pointer shadow-2xs" title="In Soglia (80% - 90%)">
+                <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-amber-400 inline-block"></span>
+                <span id="count-yellow" class="font-mono">5</span>
+              </button>
+
+              <!-- Red Filter -->
+              <button id="filterBtn-red" onclick="toggleStatusFilter('red')" class="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-full bg-rose-50 dark:bg-rose-950/70 border border-rose-300 dark:border-rose-700 text-rose-800 dark:text-rose-200 text-[11px] font-bold hover:scale-105 transition cursor-pointer shadow-2xs" title="Critico (1% - 79%)">
+                <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-rose-500 inline-block"></span>
+                <span id="count-red" class="font-mono">11</span>
+              </button>
+
+              <!-- Grey Filter -->
+              <button id="filterBtn-grey" onclick="toggleStatusFilter('grey')" class="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-[11px] font-bold hover:scale-105 transition cursor-pointer shadow-2xs" title="Inattive / 0% / Standby">
+                <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-slate-400 inline-block"></span>
+                <span id="count-grey" class="font-mono">49</span>
+              </button>
             </div>
-            <!-- Row 2: Squadre -->
-            <div class="flex items-center gap-4 text-[11px] font-medium text-slate-700 dark:text-slate-300">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 w-12">Squadre:</span>
-              <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
-                <input type="checkbox" id="chkSq1" checked onchange="applyFilters()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
-                <span>Sq 1</span>
-              </label>
-              <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
-                <input type="checkbox" id="chkSq2" checked onchange="applyFilters()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
-                <span>Sq 2</span>
-              </label>
-              <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
-                <input type="checkbox" id="chkSq3" checked onchange="applyFilters()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
-                <span>Sq 3</span>
-              </label>
-              <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
-                <input type="checkbox" id="chkSq4" checked onchange="applyFilters()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
-                <span>Sq 4</span>
-              </label>
+
+            <!-- Right: Settings, Eff, Print Buttons -->
+            <div class="flex items-center gap-1.5 sm:gap-2">
+              <button onclick="openSettingsModal()" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition shadow-2xs cursor-pointer" title="Impostazioni">
+                <i class="fa-solid fa-gear text-slate-500 dark:text-slate-400"></i>
+                <span class="hidden sm:inline">Settings</span>
+              </button>
+              <button onclick="openEffModal()" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/70 dark:hover:bg-indigo-900/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-semibold transition shadow-2xs cursor-pointer" title="Analisi Efficienza">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Eff</span>
+              </button>
+              <button onclick="window.print()" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition shadow-2xs cursor-pointer">
+                <i class="fa-solid fa-print text-slate-500 dark:text-slate-400"></i>
+                <span>Print</span>
+              </button>
             </div>
-          </div>
-
-          <!-- Center-Right: "Mostra" Status Filter Pills -->
-          <div class="flex items-center gap-2 bg-slate-50/80 dark:bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-200/70 dark:border-slate-800">
-            <span class="text-xs font-bold text-slate-600 dark:text-slate-300 mr-1">Mostra</span>
-            
-            <!-- Green Filter -->
-            <button id="filterBtn-green" onclick="toggleStatusFilter('green')" class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 text-[11px] font-bold hover:scale-105 transition cursor-pointer shadow-2xs" title="Ottimale (>= 91%)">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
-              <span id="count-green" class="font-mono">4</span>
-            </button>
-
-            <!-- Yellow Filter -->
-            <button id="filterBtn-yellow" onclick="toggleStatusFilter('yellow')" class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-amber-50 dark:bg-amber-950/70 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200 text-[11px] font-bold hover:scale-105 transition cursor-pointer shadow-2xs" title="In Soglia (80% - 90%)">
-              <span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>
-              <span id="count-yellow" class="font-mono">5</span>
-            </button>
-
-            <!-- Red Filter -->
-            <button id="filterBtn-red" onclick="toggleStatusFilter('red')" class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-rose-50 dark:bg-rose-950/70 border border-rose-300 dark:border-rose-700 text-rose-800 dark:text-rose-200 text-[11px] font-bold hover:scale-105 transition cursor-pointer shadow-2xs" title="Critico (1% - 79%)">
-              <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>
-              <span id="count-red" class="font-mono">11</span>
-            </button>
-
-            <!-- Grey Filter -->
-            <button id="filterBtn-grey" onclick="toggleStatusFilter('grey')" class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-[11px] font-bold hover:scale-105 transition cursor-pointer shadow-2xs" title="Inattive / 0% / Standby">
-              <span class="w-2.5 h-2.5 rounded-full bg-slate-400 inline-block"></span>
-              <span id="count-grey" class="font-mono">49</span>
-            </button>
-          </div>
-
-          <!-- Right: Settings, Eff, Print Buttons -->
-          <div class="flex items-center gap-2">
-            <button onclick="openSettingsModal()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition shadow-2xs cursor-pointer">
-              <i class="fa-solid fa-gear text-slate-500 dark:text-slate-400"></i>
-              <span>Settings</span>
-            </button>
-            <button onclick="openEffModal()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/70 dark:hover:bg-indigo-900/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-semibold transition shadow-2xs cursor-pointer">
-              <i class="fa-solid fa-chart-line"></i>
-              <span>Eff</span>
-            </button>
-            <button onclick="window.print()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition shadow-2xs cursor-pointer">
-              <i class="fa-solid fa-print text-slate-500 dark:text-slate-400"></i>
-              <span>Print</span>
-            </button>
           </div>
 
         </div>
       </section>
 
       <!-- ===================================================================== -->
-      <!-- GLOBAL EFFICIENCY KPI BAR                                             -->
+      <!-- GLOBAL EFFICIENCY KPI BAR (iPhone 15 & Desktop Responsive)            -->
       <!-- ===================================================================== -->
-      <section class="grid grid-cols-1 md:grid-cols-2 gap-2.5 shrink-0">
+      <section class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 shrink-0">
         <!-- Total Efficiency (All) -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-lg px-4 py-2 flex items-center justify-between shadow-2xs">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-lg bg-rose-100 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800 flex items-center justify-center text-rose-600 dark:text-rose-400">
-              <i class="fa-solid fa-gauge-simple-high text-base"></i>
+        <div class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-lg px-3 sm:px-4 py-2 flex items-center justify-between gap-2 shadow-2xs">
+          <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-rose-100 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
+              <i class="fa-solid fa-gauge-simple-high text-sm sm:text-base"></i>
             </div>
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Efficiency (All)</span>
-                <span class="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 font-mono">69 slots</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate">Total Efficiency (All)</span>
+                <span class="text-[9px] sm:text-[10px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 font-mono shrink-0">69 slots</span>
               </div>
-              <div class="w-48 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-1.5">
+              <div class="w-full max-w-[180px] sm:max-w-[200px] h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-1.5">
                 <div id="barEffAll" class="h-full bg-rose-500 rounded-full transition-all duration-500" style="width: 25.5%"></div>
               </div>
             </div>
           </div>
-          <div class="flex items-center gap-2">
-            <div id="badgeEffAll" class="px-3.5 py-1 rounded-md bg-rose-500/15 dark:bg-rose-500/20 border border-rose-400/50 text-rose-700 dark:text-rose-300 font-mono text-lg font-extrabold tracking-tight">
+          <div class="flex items-center shrink-0">
+            <div id="badgeEffAll" class="px-2.5 sm:px-3.5 py-1 rounded-md bg-rose-500/15 dark:bg-rose-500/20 border border-rose-400/50 text-rose-700 dark:text-rose-300 font-mono text-base sm:text-lg font-extrabold tracking-tight">
               25.5%
             </div>
           </div>
         </div>
 
         <!-- Total Efficiency (Working) -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-lg px-4 py-2 flex items-center justify-between shadow-2xs">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-lg bg-rose-100 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800 flex items-center justify-center text-rose-600 dark:text-rose-400">
-              <i class="fa-solid fa-bolt text-base"></i>
+        <div class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-lg px-3 sm:px-4 py-2 flex items-center justify-between gap-2 shadow-2xs">
+          <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-rose-100 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
+              <i class="fa-solid fa-bolt text-sm sm:text-base"></i>
             </div>
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Efficiency (Working)</span>
-                <span id="workingCountBadge" class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 font-mono font-semibold">20 active</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate">Total Efficiency (Working)</span>
+                <span id="workingCountBadge" class="text-[9px] sm:text-[10px] px-1.5 py-0.2 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 font-mono font-semibold shrink-0">19 active</span>
               </div>
-              <div class="w-48 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-1.5">
+              <div class="w-full max-w-[180px] sm:max-w-[200px] h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-1.5">
                 <div id="barEffWorking" class="h-full bg-rose-500 rounded-full transition-all duration-500" style="width: 59.6%"></div>
               </div>
             </div>
           </div>
-          <div class="flex items-center gap-2">
-            <div id="badgeEffWorking" class="px-3.5 py-1 rounded-md bg-rose-500/15 dark:bg-rose-500/20 border border-rose-400/50 text-rose-700 dark:text-rose-300 font-mono text-lg font-extrabold tracking-tight">
+          <div class="flex items-center shrink-0">
+            <div id="badgeEffWorking" class="px-2.5 sm:px-3.5 py-1 rounded-md bg-rose-500/15 dark:bg-rose-500/20 border border-rose-400/50 text-rose-700 dark:text-rose-300 font-mono text-base sm:text-lg font-extrabold tracking-tight">
               59.6%
             </div>
           </div>
@@ -472,7 +487,7 @@
       <!-- ===================================================================== -->
       <!-- MAIN 2x2 SYNOPTIC QUADRANT GRID (SQUADRA 3, 2, 4, 1)                  -->
       <!-- ===================================================================== -->
-      <section class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-3 min-h-0 overflow-y-auto custom-scroll pr-0.5">
+      <section class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-3 min-h-0 lg:overflow-y-auto custom-scroll pr-0.5">
 
         <!-- ================================================================= -->
         <!-- TOP-LEFT QUADRANT: SQUADRA 3 (LINEA 5)                            -->
@@ -596,14 +611,14 @@
       </section>
 
       <!-- BOTTOM STATUS BAR (Matching "Assign User Roles" footer from screenshot) -->
-      <footer class="no-print h-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-md px-3 flex items-center justify-between text-[10px] text-slate-400 shrink-0">
-        <div class="flex items-center gap-4">
+      <footer class="no-print min-h-[24px] py-1 sm:py-0 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-md px-3 flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-400 shrink-0">
+        <div class="flex items-center gap-3">
           <span class="flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
             Server PLC: <strong class="text-slate-600 dark:text-slate-300">ONLINE (192.168.10.45)</strong>
           </span>
-          <span>•</span>
-          <span>Fai clic su qualsiasi macchina per ispezionare OEE, commessa, tempi ciclo e simulare variazioni.</span>
+          <span class="hidden md:inline">•</span>
+          <span class="hidden md:inline">Fai clic su qualsiasi macchina per ispezionare OEE, commessa, tempi ciclo e simulare variazioni.</span>
         </div>
         <div class="flex items-center gap-3">
           <button onclick="showToast('Gestione permessi e ruoli operatore')" class="hover:text-slate-700 dark:hover:text-slate-200 underline decoration-dotted cursor-pointer">
@@ -1048,15 +1063,15 @@
           cellsHtml += `
             <div
               onclick="openMachineModal('${lineKey}', '${m.id}')"
-              class="machine-card status-${status} ${dimmedClass} rounded-lg px-2.5 py-1.5 min-h-[52px] flex flex-col justify-between cursor-pointer select-none"
+              class="machine-card status-${status} ${dimmedClass} rounded-lg px-1.5 sm:px-2.5 py-1.5 min-h-[54px] sm:min-h-[52px] flex flex-col justify-between cursor-pointer select-none"
             >
-              <div class="flex items-start justify-between gap-1">
-                <div class="flex flex-col leading-tight">
-                  <span class="font-mono text-[11px] font-bold tracking-tight opacity-90">${m.id}</span>
-                  <span class="font-mono text-[10px] font-semibold opacity-70 mt-0.5">${m.family || ''}</span>
+              <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-0.5 sm:gap-1">
+                <div class="flex items-center justify-between sm:flex-col sm:items-start leading-tight">
+                  <span class="font-mono text-[10px] sm:text-[11px] font-bold tracking-tight opacity-90">${m.id}</span>
+                  <span class="font-mono text-[9px] sm:text-[10px] font-semibold opacity-70 sm:mt-0.5">${m.family || ''}</span>
                 </div>
-                <div class="font-mono text-sm font-extrabold tracking-tight self-center">
-                  ${effDisplay}
+                <div class="font-mono text-xs sm:text-sm font-extrabold tracking-tight self-end sm:self-center leading-none mt-0.5 sm:mt-0">
+                  ${effDisplay || '&nbsp;'}
                 </div>
               </div>
               ${showBars ? `
@@ -1068,21 +1083,21 @@
           `;
         });
 
-        rowsHtml += `<div class="grid grid-cols-5 gap-1.5">${cellsHtml}</div>`;
+        rowsHtml += `<div class="grid grid-cols-5 gap-1 sm:gap-1.5">${cellsHtml}</div>`;
       });
 
       container.innerHTML = `
-        <div class="flex items-stretch gap-3">
+        <div class="flex flex-col sm:flex-row items-stretch gap-2 sm:gap-3">
           <!-- Enlarged Line Window Card: 1) Line Name, 2) Efficiency %, 3) Operator Surname & Name Field -->
           <div
             onclick="editLineOperator('${lineKey}')"
             title="Clicca per modificare l'operatore assegnato alla ${line.name}"
-            class="w-44 sm:w-52 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-800/95 border-2 border-slate-300/90 dark:border-slate-700 flex flex-col items-center justify-between p-2.5 text-center shadow-sm hover:border-indigo-500 dark:hover:border-indigo-400 hover:shadow-md transition cursor-pointer group"
+            class="w-full sm:w-48 xl:w-52 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-800/95 border-2 border-slate-300/90 dark:border-slate-700 flex flex-col items-center justify-between p-2.5 text-center shadow-sm hover:border-indigo-500 dark:hover:border-indigo-400 hover:shadow-md transition cursor-pointer group"
           >
             <!-- 1. Top: Line Name -->
             <div class="w-full flex items-center justify-center gap-1.5">
               <span class="text-sm font-extrabold tracking-wider text-slate-800 dark:text-slate-100 uppercase leading-none">${line.name}</span>
-              <i class="fa-solid fa-pen text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition"></i>
+              <i class="fa-solid fa-pen text-[10px] text-slate-400 opacity-70 sm:opacity-0 group-hover:opacity-100 transition"></i>
             </div>
 
             <!-- 2. Middle: Line Efficiency Percentage underneath Line Name -->
@@ -1093,7 +1108,7 @@
             </div>
 
             <!-- 3. Bottom: Operator Name Field (Surname & Name) underneath Efficiency % -->
-            <div class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 flex items-center justify-center gap-1.5 shadow-2xs">
+            <div class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 flex items-center justify-center gap-1.5 shadow-2xs">
               <i class="fa-solid fa-id-badge text-[10px] text-indigo-500 dark:text-indigo-400 shrink-0"></i>
               <span class="text-[11px] font-bold text-slate-800 dark:text-slate-100 uppercase tracking-tight leading-tight truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
                 ${line.operator || 'NON ASSEGNATO'}
@@ -1102,11 +1117,26 @@
           </div>
 
           <!-- 2x5 Machine Grid -->
-          <div class="flex-1 flex flex-col justify-between gap-1.5">
+          <div class="flex-1 flex flex-col justify-between gap-1 sm:gap-1.5">
             ${rowsHtml}
           </div>
         </div>
       `;
+    }
+
+    function toggleMobileFilters() {
+      const el = document.getElementById('mobileCollapsibleFilters');
+      const chev = document.getElementById('mobileFilterChevron');
+      if (!el) return;
+      if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+        if (chev) chev.classList.add('rotate-180');
+      } else {
+        el.classList.add('hidden');
+        el.classList.remove('flex');
+        if (chev) chev.classList.remove('rotate-180');
+      }
     }
 
     let editingLineKey = null;
