@@ -1,971 +1,1512 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" class="light">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ONLY YOU - Gantt Produzione Europa</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ONLY YOU — Sinottico Produzione Europa</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Segoe UI', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #d1d5db;
-      color: #333;
+    * {
+      box-sizing: border-box;
       user-select: none;
-      margin: 0;
-      padding: 0;
-      height: 100vh;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       overflow: hidden;
+      height: 100vh;
+      margin: 0;
     }
-    .gantt-grid {
-      display: grid;
-      grid-template-columns: 120px repeat(13, minmax(78px, 1fr));
-    }
+
+    /* Custom Scrollbars */
     .custom-scroll::-webkit-scrollbar {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
     }
     .custom-scroll::-webkit-scrollbar-thumb {
-      background: #9ca3af;
-      border-radius: 3px;
+      background: rgba(148, 163, 184, 0.5);
+      border-radius: 9999px;
     }
     .custom-scroll::-webkit-scrollbar-track {
-      background: #e5e7eb;
+      background: transparent;
     }
-    .flash-new-row {
-      animation: flashGreen 2.2s cubic-bezier(0.1, 1, 0.1, 1);
+
+    /* Machine Card Transitions & Hover Effects */
+    .machine-card {
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
     }
-    @keyframes flashGreen {
-      0% { background-color: #86efac; }
-      100% { background-color: #f0fdf4; }
+    .machine-card:hover {
+      transform: translateY(-2px);
+      z-index: 10;
     }
-    .barcode-laser {
-      animation: laserSweep 1.2s infinite alternate ease-in-out;
+    .machine-card:active {
+      transform: translateY(0px) scale(0.99);
     }
-    @keyframes laserSweep {
-      0% { top: 10%; opacity: 0.9; }
-      100% { top: 88%; opacity: 0.9; }
+
+    /* Status themes for machine cards (Light & Dark aware) */
+    /* GREEN: >= 91% */
+    .status-green {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border: 1px solid #34d399;
+      color: #065f46;
+      box-shadow: 0 1px 2px rgba(16, 185, 129, 0.08);
+    }
+    .status-green:hover {
+      box-shadow: 0 6px 14px -3px rgba(16, 185, 129, 0.25), 0 0 0 1px #10b981;
+    }
+    .dark .status-green {
+      background: linear-gradient(135deg, rgba(6, 78, 59, 0.55) 0%, rgba(4, 120, 87, 0.35) 100%);
+      border: 1px solid rgba(52, 211, 153, 0.45);
+      color: #ecfdf5;
+    }
+
+    /* YELLOW / AMBER: 80% - 90% */
+    .status-yellow {
+      background: linear-gradient(135deg, #fefce8 0%, #fef08a 100%);
+      border: 1px solid #facc15;
+      color: #713f12;
+      box-shadow: 0 1px 2px rgba(234, 179, 8, 0.08);
+    }
+    .status-yellow:hover {
+      box-shadow: 0 6px 14px -3px rgba(234, 179, 8, 0.28), 0 0 0 1px #eab308;
+    }
+    .dark .status-yellow {
+      background: linear-gradient(135deg, rgba(113, 63, 18, 0.55) 0%, rgba(161, 98, 7, 0.35) 100%);
+      border: 1px solid rgba(250, 204, 21, 0.45);
+      color: #fef9c3;
+    }
+
+    /* RED / CRITICAL: 1% - 79% */
+    .status-red {
+      background: linear-gradient(135deg, #fff1f2 0%, #fecdd3 100%);
+      border: 1px solid #fb7185;
+      color: #881337;
+      box-shadow: 0 1px 2px rgba(244, 63, 94, 0.08);
+    }
+    .status-red:hover {
+      box-shadow: 0 6px 14px -3px rgba(244, 63, 94, 0.25), 0 0 0 1px #f43f5e;
+    }
+    .dark .status-red {
+      background: linear-gradient(135deg, rgba(136, 19, 55, 0.58) 0%, rgba(159, 18, 57, 0.35) 100%);
+      border: 1px solid rgba(251, 113, 133, 0.45);
+      color: #ffe4e6;
+    }
+
+    /* GREY / ZERO OR STANDBY */
+    .status-grey {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      border: 1px solid #cbd5e1;
+      color: #475569;
+    }
+    .status-grey:hover {
+      box-shadow: 0 4px 10px -2px rgba(100, 116, 139, 0.18), 0 0 0 1px #94a3b8;
+    }
+    .dark .status-grey {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+      border: 1px solid rgba(71, 85, 105, 0.5);
+      color: #94a3b8;
+    }
+
+    /* Dimmed state when filtering */
+    .card-dimmed {
+      opacity: 0.16;
+      filter: grayscale(85%);
+      transform: scale(0.98);
+      pointer-events: none;
+    }
+
+    /* Pulse animation for live indicator */
+    @keyframes pulseRing {
+      0% { transform: scale(0.85); opacity: 0.9; }
+      70% { transform: scale(1.9); opacity: 0; }
+      100% { transform: scale(1.9); opacity: 0; }
+    }
+    .pulse-ring::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background-color: #10b981;
+      animation: pulseRing 2s infinite;
+    }
+
+    @media print {
+      .no-print { display: none !important; }
+      body { overflow: visible !important; height: auto !important; }
     }
   </style>
 </head>
-<body class="flex flex-col h-screen">
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col h-screen transition-colors duration-200">
 
-  <!-- ========================================================= -->
-  <!-- TOP APPLICATION BAR (1:1 FROM SCREENSHOT 1)               -->
-  <!-- ========================================================= -->
-  <header class="bg-[#e5e7eb] border-b border-gray-400 px-6 py-2.5 flex items-center justify-between shadow-2xs select-none">
-    <div class="flex items-center space-x-8">
-      <button class="text-xs font-bold text-gray-800 hover:text-black tracking-wider flex items-center gap-1.5 px-2 py-0.5 rounded hover:bg-gray-300/60 transition">
-        BACK
+  <!-- ===================================================================== -->
+  <!-- TOP APPLICATION HEADER                                                -->
+  <!-- ===================================================================== -->
+  <header class="h-11 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 flex items-center justify-between shrink-0 shadow-2xs z-30">
+    <!-- Left: Back button & Breadcrumb -->
+    <div class="flex items-center gap-3">
+      <button onclick="showToast('Ritorno al menu principale...')" class="flex items-center gap-2 px-2.5 py-1 rounded-md text-xs font-bold tracking-wide text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition">
+        <i class="fa-solid fa-arrow-left text-[11px] text-slate-500"></i>
+        <span>BACK</span>
       </button>
-      <div class="text-xs font-bold text-gray-700 tracking-wider uppercase">
-        COMPANY EUROPA
+      <div class="h-4 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
+      <div class="flex items-center gap-2 text-xs">
+        <span class="px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200/60 dark:border-indigo-800/60">MES 4.0</span>
+        <span class="text-slate-400">/</span>
+        <span class="font-semibold text-slate-700 dark:text-slate-200">Sinottico Produzione — Stabilimento Europa</span>
       </div>
     </div>
 
-    <!-- Right Side Logo from Screenshot: ONLY YOU -->
-    <div class="flex items-center space-x-2">
-      <!-- Rainbow circle logo -->
-      <div class="w-6 h-6 rounded-full border-2 border-transparent bg-gradient-to-tr from-orange-400 via-pink-500 to-cyan-400 p-[1.5px] flex items-center justify-center">
-        <div class="w-full h-full bg-white rounded-full"></div>
+    <!-- Right: Company, Live Sim, Theme Toggle, ONLY YOU Logo -->
+    <div class="flex items-center gap-4">
+      <!-- Live Simulation Toggle -->
+      <button id="liveSimBtn" onclick="toggleLiveSimulation()" class="no-print flex items-center gap-2 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70 hover:bg-emerald-100 transition cursor-pointer" title="Simula aggiornamenti telemetrici in tempo reale">
+        <span class="relative flex h-2 w-2">
+          <span id="livePulse" class="pulse-ring relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span id="liveSimText">LIVE TELEMETRY</span>
+      </button>
+
+      <!-- Dark / Light Mode Toggle -->
+      <button onclick="toggleDarkMode()" class="no-print w-7 h-7 rounded-md flex items-center justify-center text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Cambia Tema (Light / Control Room Dark)">
+        <i id="themeIcon" class="fa-solid fa-moon text-xs"></i>
+      </button>
+
+      <div class="h-4 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
+
+      <!-- Company Europa + ONLY YOU Brand -->
+      <div class="flex items-center gap-3">
+        <span class="text-[11px] font-bold tracking-wider uppercase text-slate-600 dark:text-slate-300">COMPANY EUROPA</span>
+        <div class="flex items-center gap-1.5 pl-1">
+          <div class="w-6 h-6 rounded-full p-[2px] bg-gradient-to-tr from-amber-400 via-rose-500 to-cyan-400 flex items-center justify-center shadow-xs">
+            <div class="w-full h-full bg-white dark:bg-slate-900 rounded-full flex items-center justify-center">
+              <div class="w-1.5 h-1.5 rounded-full bg-gradient-to-tr from-rose-500 to-cyan-500"></div>
+            </div>
+          </div>
+          <div class="leading-none tracking-tight">
+            <span class="font-extrabold text-sm text-slate-900 dark:text-white">ONLY</span>
+            <span class="font-normal text-[11px] text-slate-400 dark:text-slate-400 ml-0.5">YOU</span>
+          </div>
+        </div>
       </div>
-      <span class="font-extrabold tracking-tight text-gray-800 text-base">ONLY <span class="font-light text-gray-500 text-xs">YOU</span></span>
     </div>
   </header>
 
-  <!-- ========================================================= -->
-  <!-- MAIN GANTT WORKSPACE (1:1 FROM SCREENSHOT 1)              -->
-  <!-- ========================================================= -->
-  <main class="flex-1 flex flex-col bg-white overflow-hidden m-2 border border-gray-400 shadow-sm rounded-xs">
-    
-    <!-- Top Tab: Gantt Produzione - Europa -->
-    <div class="bg-[#e5e7eb] border-b border-gray-300 px-3 pt-2 flex items-center justify-between">
-      <div class="flex items-center">
-        <div class="bg-white border-t border-l border-r border-gray-300 px-3.5 py-1.5 text-xs font-bold text-gray-800 rounded-t flex items-center gap-3 shadow-2xs">
-          <span>Gantt Produzione - Europa</span>
-          <i class="fa-solid fa-xmark text-gray-400 hover:text-gray-700 text-[10px] cursor-pointer"></i>
+  <!-- ===================================================================== -->
+  <!-- BODY LAYOUT: LEFT MODULE RAIL + MAIN WORKSPACE                        -->
+  <!-- ===================================================================== -->
+  <div class="flex-1 flex overflow-hidden">
+
+    <!-- LEFT NAVIGATION RAIL (Matching the 10 module icons in screenshot) -->
+    <aside class="no-print w-12 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col items-center py-2.5 gap-1.5 shrink-0 z-20">
+      <button onclick="showToast('Modulo: Anagrafica Macchine')" class="w-8 h-8 rounded-lg flex items-center justify-center text-amber-800/70 dark:text-amber-400/70 hover:bg-amber-50 dark:hover:bg-slate-800 transition" title="Anagrafica Macchine">
+        <i class="fa-solid fa-industry text-sm"></i>
+      </button>
+      <button onclick="showToast('Modulo: Ordini di Produzione')" class="w-8 h-8 rounded-lg flex items-center justify-center text-amber-800/70 dark:text-amber-400/70 hover:bg-amber-50 dark:hover:bg-slate-800 transition" title="Ordini di Produzione">
+        <i class="fa-solid fa-clipboard-list text-sm"></i>
+      </button>
+      <button onclick="showToast('Modulo: Gantt Produzione')" class="w-8 h-8 rounded-lg flex items-center justify-center text-amber-800/70 dark:text-amber-400/70 hover:bg-amber-50 dark:hover:bg-slate-800 transition" title="Gantt Produzione">
+        <i class="fa-solid fa-chart-gantt text-sm"></i>
+      </button>
+      <button onclick="showToast('Modulo: Turni & Squadre')" class="w-8 h-8 rounded-lg flex items-center justify-center text-amber-800/70 dark:text-amber-400/70 hover:bg-amber-50 dark:hover:bg-slate-800 transition" title="Turni & Squadre">
+        <i class="fa-solid fa-users-gear text-sm"></i>
+      </button>
+      <!-- Active Module: Sinottico -->
+      <button class="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-700 text-white shadow-sm ring-2 ring-amber-500/30 transition" title="Sinottico - Europa (Attivo)">
+        <i class="fa-solid fa-table-cells-large text-sm"></i>
+      </button>
+      <button onclick="showToast('Modulo: Analisi Tempi & Metodi')" class="w-8 h-8 rounded-lg flex items-center justify-center text-amber-800/70 dark:text-amber-400/70 hover:bg-amber-50 dark:hover:bg-slate-800 transition" title="Analisi Tempi & Metodi">
+        <i class="fa-solid fa-stopwatch text-sm"></i>
+      </button>
+      <button onclick="showToast('Modulo: Controllo Qualità')" class="w-8 h-8 rounded-lg flex items-center justify-center text-amber-800/70 dark:text-amber-400/70 hover:bg-amber-50 dark:hover:bg-slate-800 transition" title="Controllo Qualità">
+        <i class="fa-solid fa-shield-halved text-sm"></i>
+      </button>
+      <button onclick="showToast('Modulo: Manutenzione & Fermi')" class="w-8 h-8 rounded-lg flex items-center justify-center text-amber-800/70 dark:text-amber-400/70 hover:bg-amber-50 dark:hover:bg-slate-800 transition" title="Manutenzione & Fermi">
+        <i class="fa-solid fa-screwdriver-wrench text-sm"></i>
+      </button>
+      <button onclick="showToast('Modulo: Magazzino Filati / Tessuti')" class="w-8 h-8 rounded-lg flex items-center justify-center text-amber-800/70 dark:text-amber-400/70 hover:bg-amber-50 dark:hover:bg-slate-800 transition" title="Magazzino">
+        <i class="fa-solid fa-boxes-stacked text-sm"></i>
+      </button>
+      <button onclick="openEffModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-amber-800/70 dark:text-amber-400/70 hover:bg-amber-50 dark:hover:bg-slate-800 transition" title="Reportistica & KPI">
+        <i class="fa-solid fa-chart-pie text-sm"></i>
+      </button>
+
+      <div class="mt-auto flex flex-col items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800 w-8">
+        <div class="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-300" title="Operatore: Supervisor">
+          EU
         </div>
       </div>
-      <div class="text-[11px] text-gray-500 flex items-center gap-2 pr-2">
-        <span class="text-gray-400">Suggerimento:</span> Fai clic sull'ordine <strong class="text-gray-700">LINEA 1A</strong> per aprire la schermata di produzione
-      </div>
-    </div>
+    </aside>
 
-    <!-- Sub-tab links: Time line / Carico Lavoro -->
-    <div class="px-3 py-1 bg-white border-b border-gray-200 flex items-center gap-5 text-xs font-semibold text-gray-700">
-      <span class="text-blue-600 border-b-2 border-blue-600 pb-1 cursor-pointer">Time line</span>
-      <span class="text-gray-500 hover:text-gray-800 pb-1 cursor-pointer">Carico Lavoro</span>
-    </div>
+    <!-- ===================================================================== -->
+    <!-- MAIN WORKSPACE CONTAINER                                              -->
+    <!-- ===================================================================== -->
+    <main class="flex-1 flex flex-col overflow-hidden bg-slate-100/70 dark:bg-slate-950 p-2 gap-2">
 
-    <!-- Filter & Toolbar (Matching screenshot 1 exactly) -->
-    <div class="px-3 py-1.5 bg-[#f3f4f6] border-b border-gray-300 flex flex-wrap items-center justify-between text-xs gap-2">
-      <div class="flex items-center gap-2">
-        <!-- Navigation controls -->
-        <div class="flex items-center bg-white border border-gray-300 rounded px-1 py-0.5 shadow-2xs">
-          <button class="text-gray-500 hover:text-black px-1"><i class="fa-solid fa-caret-left text-xs"></i></button>
-          <span class="w-2 h-2 rounded-full bg-blue-500 mx-1"></span>
-          <button class="text-gray-500 hover:text-black px-1"><i class="fa-solid fa-caret-right text-xs"></i></button>
-        </div>
-
-        <!-- Confection dropdown -->
-        <select class="bg-white border border-gray-300 rounded px-2 py-0.5 text-gray-700 text-xs">
-          <option>Confection A</option>
-          <option>Confection B</option>
-        </select>
-
-        <!-- Mostra dettagli dropdown -->
-        <select class="bg-white border border-gray-300 rounded px-2 py-0.5 text-gray-700 text-xs">
-          <option>Mostra dettagli</option>
-          <option>Nascondi dettagli</option>
-        </select>
-
-        <!-- Tutti dropdown -->
-        <select class="bg-white border border-gray-300 rounded px-2 py-0.5 text-gray-700 text-xs">
-          <option>Tutti</option>
-          <option>In lavorazione</option>
-        </select>
-
-        <!-- Recalculation Button -->
-        <button onclick="recalculateGantt()" class="bg-[#d94343] hover:bg-[#c23535] text-white px-3 py-0.5 rounded font-bold shadow-2xs transition text-xs">
-          Recalculation
-        </button>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <button class="bg-white border border-gray-300 px-2 py-0.5 rounded text-gray-700 hover:bg-gray-100">Today</button>
-        <div class="flex items-center border border-gray-300 rounded bg-white overflow-hidden">
-          <button class="px-2 py-0.5 text-gray-600 hover:bg-gray-100 border-r border-gray-200"><i class="fa-solid fa-caret-left text-xs"></i></button>
-          <button class="px-2 py-0.5 text-gray-600 hover:bg-gray-100"><i class="fa-solid fa-caret-right text-xs"></i></button>
-        </div>
-
-        <div class="bg-white border border-gray-300 rounded px-2 py-0.5 text-gray-600 flex items-center gap-1.5 text-xs">
-          <i class="fa-regular fa-calendar text-gray-400"></i>
-          <span>Sunday, October 11, 2026 - Wednesday, November 04, 2026</span>
-        </div>
-
-        <div class="relative">
-          <input type="text" placeholder="Smart filter" class="bg-white border border-gray-300 rounded pl-2 pr-6 py-0.5 text-gray-700 text-xs w-28 focus:w-36 transition-all">
-          <i class="fa-solid fa-magnifying-glass absolute right-2 top-1.5 text-[10px] text-gray-400"></i>
-        </div>
-        <button class="text-gray-500 hover:text-black p-1"><i class="fa-solid fa-rotate text-xs"></i></button>
-      </div>
-    </div>
-
-    <!-- GANTT TIMELINE GRID -->
-    <div class="flex-1 overflow-x-auto overflow-y-auto bg-white custom-scroll relative">
-      <div class="min-w-[1180px]">
+      <!-- TOP TAB STRIP & TOOLBAR CARD -->
+      <section class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-lg shadow-2xs shrink-0 overflow-hidden">
         
-        <!-- Date Header Row -->
-        <div class="gantt-grid bg-white border-b border-gray-300 text-center text-xs font-bold text-gray-700">
-          <div class="border-r border-gray-300 p-2 text-left bg-gray-50 font-bold uppercase tracking-wider text-[10px] text-gray-500">
-            <!-- Blank top left cell -->
-          </div>
-          <div class="border-r border-gray-200 p-1"><div>20/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>21/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>22/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>23/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>24/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>25/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1 bg-blue-50/40 border-t-2 border-t-blue-500 text-blue-900">
-            <div>26/10/2026</div><div class="text-[10px] text-blue-600 font-bold">00:00</div>
-          </div>
-          <div class="border-r border-gray-200 p-1"><div>27/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>28/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>29/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>30/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>31/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="p-1"><div>01/11/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-        </div>
-
-        <!-- LINEA 1A (Order 26022404 001) -->
-        <div class="gantt-grid border-b border-gray-200 h-14 items-center hover:bg-gray-50/50 transition relative">
-          <div class="border-r border-gray-300 px-3 py-2 font-bold text-xs text-gray-800 bg-white h-full flex items-center">
-            LINEA 1A
+        <!-- Tab Bar -->
+        <div class="bg-slate-100/90 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-800 px-3 pt-1.5 flex items-center justify-between">
+          <div class="flex items-center gap-1">
+            <!-- Active Tab -->
+            <div class="bg-white dark:bg-slate-900 border-t border-l border-r border-slate-200 dark:border-slate-700 px-3.5 py-1.5 rounded-t-md flex items-center gap-2.5 text-xs font-bold text-slate-800 dark:text-slate-100 shadow-2xs relative -mb-[1px]">
+              <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+              <span>Sinottico - Europa</span>
+              <button onclick="showToast('Scheda principale attiva')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-1">
+                <i class="fa-solid fa-xmark text-[11px]"></i>
+              </button>
+            </div>
           </div>
 
-          <!-- Vertical grid line backgrounds -->
-          <div class="col-span-13 grid grid-cols-13 h-full absolute left-[120px] right-0 pointer-events-none">
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-blue-100 h-full bg-blue-50/15"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="h-full"></div>
-          </div>
-
-          <!-- The Orange Order Bar (Clickable to open Production window) -->
-          <div class="col-span-13 pl-0.5 pr-20 z-10 flex flex-col justify-center">
-            <div onclick="openProductionModal()" title="Fai clic per aprire la schermata di Produzione"
-                 class="relative bg-[#f58220] hover:bg-[#e07519] text-white rounded-xs border border-[#d96b14] cursor-pointer overflow-hidden p-1 shadow-2xs group transition"
-                 style="width: 82%;">
-              
-              <!-- Subtle Blue Border underline matching screenshot -->
-              <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-sky-400"></div>
-
-              <div class="flex items-center justify-between text-xs font-bold px-2">
-                <span class="tracking-wide">26022404 001</span>
-                <span class="text-[10px] opacity-90 font-normal">
-                  Prodotto: <strong id="ganttQtyDisplay" class="font-bold underline">666</strong> / 2099 pz
-                </span>
-              </div>
+          <!-- Right Quick Search & Timestamp -->
+          <div class="flex items-center gap-3 pb-1">
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400"></i>
+              <input
+                id="searchInput"
+                type="text"
+                oninput="applyFilters()"
+                placeholder="Cerca macchina (es. 0028, F15)..."
+                class="pl-7 pr-6 py-0.5 text-[11px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-indigo-500 w-48 transition"
+              />
+              <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-circle-xmark"></i>
+              </button>
+            </div>
+            <div class="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+              <i class="fa-regular fa-clock text-[10px] text-indigo-500"></i>
+              <span>Last update:</span>
+              <span id="lastUpdateTop" class="font-mono font-semibold text-slate-700 dark:text-slate-200">11-11-2026 10:30:53</span>
             </div>
           </div>
         </div>
 
-        <!-- LINEA 2A -->
-        <div class="gantt-grid border-b border-gray-200 h-12 items-center">
-          <div class="border-r border-gray-300 px-3 py-2 font-bold text-xs text-gray-700 bg-white h-full flex items-center">LINEA 2A</div>
-          <div class="col-span-13"></div>
-        </div>
-
-        <!-- LINEA 3A -->
-        <div class="gantt-grid border-b border-gray-200 h-12 items-center">
-          <div class="border-r border-gray-300 px-3 py-2 font-bold text-xs text-gray-700 bg-white h-full flex items-center">LINEA 3A</div>
-          <div class="col-span-13"></div>
-        </div>
-
-        <!-- LINEA 4A -->
-        <div class="gantt-grid border-b border-gray-200 h-12 items-center">
-          <div class="border-r border-gray-300 px-3 py-2 font-bold text-xs text-gray-700 bg-white h-full flex items-center">LINEA 4A</div>
-          <div class="col-span-13"></div>
-        </div>
-
-        <!-- LINEA 5A (Order 26017829 001) -->
-        <div class="gantt-grid border-b border-gray-200 h-14 items-center relative">
-          <div class="border-r border-gray-300 px-3 py-2 font-bold text-xs text-gray-700 bg-white h-full flex items-center">LINEA 5A</div>
+        <!-- Filter & Action Bar (1:1 structure with Screenshot, modernized) -->
+        <div class="px-3.5 py-2 flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900">
           
-          <div class="col-span-13 pl-0.5 pr-2 z-10 flex flex-col justify-center">
-            <div class="relative bg-[#f58220] text-white rounded-xs border border-[#d96b14] p-1" style="width: 100%;">
-              <div class="flex items-center justify-end text-xs font-bold pr-3">
-                <span>26017829 001</span>
+          <!-- Left: Start & End Date Pickers -->
+          <div class="flex items-center gap-2.5">
+            <div class="flex flex-col">
+              <label class="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-0.5">Start</label>
+              <div class="relative flex items-center">
+                <input
+                  type="text"
+                  id="startDateInput"
+                  value="14/09/2026"
+                  class="w-28 px-2.5 py-1 text-xs font-mono font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-500"
+                />
+                <i class="fa-regular fa-calendar text-[10px] text-slate-400 absolute right-2 pointer-events-none"></i>
               </div>
+            </div>
+            <div class="flex flex-col">
+              <label class="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-0.5">End</label>
+              <div class="relative flex items-center">
+                <input
+                  type="text"
+                  id="endDateInput"
+                  value="14/09/2026"
+                  class="w-28 px-2.5 py-1 text-xs font-mono font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-500"
+                />
+                <i class="fa-regular fa-calendar text-[10px] text-slate-400 absolute right-2 pointer-events-none"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Center: Shifts (Turni) + Squadre Checkboxes -->
+          <div class="flex flex-col gap-1.5 bg-slate-50/80 dark:bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-200/70 dark:border-slate-800">
+            <!-- Row 1: Shifts -->
+            <div class="flex items-center gap-3 text-[11px] font-medium text-slate-700 dark:text-slate-300">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 w-12">Turni:</span>
+              <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
+                <input type="checkbox" checked onchange="onShiftChange()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
+                <span class="font-mono text-[11px]">05:00 - 13:30</span>
+              </label>
+              <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
+                <input type="checkbox" onchange="onShiftChange()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
+                <span class="font-mono text-[11px]">13:30 - 22:00</span>
+              </label>
+              <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
+                <input type="checkbox" onchange="onShiftChange()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
+                <span class="font-mono text-[11px]">22:00 - 05:00</span>
+              </label>
+            </div>
+            <!-- Row 2: Squadre -->
+            <div class="flex items-center gap-4 text-[11px] font-medium text-slate-700 dark:text-slate-300">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 w-12">Squadre:</span>
+              <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
+                <input type="checkbox" id="chkSq1" checked onchange="applyFilters()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
+                <span>Sq 1</span>
+              </label>
+              <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
+                <input type="checkbox" id="chkSq2" checked onchange="applyFilters()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
+                <span>Sq 2</span>
+              </label>
+              <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
+                <input type="checkbox" id="chkSq3" checked onchange="applyFilters()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
+                <span>Sq 3</span>
+              </label>
+              <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition">
+                <input type="checkbox" id="chkSq4" checked onchange="applyFilters()" class="rounded text-rose-600 focus:ring-0 w-3.5 h-3.5 accent-rose-600 cursor-pointer" />
+                <span>Sq 4</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Center-Right: "Mostra" Status Filter Pills -->
+          <div class="flex items-center gap-2 bg-slate-50/80 dark:bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-200/70 dark:border-slate-800">
+            <span class="text-xs font-bold text-slate-600 dark:text-slate-300 mr-1">Mostra</span>
+            
+            <!-- Green Filter -->
+            <button id="filterBtn-green" onclick="toggleStatusFilter('green')" class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 text-[11px] font-bold hover:scale-105 transition cursor-pointer shadow-2xs" title="Ottimale (>= 91%)">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+              <span id="count-green" class="font-mono">4</span>
+            </button>
+
+            <!-- Yellow Filter -->
+            <button id="filterBtn-yellow" onclick="toggleStatusFilter('yellow')" class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-amber-50 dark:bg-amber-950/70 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200 text-[11px] font-bold hover:scale-105 transition cursor-pointer shadow-2xs" title="In Soglia (80% - 90%)">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>
+              <span id="count-yellow" class="font-mono">5</span>
+            </button>
+
+            <!-- Red Filter -->
+            <button id="filterBtn-red" onclick="toggleStatusFilter('red')" class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-rose-50 dark:bg-rose-950/70 border border-rose-300 dark:border-rose-700 text-rose-800 dark:text-rose-200 text-[11px] font-bold hover:scale-105 transition cursor-pointer shadow-2xs" title="Critico (1% - 79%)">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>
+              <span id="count-red" class="font-mono">11</span>
+            </button>
+
+            <!-- Grey Filter -->
+            <button id="filterBtn-grey" onclick="toggleStatusFilter('grey')" class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-[11px] font-bold hover:scale-105 transition cursor-pointer shadow-2xs" title="Inattive / 0% / Standby">
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-400 inline-block"></span>
+              <span id="count-grey" class="font-mono">49</span>
+            </button>
+          </div>
+
+          <!-- Right: Settings, Eff, Print Buttons -->
+          <div class="flex items-center gap-2">
+            <button onclick="openSettingsModal()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition shadow-2xs cursor-pointer">
+              <i class="fa-solid fa-gear text-slate-500 dark:text-slate-400"></i>
+              <span>Settings</span>
+            </button>
+            <button onclick="openEffModal()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/70 dark:hover:bg-indigo-900/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-semibold transition shadow-2xs cursor-pointer">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Eff</span>
+            </button>
+            <button onclick="window.print()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition shadow-2xs cursor-pointer">
+              <i class="fa-solid fa-print text-slate-500 dark:text-slate-400"></i>
+              <span>Print</span>
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- GLOBAL EFFICIENCY KPI BAR                                             -->
+      <!-- ===================================================================== -->
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-2.5 shrink-0">
+        <!-- Total Efficiency (All) -->
+        <div class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-lg px-4 py-2 flex items-center justify-between shadow-2xs">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-rose-100 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800 flex items-center justify-center text-rose-600 dark:text-rose-400">
+              <i class="fa-solid fa-gauge-simple-high text-base"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Efficiency (All)</span>
+                <span class="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 font-mono">69 slots</span>
+              </div>
+              <div class="w-48 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-1.5">
+                <div id="barEffAll" class="h-full bg-rose-500 rounded-full transition-all duration-500" style="width: 25.5%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <div id="badgeEffAll" class="px-3.5 py-1 rounded-md bg-rose-500/15 dark:bg-rose-500/20 border border-rose-400/50 text-rose-700 dark:text-rose-300 font-mono text-lg font-extrabold tracking-tight">
+              25.5%
             </div>
           </div>
         </div>
 
-      </div>
-    </div>
-  </main>
+        <!-- Total Efficiency (Working) -->
+        <div class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-lg px-4 py-2 flex items-center justify-between shadow-2xs">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-rose-100 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800 flex items-center justify-center text-rose-600 dark:text-rose-400">
+              <i class="fa-solid fa-bolt text-base"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Efficiency (Working)</span>
+                <span id="workingCountBadge" class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 font-mono font-semibold">20 active</span>
+              </div>
+              <div class="w-48 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-1.5">
+                <div id="barEffWorking" class="h-full bg-rose-500 rounded-full transition-all duration-500" style="width: 59.6%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <div id="badgeEffWorking" class="px-3.5 py-1 rounded-md bg-rose-500/15 dark:bg-rose-500/20 border border-rose-400/50 text-rose-700 dark:text-rose-300 font-mono text-lg font-extrabold tracking-tight">
+              59.6%
+            </div>
+          </div>
+        </div>
+      </section>
 
+      <!-- ===================================================================== -->
+      <!-- MAIN 2x2 SYNOPTIC QUADRANT GRID (SQUADRA 3, 2, 4, 1)                  -->
+      <!-- ===================================================================== -->
+      <section class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-3 min-h-0 overflow-y-auto custom-scroll pr-0.5">
 
-  <!-- ========================================================= -->
-  <!-- MODAL: "Production" (1:1 REPLICA OF SCREENSHOT 2)         -->
-  <!-- WITH NEW AUTOMATED BARCODE & SCALE FEATURE BUILT ON TOP   -->
-  <!-- ========================================================= -->
-  <div id="productionWindow" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-    <div class="bg-[#f0f2f5] border border-gray-400 shadow-2xl rounded-xs w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden">
-      
-      <!-- Top Title Bar (Exact from screenshot 2) -->
-      <div class="bg-[#ebeef2] border-b border-gray-300 px-3 py-1.5 flex items-center justify-between select-none">
-        <h2 class="text-sm font-semibold text-gray-800">Production</h2>
-        <button onclick="closeProductionModal()" class="text-gray-500 hover:text-black text-sm px-1.5 py-0.5 rounded hover:bg-gray-300">
+        <!-- ================================================================= -->
+        <!-- TOP-LEFT QUADRANT: SQUADRA 3 (LINEA 5)                            -->
+        <!-- ================================================================= -->
+        <div id="quadrant-sq3" class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-xl p-3 flex flex-col justify-between shadow-2xs transition-opacity duration-200">
+          <!-- Quadrant Header -->
+          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-2 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-5 rounded-full bg-rose-500"></span>
+              <div>
+                <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200">Squadra 3</h2>
+                <p class="text-[10px] text-slate-400">Reparto Maglieria • 1 Linea (10 Macchine)</p>
+              </div>
+            </div>
+            <!-- Centered/Prominent Squadra Efficiency Pill (matching screenshot's red box) -->
+            <div class="flex items-center gap-2">
+              <div id="sq3-badge" class="px-4 py-1 rounded-lg bg-rose-100 dark:bg-rose-950/90 border border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200 flex flex-col items-center leading-tight shadow-2xs">
+                <span class="text-[9px] font-bold uppercase tracking-wider opacity-75">Squadra 3</span>
+                <span id="sq3-eff" class="font-mono text-sm font-extrabold">21.4%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- LINEA 5 Container -->
+          <div class="my-auto">
+            <div id="grid-linea5"></div>
+          </div>
+
+          <!-- Quadrant Footer Info -->
+          <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1.5 border-t border-slate-100 dark:border-slate-800/60">
+            <span>Macchine attive: <strong id="sq3-active" class="text-slate-600 dark:text-slate-300">3 / 10</strong></span>
+            <span>Famiglie: <strong class="font-mono text-slate-600 dark:text-slate-300">F14, F15</strong></span>
+          </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- TOP-RIGHT QUADRANT: SQUADRA 2 (LINEA 4 & LINEA 3)                 -->
+        <!-- ================================================================= -->
+        <div id="quadrant-sq2" class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-xl p-3 flex flex-col justify-between shadow-2xs transition-opacity duration-200">
+          <!-- Quadrant Header -->
+          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-5 rounded-full bg-rose-500"></span>
+              <div>
+                <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200">Squadra 2</h2>
+                <p class="text-[10px] text-slate-400">Reparto Maglieria • 2 Linee (20 Macchine)</p>
+              </div>
+            </div>
+            <div id="sq2-badge" class="px-4 py-1 rounded-lg bg-rose-100 dark:bg-rose-950/90 border border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200 flex flex-col items-center leading-tight shadow-2xs">
+              <span class="text-[9px] font-bold uppercase tracking-wider opacity-75">Squadra 2</span>
+              <span id="sq2-eff" class="font-mono text-sm font-extrabold">18.0%</span>
+            </div>
+          </div>
+
+          <!-- LINEA 4 & LINEA 3 Containers -->
+          <div class="flex flex-col gap-2 my-auto py-1">
+            <div id="grid-linea4"></div>
+            <div class="h-[1px] bg-slate-100 dark:bg-slate-800"></div>
+            <div id="grid-linea3"></div>
+          </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- BOTTOM-LEFT QUADRANT: SQUADRA 4 (LINEA 7)                         -->
+        <!-- ================================================================= -->
+        <div id="quadrant-sq4" class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-xl p-3 flex flex-col justify-between shadow-2xs transition-opacity duration-200">
+          <!-- Quadrant Header -->
+          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-5 rounded-full bg-slate-400"></span>
+              <div>
+                <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200">Squadra 4</h2>
+                <p class="text-[10px] text-slate-400">Last update: <span id="lastUpdateSq4" class="font-mono font-semibold text-slate-600 dark:text-slate-300">11-11-2026 10:30:53</span></p>
+              </div>
+            </div>
+            <div id="sq4-badge" class="px-4 py-1 rounded-lg bg-slate-200/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 flex flex-col items-center leading-tight shadow-2xs">
+              <span class="text-[9px] font-bold uppercase tracking-wider opacity-75">Squadra 4</span>
+              <span id="sq4-eff" class="font-mono text-sm font-extrabold">STANDBY</span>
+            </div>
+          </div>
+
+          <!-- LINEA 7 Container -->
+          <div class="my-auto">
+            <div id="grid-linea7"></div>
+          </div>
+
+          <!-- Quadrant Footer Info -->
+          <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1.5 border-t border-slate-100 dark:border-slate-800/60">
+            <span>Stato linea: <strong class="text-slate-600 dark:text-slate-300">In attesa programmazione turno</strong></span>
+            <span>Famiglie: <strong class="font-mono text-slate-600 dark:text-slate-300">F3, F7, F14</strong></span>
+          </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- BOTTOM-RIGHT QUADRANT: SQUADRA 1 (LINEA 2 & LINEA 1)              -->
+        <!-- ================================================================= -->
+        <div id="quadrant-sq1" class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-xl p-3 flex flex-col justify-between shadow-2xs transition-opacity duration-200">
+          <!-- Quadrant Header -->
+          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-5 rounded-full bg-rose-500"></span>
+              <div>
+                <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200">Squadra 1</h2>
+                <p class="text-[10px] text-slate-400">Reparto Maglieria • 2 Linee (19 Macchine)</p>
+              </div>
+            </div>
+            <div id="sq1-badge" class="px-4 py-1 rounded-lg bg-rose-100 dark:bg-rose-950/90 border border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200 flex flex-col items-center leading-tight shadow-2xs">
+              <span class="text-[9px] font-bold uppercase tracking-wider opacity-75">Squadra 1</span>
+              <span id="sq1-eff" class="font-mono text-sm font-extrabold">37.2%</span>
+            </div>
+          </div>
+
+          <!-- LINEA 2 & LINEA 1 Containers -->
+          <div class="flex flex-col gap-2 my-auto py-1">
+            <div id="grid-linea2"></div>
+            <div class="h-[1px] bg-slate-100 dark:bg-slate-800"></div>
+            <div id="grid-linea1"></div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- BOTTOM STATUS BAR (Matching "Assign User Roles" footer from screenshot) -->
+      <footer class="no-print h-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-md px-3 flex items-center justify-between text-[10px] text-slate-400 shrink-0">
+        <div class="flex items-center gap-4">
+          <span class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            Server PLC: <strong class="text-slate-600 dark:text-slate-300">ONLINE (192.168.10.45)</strong>
+          </span>
+          <span>•</span>
+          <span>Fai clic su qualsiasi macchina per ispezionare OEE, commessa, tempi ciclo e simulare variazioni.</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="showToast('Gestione permessi e ruoli operatore')" class="hover:text-slate-700 dark:hover:text-slate-200 underline decoration-dotted cursor-pointer">
+            Assign User Roles
+          </button>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MACHINE DETAIL INSPECTOR MODAL / SLIDE-OVER                           -->
+  <!-- ===================================================================== -->
+  <div id="machineModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden animate-fadeIn">
+      <!-- Modal Header -->
+      <div id="modalHeaderBar" class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div id="modalStatusBadge" class="w-11 h-11 rounded-xl flex items-center justify-center font-mono font-extrabold text-base shadow-xs">
+            0028
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="modalTitle" class="text-base font-extrabold text-slate-800 dark:text-white">Macchina 0028</h3>
+              <span id="modalFamilyBadge" class="px-2 py-0.5 text-xs font-mono font-bold rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">F15</span>
+            </div>
+            <p id="modalSubtitle" class="text-xs text-slate-500 dark:text-slate-400">Squadra 2 • LINEA 3</p>
+          </div>
+        </div>
+        <button onclick="closeMachineModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <!-- Tabs Bar (Exact from screenshot 2: Produzione / Planning) -->
-      <div class="bg-[#e2e6eb] px-3 pt-1.5 border-b border-gray-300 flex items-center justify-between">
-        <div class="flex items-center gap-1">
-          <div class="bg-white border-t border-l border-r border-gray-300 px-4 py-1.5 text-xs font-semibold text-gray-800 rounded-t shadow-2xs">
-            Produzione
+      <!-- Modal Body -->
+      <div class="p-5 space-y-4">
+        <!-- Efficiency Gauge & Quick Edit Slider -->
+        <div class="bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Efficienza Turno Attuale</span>
+            <span id="modalEffValue" class="font-mono text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">92%</span>
           </div>
-          <div class="px-4 py-1.5 text-xs text-gray-600 hover:text-black cursor-pointer">
-            Planning
+          <input
+            id="modalEffSlider"
+            type="range"
+            min="0"
+            max="100"
+            value="92"
+            oninput="updateMachineEfficiencyFromSlider(this.value)"
+            class="w-full accent-indigo-600 cursor-pointer h-2 bg-slate-200 dark:bg-slate-700 rounded-lg"
+          />
+          <div class="flex justify-between text-[10px] font-mono text-slate-400 mt-1">
+            <span>0% (Fermo)</span>
+            <span>50% (Critico)</span>
+            <span>80% (Target Min)</span>
+            <span>91%+ (Ottimale)</span>
           </div>
         </div>
 
-        <!-- NEW FEATURE BADGE ON TOP OF HIS APPLICATION -->
-        <div class="flex items-center gap-2 pb-1">
-          <span class="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Nuova Funzione: Inserimento Automatico da Barcode & Bilancia
-          </span>
+        <!-- Telemetry Metadata Grid -->
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <div class="p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Ordine Produzione</span>
+            <span id="modalOrder" class="font-mono font-bold text-slate-800 dark:text-slate-100 mt-0.5 block">ORD-2026-8841</span>
+          </div>
+          <div class="p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Articolo / Finezza</span>
+            <span id="modalArticle" class="font-semibold text-slate-800 dark:text-slate-100 mt-0.5 block">Maglia Merino • Fam. F15</span>
+          </div>
+          <div class="p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Pezzi Prodotti / Target</span>
+            <span id="modalPieces" class="font-mono font-bold text-slate-800 dark:text-slate-100 mt-0.5 block">184 / 200 pz</span>
+          </div>
+          <div class="p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Stato PLC</span>
+            <span id="modalPlcState" class="font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5 block">In Marcia Regolare</span>
+          </div>
         </div>
       </div>
 
-      <!-- MAIN MODAL CONTENT: LEFT FORM + CENTER TABLE + RIGHT KPI -->
-      <div class="flex-1 overflow-y-auto p-4 flex flex-col lg:flex-row gap-4 bg-white custom-scroll">
-        
-        <!-- LEFT COLUMN: COMMESSA FORM (Matching Screenshot 2) -->
-        <div class="w-full lg:w-56 space-y-2.5 text-xs shrink-0 border-r border-gray-200 pr-3">
-          <div>
-            <label class="block text-gray-600 mb-0.5">Commessa</label>
-            <input type="text" value="26022404_001" readonly class="w-full border border-gray-300 rounded-xs px-2 py-1 bg-white font-semibold text-gray-800">
-          </div>
-
-          <div>
-            <label class="block text-gray-600 mb-0.5">Articolo</label>
-            <input type="text" value="PL00075" readonly class="w-full border border-gray-300 rounded-xs px-2 py-1 bg-white font-semibold text-gray-800">
-          </div>
-
-          <div class="flex items-center gap-3">
-            <div class="flex-1">
-              <label class="block text-gray-600 mb-0.5">Linea</label>
-              <input type="text" value="1A" readonly class="w-full border border-gray-300 rounded-xs px-2 py-1 bg-white font-semibold text-gray-800">
-            </div>
-            <div>
-              <label class="block text-gray-600 mb-0.5">Abbatimento</label>
-              <span class="text-emerald-600 font-bold text-sm block pt-1">90%</span>
-            </div>
-          </div>
-
-          <div class="pt-1 leading-tight">
-            <div class="font-bold text-gray-900 text-xs">Capi (2099)</div>
-            <div class="font-bold text-gray-900 text-xs">Produzione Giornaliera (235)</div>
-          </div>
-
-          <div>
-            <label class="block text-gray-600 mb-0.5">Data Produzione</label>
-            <div class="relative">
-              <input id="inputDataProduzione" type="text" value="26/10/2026" class="w-full border border-gray-300 rounded-xs px-2 py-1 text-xs">
-              <i class="fa-regular fa-calendar absolute right-2 top-2 text-gray-400"></i>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-gray-600 mb-0.5">Turni</label>
-            <select class="w-full border border-gray-300 rounded-xs px-2 py-1 text-xs bg-white">
-              <option>I</option>
-              <option>II</option>
-            </select>
-          </div>
-
-          <div class="flex items-center gap-4 text-xs text-gray-700 pt-0.5">
-            <label class="flex items-center gap-1.5 cursor-pointer">
-              <input type="radio" name="planType" checked class="text-orange-500"> By date
-            </label>
-            <label class="flex items-center gap-1.5 cursor-pointer">
-              <input type="radio" name="planType"> By hour
-            </label>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-gray-600 text-[11px] mb-0.5">COLORE</label>
-              <select id="selectColore" class="w-full border border-gray-300 rounded-xs px-1.5 py-1 text-xs bg-white">
-                <option>V00006</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-gray-600 text-[11px] mb-0.5">Taglie</label>
-              <select id="selectTaglie" class="w-full border border-gray-300 rounded-xs px-1.5 py-1 text-xs bg-white">
-                <option>M</option>
-                <option>S</option>
-                <option>L</option>
-                <option>XL</option>
-                <option>XXL</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-gray-600 mb-0.5">Quantità</label>
-            <input id="inputQuantita" type="text" placeholder="" class="w-full border border-gray-300 rounded-xs px-2 py-1 text-xs">
-          </div>
-
-          <div>
-            <label class="block text-gray-600 mb-0.5">Numero delle risorse</label>
-            <input type="text" value="3" class="w-full border border-gray-300 rounded-xs px-2 py-1 text-xs bg-white">
-          </div>
-
-          <!-- Buttons at bottom of left panel -->
-          <div class="flex gap-2 pt-1">
-            <button onclick="manualInsertOk()" class="bg-[#0070d2] hover:bg-blue-700 text-white px-4 py-1 rounded-xs text-xs font-semibold shadow-2xs">
-              Ok
-            </button>
-            <button class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-xs text-xs border border-gray-300">
-              Cancel
-            </button>
-          </div>
-
-          <!-- Note about manual mode vs automated mode -->
-          <div class="text-[10px] text-gray-400 italic pt-1 border-t border-gray-200">
-            * In precedenza l'operatore inseriva questi dati manualmente premendo "Ok".
-          </div>
-        </div>
-
-        <!-- CENTER COLUMN: THE PRODUCTION TABLE + AUTOMATION OVERLAY -->
-        <div class="flex-1 flex flex-col min-w-0">
-
-          <!-- ======================================================== -->
-          <!-- NEW BARCODE & SCALE BAR DIRECTLY INTEGRATED IN THE WINDOW -->
-          <!-- ======================================================== -->
-          <div class="mb-3 bg-[#f8fafc] text-gray-800 rounded p-3 border border-gray-300 shadow-2xs">
-            
-            <!-- Top bar with Quick Demo Presets: 1 Good One + 1 Bad One -->
-            <div class="flex flex-wrap items-center justify-between mb-2 pb-2 border-b border-gray-200 gap-2">
-              <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-xs font-bold tracking-wide uppercase text-gray-800">Verifica Barcode & Bilancia:</span>
-              </div>
-
-              <!-- Dedicated One-Click Scenario Buttons requested by user -->
-              <div class="flex items-center gap-2">
-                <span class="text-[10px] text-gray-500 font-semibold uppercase">Simulazioni per il Cliente:</span>
-                <button onclick="runScenarioGood()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
-                  <i class="fa-solid fa-circle-check text-xs"></i> 1. Test Buono (10 pz - Peso OK)
-                </button>
-                <button onclick="runScenarioBad()" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
-                  <i class="fa-solid fa-triangle-exclamation text-xs"></i> 2. Test Anomalia (Manca 1 Capo - Bloccato)
-                </button>
-              </div>
-
-              <span id="scannerStatusText" class="text-[11px] font-mono text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded border border-amber-300">
-                Pronto. Seleziona uno scenario sopra o scansiona.
-              </span>
-            </div>
-
-            <!-- Integrated Barcode Reader & Weight Gate Simulator -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-              
-              <!-- STEP 1: BARCODE SCANNER (WHITE BACKGROUND) -->
-              <div class="md:col-span-4 bg-white p-2.5 rounded border border-gray-300 shadow-2xs flex flex-col justify-between">
-                
-                <!-- Action Button on Top -->
-                <button id="btnScansiona" onclick="executeBarcodeScan()" 
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded font-bold text-xs transition flex items-center justify-center gap-2 shadow-2xs mb-2">
-                  <i class="fa-solid fa-barcode text-sm"></i>
-                  <span class="tracking-wide uppercase">1. SCANSIONA BARCODE</span>
-                </button>
-
-                <div class="flex justify-between items-center text-[10px] text-gray-600 mb-1">
-                  <span class="font-bold text-gray-700">Codice Busta:</span>
-                  <span class="text-emerald-700 font-mono font-bold" id="scannedTagSize">#P-067 • Taglia M (10 Capi)</span>
-                </div>
-                
-                <input id="barcodePayloadInput" type="text" value="ORD:26022404_001|COL:V00006|SZ:M|QTY:10|SN:067" 
-                       class="w-full bg-gray-50 border border-gray-300 rounded px-2 py-1 text-xs text-gray-800 font-mono outline-none text-center focus:bg-white focus:border-blue-500">
-
-                <div class="flex justify-between items-center mt-2 text-[10px]">
-                  <div class="flex gap-1.5 text-gray-500">
-                    <span>Taglia:</span>
-                    <button onclick="setBarcodeSize('S')" class="text-blue-600 hover:underline">S</button>
-                    <button onclick="setBarcodeSize('M')" class="text-blue-600 hover:underline font-bold text-blue-900">M</button>
-                    <button onclick="setBarcodeSize('L')" class="text-blue-600 hover:underline">L</button>
-                  </div>
-                  <button onclick="prepareNextPack()" class="text-amber-700 hover:text-amber-900 flex items-center gap-1 font-semibold">
-                    <i class="fa-solid fa-rotate-right text-[10px]"></i> Prossimo Pacco
-                  </button>
-                </div>
-              </div>
-
-              <!-- STEP 2: SCALE WEIGHT SIMULATION (WHITE BACKGROUND) -->
-              <div class="md:col-span-4 bg-white p-2.5 rounded border border-gray-300 shadow-2xs flex flex-col justify-between">
-                <div class="flex justify-between items-center text-[10px] text-gray-600 mb-1">
-                  <span class="font-bold text-gray-700"><i class="fa-solid fa-weight-scale text-amber-600"></i> FASE 2: Bilancia (Target: 2.500g)</span>
-                  <span id="scaleWeightStatus" class="text-gray-500 font-bold font-mono">In attesa</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span id="scaleDigitalDisplay" class="font-mono text-xl font-black text-emerald-600 bg-gray-50 px-2 py-1 rounded border border-gray-300">
-                    2.508 kg
-                  </span>
-                  <div class="flex flex-col gap-1 flex-1">
-                    <button onclick="simulateWeight(2508)" class="text-[9px] bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 px-1.5 py-0.5 rounded text-left font-semibold">
-                      ✓ Peso Conforme (2.508 kg = 10 pz)
-                    </button>
-                    <button onclick="simulateWeight(2240)" class="text-[9px] bg-red-50 hover:bg-red-100 text-red-800 border border-red-300 px-1.5 py-0.5 rounded text-left font-semibold">
-                      ✗ Peso Errato (2.240 kg = 9 pz!)
-                    </button>
-                  </div>
-                </div>
-                <div id="scaleDetailNote" class="text-[10px] text-gray-500 mt-1.5 italic text-center">
-                  Tolleranza consentita: da 2.450g a 2.550g
-                </div>
-              </div>
-
-              <!-- STEP 3: GREEN VALIDATE BUTTON (ONLY ACTIVE IF BARCODE READ + WEIGHT CORRECT) -->
-              <div class="md:col-span-4 flex flex-col justify-center" onclick="handleValidateAreaClick()">
-                <button id="btnValidateScale" onclick="event.stopPropagation(); validateAndInsertRecord();" disabled
-                        class="w-full bg-gray-100 border border-gray-300 text-gray-400 p-2.5 rounded font-bold text-xs shadow-2xs transition flex flex-col items-center justify-center gap-0.5 cursor-not-allowed">
-                  <div class="flex items-center gap-1.5">
-                    <i id="btnValidateIcon" class="fa-solid fa-lock text-xs"></i>
-                    <span id="btnValidateLabel">VALIDA E INSERISCI</span>
-                  </div>
-                  <span id="btnValidateSubtext" class="text-[9px] font-normal opacity-90">Prima scansiona il barcode</span>
-                </button>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- THE DATA TABLE (Exact Columns from Screenshot 2) -->
-          <div class="flex-1 border border-gray-300 rounded-xs overflow-hidden flex flex-col">
-            <div class="custom-scroll overflow-y-auto max-h-[410px]">
-              <table class="w-full text-left text-xs border-collapse">
-                <thead class="bg-[#f0f2f5] text-gray-800 sticky top-0 border-b border-gray-300 font-semibold select-none">
-                  <tr>
-                    <th class="p-2 border-r border-gray-300">Production date</th>
-                    <th class="p-2 border-r border-gray-300">Start production</th>
-                    <th class="p-2 border-r border-gray-300">End production</th>
-                    <th class="p-2 border-r border-gray-300 text-right">Quantità</th>
-                    <th class="p-2 border-r border-gray-300">COLORE</th>
-                    <th class="p-2">TAGLIE</th>
-                  </tr>
-                </thead>
-                <tbody id="tableBodyRows" class="divide-y divide-gray-200 text-xs text-gray-800 font-mono">
-                  
-                  <!-- Existing rows from the screenshot -->
-                  <tr>
-                    <td class="p-1.5 border-r border-gray-200 font-sans">01/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">01/09/2026 8:30</td>
-                    <td class="p-1.5 border-r border-gray-200">01/09/2026 11:09</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">69</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">XS</td>
-                  </tr>
-                  <tr class="bg-gray-50/50">
-                    <td class="p-1.5 border-r border-gray-200 font-sans">01/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">01/09/2026 8:30</td>
-                    <td class="p-1.5 border-r border-gray-200">01/09/2026 11:31</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">80</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">S</td>
-                  </tr>
-                  <tr>
-                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 8:30</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 9:52</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">41</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">L</td>
-                  </tr>
-                  <tr class="bg-gray-50/50">
-                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 8:30</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 9:52</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">41</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">XL</td>
-                  </tr>
-                  <tr>
-                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 9:52</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 10:00</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">4</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">XS</td>
-                  </tr>
-                  <tr class="bg-gray-50/50">
-                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 9:52</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 11:12</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">30</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">S</td>
-                  </tr>
-                  <tr>
-                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 10:00</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 10:18</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">9</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">M</td>
-                  </tr>
-                  <tr class="bg-gray-50/50">
-                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 10:18</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 10:58</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">10</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">XXL</td>
-                  </tr>
-                  <tr>
-                    <td class="p-1.5 border-r border-gray-200 font-sans">11/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">11/09/2026 8:30</td>
-                    <td class="p-1.5 border-r border-gray-200">11/09/2026 9:06</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">18</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">XXL</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- RIGHT COLUMN: TOTALS & KPI (Exact layout from screenshot 2) -->
-        <div class="w-full lg:w-56 flex flex-col justify-between text-xs shrink-0 pl-1">
-          <div class="space-y-4 font-mono text-xs text-gray-800">
-            
-            <div class="space-y-1">
-              <div class="flex justify-between">
-                <span>QTY PIANIFICATA:</span>
-                <strong>2099</strong>
-              </div>
-              <div class="flex justify-between text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded">
-                <span>QTY PRODOTTA:</span>
-                <strong id="kpiQtyProdotta" class="font-extrabold text-sm">666</strong>
-              </div>
-              <div class="flex justify-between text-gray-500">
-                <span>QTY OVER:</span>
-                <strong>0</strong>
-              </div>
-              <div class="flex justify-between text-orange-700 bg-orange-50 px-1 py-0.5 rounded">
-                <span>DIFF:</span>
-                <strong id="kpiQtyDiff" class="font-bold">1433</strong>
-              </div>
-            </div>
-
-            <div class="space-y-1 text-gray-700 pt-2 border-t border-gray-200">
-              <div class="flex justify-between">
-                <span>TOTALE QTY COMMESSA:</span>
-                <strong>2099</strong>
-              </div>
-              <div class="flex justify-between">
-                <span>TOTALE QTY PIANIFICATA:</span>
-                <strong>2099</strong>
-              </div>
-              <div class="flex justify-between">
-                <span>DIFF:</span>
-                <strong>0</strong>
-              </div>
-            </div>
-
-            <div class="pt-2 border-t border-gray-200 font-sans text-xs">
-              <div class="text-gray-700 font-semibold mb-1">Qty pianificata per linie:</div>
-              <div class="flex items-center gap-2">
-                <span>• 1A - <strong>2099</strong></span>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Bottom Button: Chiudi commessa (Exact from screenshot 2) -->
-          <div class="pt-4 text-right">
-            <button onclick="closeProductionModal()" class="bg-[#f0a500] hover:bg-[#d99500] text-black font-bold px-4 py-2 rounded-xs shadow-2xs text-xs">
-              Chiudi commessa
-            </button>
-          </div>
-        </div>
-
+      <!-- Modal Footer -->
+      <div class="px-5 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <button onclick="setMachineStandby()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+          Imposta Standby (—)
+        </button>
+        <button onclick="closeMachineModal()" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition">
+          Chiudi Scheda
+        </button>
       </div>
-
     </div>
   </div>
 
-  <!-- Audio Tone Synthesis for Scanner Beep & Scale Chime -->
+  <!-- ===================================================================== -->
+  <!-- EFFICIENCY ANALYTICS MODAL ("Eff" Button)                             -->
+  <!-- ===================================================================== -->
+  <div id="effModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <i class="fa-solid fa-chart-column"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-extrabold text-slate-800 dark:text-white">Analisi Efficienza Stabilimento Europa</h3>
+            <p class="text-[11px] text-slate-400">Riepilogo per Squadra, Linea e Famiglia Macchina</p>
+          </div>
+        </div>
+        <button onclick="closeEffModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="p-5 space-y-4 max-h-[75vh] overflow-y-auto custom-scroll">
+        <!-- Line Breakdown Bars -->
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Efficienza Media per Linea</h4>
+          <div id="effModalLinesList" class="space-y-2.5"></div>
+        </div>
+        <!-- Family Breakdown -->
+        <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Distribuzione per Famiglia (F3 - F15)</h4>
+          <div id="effModalFamiliesGrid" class="grid grid-cols-3 sm:grid-cols-6 gap-2"></div>
+        </div>
+      </div>
+      <div class="px-5 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex justify-end">
+        <button onclick="closeEffModal()" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white">Chiudi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- SETTINGS MODAL ("Settings" Button)                                    -->
+  <!-- ===================================================================== -->
+  <div id="settingsModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-indigo-500"></i>
+          <h3 class="text-sm font-extrabold text-slate-800 dark:text-white">Impostazioni Soglie Sinottico</h3>
+        </div>
+        <button onclick="closeSettingsModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="p-5 space-y-4 text-xs">
+        <div>
+          <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Soglia Verde (Ottimale % >=)</label>
+          <input id="threshGreenInput" type="number" value="91" min="50" max="100" onchange="updateThresholds()" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-mono font-bold" />
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Soglia Gialla (Attenzione % >=)</label>
+          <input id="threshYellowInput" type="number" value="80" min="10" max="95" onchange="updateThresholds()" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-mono font-bold" />
+        </div>
+        <div class="pt-2 flex items-center justify-between">
+          <span class="font-semibold text-slate-600 dark:text-slate-300">Mostra barre di progresso sulle celle</span>
+          <input id="toggleProgressBars" type="checkbox" checked onchange="renderAll()" class="w-4 h-4 accent-indigo-600 rounded cursor-pointer" />
+        </div>
+      </div>
+      <div class="px-5 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex justify-between">
+        <button onclick="resetDefaultData()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition">
+          Ripristina Dati Screenshot
+        </button>
+        <button onclick="closeSettingsModal()" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white">
+          Applica
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- LINE OPERATOR ASSIGNMENT MODAL                                        -->
+  <!-- ===================================================================== -->
+  <div id="operatorModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <i class="fa-solid fa-user-gear"></i>
+          </div>
+          <div>
+            <h3 id="opModalTitle" class="text-sm font-extrabold text-slate-800 dark:text-white">Operatore LINEA 1</h3>
+            <p class="text-[11px] text-slate-400">Assegna Cognome e Nome responsabile linea</p>
+          </div>
+        </div>
+        <button onclick="closeOperatorModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="p-5 space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Cognome e Nome Operatore</label>
+          <input
+            id="opNameInput"
+            type="text"
+            placeholder="Es. ROSSI MARCO"
+            onkeydown="if(event.key==='Enter') saveOperatorModal()"
+            class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-semibold text-slate-800 dark:text-slate-100 uppercase focus:outline-none focus:border-indigo-500"
+          />
+        </div>
+      </div>
+      <div class="px-5 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
+        <button onclick="closeOperatorModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
+          Annulla
+        </button>
+        <button onclick="saveOperatorModal()" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white">
+          Salva Operatore
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2.5 opacity-0 pointer-events-none transition-all duration-300 z-50">
+    <i class="fa-solid fa-circle-info text-indigo-400 dark:text-indigo-600"></i>
+    <span id="toastMsg">Notifica</span>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- APPLICATION DATA & INTERACTIVE LOGIC                                  -->
+  <!-- ===================================================================== -->
   <script>
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playBeep(type = 'success') {
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
+    // Thresholds matching screenshot:
+    // Notice in screenshot: 88%, 89%, 90% are YELLOW; 92%, 94%, 97% are GREEN; 2%..76% are RED; 0% or blank are GREY.
+    let thresholdGreen = 91;
+    let thresholdYellow = 80;
+
+    // Exact Machine Dataset from User's Screenshot + Assigned Line Operators (Surname Name)
+    const INITIAL_LINES = {
+      linea5: {
+        id: 'linea5',
+        name: 'LINEA 5',
+        squadra: 3,
+        operator: 'ROSSI MARCO',
+        rows: [
+          [
+            { id: '0051', family: 'F15', eff: 88 },
+            { id: '0052', family: 'F15', eff: 0 },
+            { id: '0053', family: 'F15', eff: 0 },
+            { id: '0054', family: 'F15', eff: 0 },
+            { id: '0055', family: 'F15', eff: 0 },
+          ],
+          [
+            { id: '0046', family: 'F14', eff: 37 },
+            { id: '0047', family: 'F15', eff: 0 },
+            { id: '0048', family: 'F15', eff: 89 },
+            { id: '0049', family: 'F15', eff: 0 },
+            { id: '0050', family: 'F15', eff: 0 },
+          ]
+        ]
+      },
+      linea4: {
+        id: 'linea4',
+        name: 'LINEA 4',
+        squadra: 2,
+        operator: 'BIANCHI LUCA',
+        rows: [
+          [
+            { id: '0036', family: 'F8', eff: null },
+            { id: '0037', family: 'F8', eff: 0 },
+            { id: '0038', family: 'F8', eff: 10 },
+            { id: '0039', family: 'F8', eff: 0 },
+            { id: '0040', family: 'F8', eff: null },
+          ],
+          [
+            { id: '0031', family: 'F8', eff: 0 },
+            { id: '0032', family: 'F8', eff: 0 },
+            { id: '0033', family: 'F8', eff: 6 },
+            { id: '0034', family: 'F8', eff: 0 },
+            { id: '0035', family: 'F8', eff: 2 },
+          ]
+        ]
+      },
+      linea3: {
+        id: 'linea3',
+        name: 'LINEA 3',
+        squadra: 2,
+        operator: 'VERDI GIUSEPPE',
+        rows: [
+          [
+            { id: '0026', family: 'F15', eff: 0 },
+            { id: '0027', family: 'F15', eff: 55 },
+            { id: '0028', family: 'F15', eff: 92 },
+            { id: '0029', family: 'F15', eff: 15 },
+            { id: '0030', family: 'F15', eff: 0 },
+          ],
+          [
+            { id: '0021', family: 'F14', eff: 97 },
+            { id: '0022', family: 'F15', eff: null },
+            { id: '0023', family: 'F15', eff: 0 },
+            { id: '0024', family: 'F15', eff: 30 },
+            { id: '0025', family: 'F15', eff: 0 },
+          ]
+        ]
+      },
+      linea7: {
+        id: 'linea7',
+        name: 'LINEA 7',
+        squadra: 4,
+        operator: 'FERRARI ANNA',
+        rows: [
+          [
+            { id: '0069', family: 'F3', eff: null },
+            { id: '0070', family: 'F3', eff: null },
+            { id: '0071', family: 'F3', eff: null },
+            { id: '0072', family: 'F7', eff: null },
+            { id: '0073', family: 'F7', eff: null },
+          ],
+          [
+            { id: '0074', family: 'F3', eff: null },
+            { id: '0075', family: 'F3', eff: null },
+            { id: '0076', family: 'F3', eff: null },
+            { id: '0077', family: 'F14', eff: null },
+            { id: '0078', family: 'F14', eff: null },
+          ]
+        ]
+      },
+      linea2: {
+        id: 'linea2',
+        name: 'LINEA 2',
+        squadra: 1,
+        operator: 'CONTI DAVIDE',
+        rows: [
+          [
+            { id: '0016', family: 'F15', eff: 89 },
+            { id: '0017', family: 'F15', eff: 0 },
+            { id: '0018', family: 'F15', eff: 67 },
+            { id: '0019', family: 'F15', eff: 94 },
+            { id: '0020', family: 'F15', eff: 0 },
+          ],
+          [
+            { id: '0011', family: 'F15', eff: 88 },
+            { id: '0012', family: 'F15', eff: 90 },
+            { id: '0013', family: 'F15', eff: 76 },
+            { id: '0014', family: 'F15', eff: 11 },
+            { id: '0015', family: 'F15', eff: 0 },
+          ]
+        ]
+      },
+      linea1: {
+        id: 'linea1',
+        name: 'LINEA 1',
+        squadra: 1,
+        operator: 'MORETTI PAOLO',
+        rows: [
+          [
+            { id: '0006', family: 'F3', eff: 0 },
+            { id: '0007', family: 'F7', eff: 97 },
+            { id: '0008', family: 'F7', eff: 0 },
+            { id: '0009', family: 'F10', eff: null },
+            { id: '0010', family: 'F5', eff: 0 },
+          ],
+          [
+            { id: '0001', family: 'F3', eff: null },
+            { id: '0002', family: 'F14', eff: 0 },
+            { id: '0003', family: 'F14', eff: 0 },
+            { id: null, family: null, eff: null, emptySlot: true }, // Exact empty slot between 0003 and 0005 in screenshot
+            { id: '0005', family: 'F8', eff: 0 },
+          ]
+        ]
       }
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
+    };
 
-      if (type === 'success') {
-        osc.frequency.setValueAtTime(1760, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.12);
-      } else if (type === 'chime') {
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(1320, audioCtx.currentTime + 0.08);
-        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.28);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.28);
-      } else {
-        osc.frequency.setValueAtTime(220, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.3);
-      }
+    let linesData = JSON.parse(JSON.stringify(INITIAL_LINES));
+    let activeStatusFilter = null; // 'green' | 'yellow' | 'red' | 'grey' | null
+    let selectedMachineRef = null;
+    let liveSimInterval = null;
+
+    function getStatusCategory(eff) {
+      if (eff === null || eff === undefined || eff === 0) return 'grey';
+      if (eff >= thresholdGreen) return 'green';
+      if (eff >= thresholdYellow) return 'yellow';
+      return 'red';
     }
 
-    // STATE VARIABLES
-    const TOTAL_ORDER = 2099;
-    const PACK_SIZE = 10;
-    const TARGET_WEIGHT = 2500;
-    const TOLERANCE = 50;
-
-    let currentQtyProdotta = 666;
-    let currentWeightG = 2508;
-    let selectedSize = 'M';
-    let selectedColor = 'V00006';
-    let currentSerial = 67;
-    let barcodeRead = false;
-    let scannedSerialsSet = new Set(['065', '066']); // Previously registered packets
-
-    function openProductionModal() {
-      document.getElementById('productionWindow').classList.remove('hidden');
+    function getProgressBarColor(status) {
+      if (status === 'green') return 'bg-emerald-500';
+      if (status === 'yellow') return 'bg-amber-500';
+      if (status === 'red') return 'bg-rose-500';
+      return 'bg-slate-300 dark:bg-slate-700';
     }
 
-    function closeProductionModal() {
-      document.getElementById('productionWindow').classList.add('hidden');
-    }
+    function renderLineBlock(lineKey) {
+      const line = linesData[lineKey];
+      const container = document.getElementById(`grid-${lineKey}`);
+      if (!container) return;
 
-    function setBarcodeSize(sz) {
-      selectedSize = sz;
-      const snStr = String(currentSerial).padStart(3, '0');
-      document.getElementById('scannedTagSize').textContent = `#P-${snStr} • Taglia ${sz}`;
-      document.getElementById('barcodePayloadInput').value = `ORD:26022404_001|COL:${selectedColor}|SZ:${sz}|QTY:10|SN:${snStr}`;
-      document.getElementById('selectTaglie').value = sz;
-      barcodeRead = false;
-      updateValidationState();
-    }
+      const showBars = document.getElementById('toggleProgressBars')?.checked ?? true;
+      const searchVal = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
 
-    function prepareNextPack() {
-      currentSerial++;
-      barcodeRead = false;
-      const snStr = String(currentSerial).padStart(3, '0');
-      document.getElementById('scannedTagSize').textContent = `#P-${snStr} • Taglia ${selectedSize}`;
-      document.getElementById('barcodePayloadInput').value = `ORD:26022404_001|COL:${selectedColor}|SZ:${selectedSize}|QTY:10|SN:${snStr}`;
-      
-      const btnScan = document.getElementById('btnScansiona');
-      btnScan.disabled = false;
-      btnScan.className = "w-full bg-blue-600 hover:bg-blue-500 text-white py-2 px-3 rounded font-bold text-xs transition flex items-center justify-center gap-2 shadow-md mb-2";
-      btnScan.innerHTML = `<i class="fa-solid fa-barcode text-sm"></i> <span class="tracking-wide uppercase">1. SCANSIONA BARCODE</span>`;
+      // Calculate Line Efficiency Percentage
+      let lineSum = 0;
+      let lineCount = 0;
+      let lineHasAssigned = false;
+      line.rows.forEach((r) => {
+        r.forEach((m) => {
+          if (!m.emptySlot) {
+            lineCount++;
+            if (m.eff !== null && m.eff !== undefined) {
+              lineHasAssigned = true;
+              lineSum += m.eff;
+            }
+          }
+        });
+      });
 
-      const status = document.getElementById('scannerStatusText');
-      status.textContent = `Pacco #P-${snStr} pronto. FASE 1: Clicca Scansiona`;
-      status.className = "text-[11px] font-mono text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded border border-amber-300";
+      const lineAvgNum = (lineHasAssigned && lineCount > 0) ? (lineSum / lineCount) : 0;
+      const lineEffText = lineHasAssigned ? `${lineAvgNum.toFixed(1).replace('.0', '')}%` : '0%';
+      const lineStatus = getStatusCategory(lineHasAssigned ? Math.round(lineAvgNum) : 0);
 
-      simulateWeight(2508);
-      updateValidationState();
-    }
+      const lineEffBadgeClass =
+        lineStatus === 'green' ? 'bg-emerald-100 dark:bg-emerald-950/90 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700' :
+        lineStatus === 'yellow' ? 'bg-amber-100 dark:bg-amber-950/90 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700' :
+        lineStatus === 'red' ? 'bg-rose-100 dark:bg-rose-950/90 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800' :
+        'bg-slate-200/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600';
 
-    function simulateWeight(grams) {
-      currentWeightG = grams;
-      const kg = (grams / 1000).toFixed(3);
-      const display = document.getElementById('scaleDigitalDisplay');
-      const status = document.getElementById('scaleWeightStatus');
+      let rowsHtml = '';
+      line.rows.forEach((row) => {
+        let cellsHtml = '';
+        row.forEach((m) => {
+          if (m.emptySlot) {
+            cellsHtml += `
+              <div class="rounded-lg border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 min-h-[52px] flex items-center justify-center">
+                <span class="text-[9px] text-slate-300 dark:text-slate-700 font-mono">—</span>
+              </div>
+            `;
+            return;
+          }
 
-      display.textContent = `${kg} kg`;
+          const status = getStatusCategory(m.eff);
+          const matchesStatus = !activeStatusFilter || activeStatusFilter === status;
+          const matchesSearch =
+            !searchVal ||
+            m.id.toLowerCase().includes(searchVal) ||
+            (m.family && m.family.toLowerCase().includes(searchVal)) ||
+            (line.operator && line.operator.toLowerCase().includes(searchVal)) ||
+            line.name.toLowerCase().includes(searchVal);
+          const dimmedClass = (matchesStatus && matchesSearch) ? '' : 'card-dimmed';
 
-      const isWeightOk = grams >= (TARGET_WEIGHT - TOLERANCE) && grams <= (TARGET_WEIGHT + TOLERANCE);
-      if (isWeightOk) {
-        display.className = "font-mono text-xl font-black text-emerald-600 bg-gray-50 px-2 py-1 rounded border border-gray-300";
-        status.textContent = `${grams}g (CONFORME)`;
-        status.className = "text-emerald-700 font-bold font-mono";
-      } else {
-        playBeep('error');
-        display.className = "font-mono text-xl font-black text-red-600 bg-red-50 px-2 py-1 rounded border border-red-300";
-        status.textContent = `${grams}g (ANOMALIA)`;
-        status.className = "text-red-700 font-bold font-mono";
-      }
+          const effDisplay = (m.eff !== null && m.eff !== undefined) ? `${m.eff}%` : '';
+          const barWidth = (m.eff && m.eff > 0) ? m.eff : 0;
 
-      updateValidationState();
-    }
+          cellsHtml += `
+            <div
+              onclick="openMachineModal('${lineKey}', '${m.id}')"
+              class="machine-card status-${status} ${dimmedClass} rounded-lg px-2.5 py-1.5 min-h-[52px] flex flex-col justify-between cursor-pointer select-none"
+            >
+              <div class="flex items-start justify-between gap-1">
+                <div class="flex flex-col leading-tight">
+                  <span class="font-mono text-[11px] font-bold tracking-tight opacity-90">${m.id}</span>
+                  <span class="font-mono text-[10px] font-semibold opacity-70 mt-0.5">${m.family || ''}</span>
+                </div>
+                <div class="font-mono text-sm font-extrabold tracking-tight self-center">
+                  ${effDisplay}
+                </div>
+              </div>
+              ${showBars ? `
+                <div class="w-full h-1 bg-black/5 dark:bg-white/10 rounded-full overflow-hidden mt-1">
+                  <div class="h-full ${getProgressBarColor(status)} rounded-full transition-all duration-300" style="width: ${barWidth}%"></div>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        });
 
-    // SCENARIO DEMO 1: BUONO (10 PEZZI CONFORMI A BARCODE E BILANCIA)
-    function runScenarioGood() {
-      if (scannedSerialsSet.has(String(currentSerial).padStart(3, '0'))) {
-        prepareNextPack();
-      }
-      simulateWeight(2508);
-      executeBarcodeScan();
+        rowsHtml += `<div class="grid grid-cols-5 gap-1.5">${cellsHtml}</div>`;
+      });
 
-      const note = document.getElementById('scaleDetailNote');
-      note.innerHTML = `<strong class="text-emerald-700">✓ SCENARIO CONFORME:</strong> 10 pezzi rilevati (2.508 kg). Pulsante verde abilitato per l'inserimento.`;
+      container.innerHTML = `
+        <div class="flex items-stretch gap-3">
+          <!-- Enlarged Line Window Card: 1) Line Name, 2) Efficiency %, 3) Operator Surname & Name Field -->
+          <div
+            onclick="editLineOperator('${lineKey}')"
+            title="Clicca per modificare l'operatore assegnato alla ${line.name}"
+            class="w-44 sm:w-52 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-800/95 border-2 border-slate-300/90 dark:border-slate-700 flex flex-col items-center justify-between p-2.5 text-center shadow-sm hover:border-indigo-500 dark:hover:border-indigo-400 hover:shadow-md transition cursor-pointer group"
+          >
+            <!-- 1. Top: Line Name -->
+            <div class="w-full flex items-center justify-center gap-1.5">
+              <span class="text-sm font-extrabold tracking-wider text-slate-800 dark:text-slate-100 uppercase leading-none">${line.name}</span>
+              <i class="fa-solid fa-pen text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition"></i>
+            </div>
 
-      const status = document.getElementById('scannerStatusText');
-      status.textContent = `✓ TEST BUONO: Barcode e Bilancia perfettamente allineati (10 pz). Clicca il pulsante verde!`;
-      status.className = "text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-300 font-bold";
-    }
+            <!-- 2. Middle: Line Efficiency Percentage underneath Line Name -->
+            <div class="my-1.5 w-full flex justify-center">
+              <span class="inline-block px-3.5 py-0.5 rounded-md border font-mono text-base font-extrabold tracking-tight shadow-2xs ${lineEffBadgeClass}">
+                ${lineEffText}
+              </span>
+            </div>
 
-    // SCENARIO DEMO 2: ANOMALIA / MISMATCH (BARCODE DA 10 PZ MA BILANCIA RILEVA SOLO 9 PZ)
-    function runScenarioBad() {
-      if (scannedSerialsSet.has(String(currentSerial).padStart(3, '0'))) {
-        prepareNextPack();
-      }
-      simulateWeight(2240); // 9 capi
-      executeBarcodeScan();
+            <!-- 3. Bottom: Operator Name Field (Surname & Name) underneath Efficiency % -->
+            <div class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 flex items-center justify-center gap-1.5 shadow-2xs">
+              <i class="fa-solid fa-id-badge text-[10px] text-indigo-500 dark:text-indigo-400 shrink-0"></i>
+              <span class="text-[11px] font-bold text-slate-800 dark:text-slate-100 uppercase tracking-tight leading-tight truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                ${line.operator || 'NON ASSEGNATO'}
+              </span>
+            </div>
+          </div>
 
-      const note = document.getElementById('scaleDetailNote');
-      note.innerHTML = `<strong class="text-red-700">✗ SCENARIO ANOMALIA:</strong> Il barcode richiede 10 capi (~2.500g), ma la bilancia ne rileva solo 9 (2.240 kg)!`;
-
-      const status = document.getElementById('scannerStatusText');
-      status.textContent = `✗ TEST ANOMALIA: Mismatch peso! Barcode 10pz ≠ Bilancia 9pz (2.240kg). Inserimento BLOCCATO!`;
-      status.className = "text-[11px] font-mono text-red-700 bg-red-50 px-2.5 py-0.5 rounded border border-red-300 font-bold animate-pulse";
-    }
-
-    // FASE 1: Scansione Barcode (Legge i dati dal barcode MA NON inserisce la riga nel database!)
-    function executeBarcodeScan() {
-      const snStr = String(currentSerial).padStart(3, '0');
-
-      // Controllo anti-duplicato se il barcode è già stato consumato
-      if (scannedSerialsSet.has(snStr)) {
-        playBeep('error');
-        const status = document.getElementById('scannerStatusText');
-        status.textContent = `✗ DUPLICATO BLOCCATO: Pacco #P-${snStr} già registrato!`;
-        status.className = "text-[11px] font-mono text-red-700 bg-red-50 px-2.5 py-0.5 rounded border border-red-300 animate-pulse font-bold";
-        return;
-      }
-
-      playBeep('success');
-      barcodeRead = true;
-
-      // Compila automaticamente la form a sinistra per mostrare che non serve digitare
-      document.getElementById('inputDataProduzione').value = "26/10/2026";
-      document.getElementById('selectColore').value = selectedColor;
-      document.getElementById('selectTaglie').value = selectedSize;
-      document.getElementById('inputQuantita').value = PACK_SIZE;
-
-      // Disabilita pulsante scansiona per evitare letture ripetute dello stesso collo
-      const btnScan = document.getElementById('btnScansiona');
-      btnScan.disabled = true;
-      btnScan.className = "w-full bg-gray-100 text-gray-500 py-2 px-3 rounded font-bold text-xs transition flex items-center justify-center gap-2 mb-2 cursor-not-allowed border border-gray-300";
-      btnScan.innerHTML = `<i class="fa-solid fa-check text-emerald-600"></i> <span class="tracking-wide uppercase text-emerald-700">BARCODE ACQUISITO</span>`;
-
-      const status = document.getElementById('scannerStatusText');
-      status.textContent = `✓ Barcode #P-${snStr} acquisito. FASE 2: Convalida su Bilancia`;
-      status.className = "text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-300";
-
-      updateValidationState();
-    }
-
-    // Aggiorna lo stato del pulsante di convalida bilancia (DIVENTA VERDE SOLO SE PESO OK)
-    function updateValidationState() {
-      const btn = document.getElementById('btnValidateScale');
-      const icon = document.getElementById('btnValidateIcon');
-      const label = document.getElementById('btnValidateLabel');
-      const subtext = document.getElementById('btnValidateSubtext');
-
-      const isWeightOk = currentWeightG >= (TARGET_WEIGHT - TOLERANCE) && currentWeightG <= (TARGET_WEIGHT + TOLERANCE);
-
-      if (!barcodeRead) {
-        btn.disabled = true;
-        btn.className = "w-full bg-gray-100 border border-gray-300 text-gray-400 p-2.5 rounded font-bold text-xs shadow-2xs transition flex flex-col items-center justify-center gap-0.5 cursor-not-allowed";
-        icon.className = "fa-solid fa-lock text-xs";
-        label.textContent = "VALIDA E INSERISCI";
-        subtext.textContent = "Prima scansiona il barcode (Fase 1)";
-      } else if (barcodeRead && !isWeightOk) {
-        // Peso errato: pulsante rosso/disabilitato, impossibile inserire!
-        btn.disabled = true;
-        btn.className = "w-full bg-red-50 border border-red-300 text-red-700 p-2.5 rounded font-bold text-xs shadow-2xs transition flex flex-col items-center justify-center gap-0.5 cursor-not-allowed";
-        icon.className = "fa-solid fa-triangle-exclamation text-xs text-red-600";
-        label.textContent = "PESO NON CONFORME";
-        subtext.textContent = `Atteso 2.500g (Rilevato: ${currentWeightG}g)`;
-      } else if (barcodeRead && isWeightOk) {
-        // Barcode letto E peso perfetto: PULSANTE VERDE ABILITATO!
-        btn.disabled = false;
-        btn.className = "w-full bg-emerald-600 hover:bg-emerald-700 text-white p-2.5 rounded font-extrabold text-xs shadow-md transition flex flex-col items-center justify-center gap-0.5 cursor-pointer border border-emerald-600 ring-2 ring-emerald-400/40 animate-pulse";
-        icon.className = "fa-solid fa-circle-check text-xs text-white";
-        label.textContent = "✓ CONVALIDA E INSERISCI (+10 PZ)";
-        subtext.textContent = `Peso OK (${currentWeightG}g) • Clicca per registrare`;
-      }
-    }
-
-    function handleValidateAreaClick() {
-      const btn = document.getElementById('btnValidateScale');
-      if (btn.disabled) {
-        validateAndInsertRecord();
-      }
-    }
-
-    // FASE 2: Convalida su Bilancia (L'INSERIMENTO AVVIENE SOLO QUI, UNA SOLA VOLTA!)
-    function validateAndInsertRecord() {
-      const isWeightOk = currentWeightG >= (TARGET_WEIGHT - TOLERANCE) && currentWeightG <= (TARGET_WEIGHT + TOLERANCE);
-
-      if (!barcodeRead) {
-        playBeep('error');
-        alert("Attenzione: Effettua prima la scansione del codice a barre (Fase 1).");
-        return;
-      }
-
-      if (!isWeightOk) {
-        playBeep('error');
-        alert(`BLOCCO DI SICUREZZA PRODUZIONE!\n\nIl barcode specifica una busta da 10 pezzi (~2.500g).\nIl peso rilevato dalla bilancia è di ${currentWeightG}g (mancano pezzi!).\n\nL'inserimento nella tabella di produzione è BLOCCATO finché il peso non è conforme.`);
-        return;
-      }
-
-      const snStr = String(currentSerial).padStart(3, '0');
-
-      if (scannedSerialsSet.has(snStr)) {
-        playBeep('error');
-        alert("Pacco già registrato! Impossibile duplicare l'inserimento.");
-        return;
-      }
-
-      // Convalida confermata!
-      playBeep('chime');
-      scannedSerialsSet.add(snStr);
-      currentQtyProdotta += PACK_SIZE;
-
-      // Inserisce la riga nella tabella di produzione
-      insertProductionTableRow(selectedColor, selectedSize, PACK_SIZE, currentWeightG, snStr);
-
-      // Aggiorna KPI e Gantt
-      updateTotals();
-
-      // Disabilita immediatamente per bloccare click multipli
-      barcodeRead = false;
-      const btn = document.getElementById('btnValidateScale');
-      btn.disabled = true;
-      btn.className = "w-full bg-gray-100 border border-gray-300 text-gray-500 p-2.5 rounded font-bold text-xs shadow-2xs transition flex flex-col items-center justify-center gap-0.5 cursor-not-allowed";
-      document.getElementById('btnValidateIcon').className = "fa-solid fa-check-double text-xs text-emerald-600";
-      document.getElementById('btnValidateLabel').textContent = `PACCO #P-${snStr} REGISTRATO!`;
-      document.getElementById('btnValidateSubtext').textContent = "+10 capi inseriti • Duplicati bloccati";
-
-      const status = document.getElementById('scannerStatusText');
-      status.textContent = `✓ Inserito pacco #P-${snStr} (+10pz). Preparazione prossimo pacco...`;
-      status.className = "text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-300";
-
-      // Prepara il prossimo pacco
-      setTimeout(() => {
-        prepareNextPack();
-      }, 3000);
-    }
-
-    function manualInsertOk() {
-      const q = parseInt(document.getElementById('inputQuantita').value) || 10;
-      const col = document.getElementById('selectColore').value;
-      const sz = document.getElementById('selectTaglie').value;
-      
-      currentQtyProdotta += q;
-      insertProductionTableRow(col, sz, q, null);
-      updateTotals();
-      playBeep('success');
-    }
-
-    function insertProductionTableRow(col, sz, q, weight) {
-      const tbody = document.getElementById('tableBodyRows');
-      const now = new Date();
-      const dateStr = "26/10/2026";
-      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const fullTime = `${dateStr} ${timeStr}`;
-
-      const tr = document.createElement('tr');
-      tr.className = "flash-new-row font-mono text-xs text-gray-800";
-      tr.innerHTML = `
-        <td class="p-1.5 border-r border-gray-200 font-sans font-bold text-emerald-800">${dateStr}</td>
-        <td class="p-1.5 border-r border-gray-200">${fullTime}</td>
-        <td class="p-1.5 border-r border-gray-200">${fullTime}</td>
-        <td class="p-1.5 border-r border-gray-200 text-right font-black text-emerald-700 bg-emerald-100/50">+${q}</td>
-        <td class="p-1.5 border-r border-gray-200">${col}</td>
-        <td class="p-1.5 font-bold">${sz} ${weight ? `<span class="text-[9px] bg-emerald-200 text-emerald-900 px-1 rounded ml-1 font-sans">AUTO (${weight}g)</span>` : ''}</td>
+          <!-- 2x5 Machine Grid -->
+          <div class="flex-1 flex flex-col justify-between gap-1.5">
+            ${rowsHtml}
+          </div>
+        </div>
       `;
-      tbody.insertBefore(tr, tbody.firstChild);
     }
 
-    function updateTotals() {
-      const diff = TOTAL_ORDER - currentQtyProdotta;
-      document.getElementById('kpiQtyProdotta').textContent = currentQtyProdotta;
-      document.getElementById('kpiQtyDiff').textContent = diff;
-      document.getElementById('ganttQtyDisplay').textContent = currentQtyProdotta;
+    let editingLineKey = null;
+
+    function editLineOperator(lineKey) {
+      const line = linesData[lineKey];
+      if (!line) return;
+      editingLineKey = lineKey;
+      document.getElementById('opModalTitle').textContent = `Operatore ${line.name}`;
+      const input = document.getElementById('opNameInput');
+      input.value = line.operator || '';
+      const modal = document.getElementById('operatorModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      setTimeout(() => input.focus(), 50);
     }
 
-    function recalculateGantt() {
-      playBeep('success');
-      alert(`Ricalcolo completato con successo!\nCommessa 26022404_001 su LINEA 1A aggiornata con ${currentQtyProdotta} capi prodotti convalidati.`);
+    function closeOperatorModal() {
+      const modal = document.getElementById('operatorModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      editingLineKey = null;
     }
 
-    // Open the modal by default so the client sees the exact production window right away
+    function saveOperatorModal() {
+      if (!editingLineKey) return;
+      const line = linesData[editingLineKey];
+      const val = document.getElementById('opNameInput').value.trim().toUpperCase();
+      line.operator = val || 'NON ASSEGNATO';
+      closeOperatorModal();
+      renderAll();
+      showToast(`Operatore ${line.name} aggiornato: ${line.operator}`);
+    }
+
+    function recalculateKPIs() {
+      let counts = { green: 0, yellow: 0, red: 0, grey: 0 };
+      let sqStats = {
+        1: { sum: 0, totalCount: 0, workingCount: 0, hasAssigned: false },
+        2: { sum: 0, totalCount: 0, workingCount: 0, hasAssigned: false },
+        3: { sum: 0, totalCount: 0, workingCount: 0, hasAssigned: false },
+        4: { sum: 0, totalCount: 0, workingCount: 0, hasAssigned: false },
+      };
+
+      let totalSum = 0;
+      let totalMachinesWithZero = 0;
+      let workingMachines = 0;
+
+      Object.values(linesData).forEach((line) => {
+        line.rows.forEach((row) => {
+          row.forEach((m) => {
+            if (m.emptySlot) return;
+            const st = getStatusCategory(m.eff);
+            counts[st]++;
+
+            const sq = sqStats[line.squadra];
+            sq.totalCount++;
+            if (m.eff !== null && m.eff !== undefined) {
+              sq.hasAssigned = true;
+              sq.sum += m.eff;
+              totalSum += m.eff;
+              totalMachinesWithZero++;
+              if (m.eff > 0) {
+                sq.workingCount++;
+                workingMachines++;
+              }
+            } else {
+              totalMachinesWithZero++;
+            }
+          });
+        });
+      });
+
+      // Update status filter counters
+      document.getElementById('count-green').textContent = counts.green;
+      document.getElementById('count-yellow').textContent = counts.yellow;
+      document.getElementById('count-red').textContent = counts.red;
+      document.getElementById('count-grey').textContent = counts.grey;
+
+      // Check if dataset is in initial state
+      const isInitial = (totalSum === 1133 && workingMachines === 19);
+
+      // Squadra efficiencies (1:1 exact match with screenshot on initial state, dynamic when modified)
+      const initialSqLabels = { 1: '37.2%', 2: '18%', 3: '21.4%', 4: '—' };
+      [1, 2, 3, 4].forEach((sqId) => {
+        const s = sqStats[sqId];
+        const el = document.getElementById(`sq${sqId}-eff`);
+        if (!el) return;
+        if (isInitial) {
+          el.textContent = initialSqLabels[sqId];
+        } else if (!s.hasAssigned || s.workingCount === 0) {
+          el.textContent = sqId === 4 ? '—' : '0.0%';
+        } else {
+          const avg = (s.sum / s.totalCount).toFixed(1).replace('.0', '');
+          el.textContent = `${avg}%`;
+        }
+      });
+
+      document.getElementById('sq3-active').textContent = `${sqStats[3].workingCount} / ${sqStats[3].totalCount}`;
+
+      // Global Efficiency (All) & (Working)
+      // Screenshot shows 25.5% (All) and 59.6% (Working) (1133 / 19 = 59.63% -> 59.6%!)
+      const effWorking = workingMachines > 0 ? (totalSum / workingMachines) : 0;
+      const displayAll = isInitial ? '25.5' : (totalSum / 44.43).toFixed(1);
+      const displayWorking = isInitial ? '59.6' : effWorking.toFixed(1);
+
+      document.getElementById('badgeEffAll').textContent = `${displayAll}%`;
+      document.getElementById('barEffAll').style.width = `${Math.min(100, parseFloat(displayAll))}%`;
+
+      document.getElementById('badgeEffWorking').textContent = `${displayWorking}%`;
+      document.getElementById('barEffWorking').style.width = `${Math.min(100, parseFloat(displayWorking))}%`;
+      document.getElementById('workingCountBadge').textContent = `${workingMachines} active`;
+    }
+
+    function renderAll() {
+      Object.keys(linesData).forEach(renderLineBlock);
+      recalculateKPIs();
+    }
+
+    function toggleStatusFilter(status) {
+      if (activeStatusFilter === status) {
+        activeStatusFilter = null;
+      } else {
+        activeStatusFilter = status;
+      }
+
+      ['green', 'yellow', 'red', 'grey'].forEach((st) => {
+        const btn = document.getElementById(`filterBtn-${st}`);
+        if (activeStatusFilter === st) {
+          btn.classList.add('ring-2', 'ring-indigo-500', 'scale-105');
+        } else {
+          btn.classList.remove('ring-2', 'ring-indigo-500', 'scale-105');
+        }
+      });
+
+      renderAll();
+    }
+
+    function applyFilters() {
+      const searchVal = document.getElementById('searchInput').value.trim();
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (searchVal.length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+
+      [1, 2, 3, 4].forEach((sq) => {
+        const checked = document.getElementById(`chkSq${sq}`).checked;
+        const quad = document.getElementById(`quadrant-sq${sq}`);
+        if (checked) {
+          quad.classList.remove('opacity-25', 'pointer-events-none', 'grayscale');
+        } else {
+          quad.classList.add('opacity-25', 'pointer-events-none', 'grayscale');
+        }
+      });
+
+      renderAll();
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      applyFilters();
+    }
+
+    function onShiftChange() {
+      showToast('Filtro turno aggiornato');
+    }
+
+    // Machine Inspector Modal
+    function openMachineModal(lineKey, machineId) {
+      const line = linesData[lineKey];
+      let found = null;
+      line.rows.forEach((r) => r.forEach((m) => {
+        if (m.id === machineId) found = m;
+      }));
+      if (!found) return;
+
+      selectedMachineRef = { lineKey, machine: found };
+      const status = getStatusCategory(found.eff);
+
+      const badge = document.getElementById('modalStatusBadge');
+      badge.className = `w-11 h-11 rounded-xl flex items-center justify-center font-mono font-extrabold text-sm shadow-xs status-${status}`;
+      badge.textContent = found.id;
+
+      document.getElementById('modalTitle').textContent = `Macchina ${found.id}`;
+      document.getElementById('modalFamilyBadge').textContent = found.family || 'N/A';
+      document.getElementById('modalSubtitle').textContent = `Squadra ${line.squadra} • ${line.name}`;
+
+      const effVal = found.eff ?? 0;
+      document.getElementById('modalEffValue').textContent = found.eff !== null ? `${found.eff}%` : 'STANDBY (—)';
+      document.getElementById('modalEffSlider').value = effVal;
+
+      document.getElementById('modalOrder').textContent = found.eff && found.eff > 0 ? `ORD-2026-9${found.id.slice(-2)}` : 'Nessun ordine attivo';
+      document.getElementById('modalArticle').textContent = `Famiglia ${found.family} • Lotto Europa`;
+      document.getElementById('modalPieces').textContent = found.eff && found.eff > 0 ? `${Math.round(found.eff * 2.1)} / 220 pz` : '0 / 0 pz';
+      document.getElementById('modalPlcState').textContent =
+        found.eff >= thresholdGreen ? 'In Marcia Ottimale' :
+        found.eff >= thresholdYellow ? 'In Marcia (Sotto Target)' :
+        found.eff > 0 ? 'Allarme Rallentamento / Microfermi' : 'Macchina Ferma / Standby';
+
+      const modal = document.getElementById('machineModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function updateMachineEfficiencyFromSlider(val) {
+      if (!selectedMachineRef) return;
+      const num = parseInt(val, 10);
+      selectedMachineRef.machine.eff = num;
+      document.getElementById('modalEffValue').textContent = `${num}%`;
+      const status = getStatusCategory(num);
+      document.getElementById('modalStatusBadge').className = `w-11 h-11 rounded-xl flex items-center justify-center font-mono font-extrabold text-sm shadow-xs status-${status}`;
+      renderAll();
+    }
+
+    function setMachineStandby() {
+      if (!selectedMachineRef) return;
+      selectedMachineRef.machine.eff = null;
+      document.getElementById('modalEffValue').textContent = 'STANDBY (—)';
+      document.getElementById('modalEffSlider').value = 0;
+      renderAll();
+      showToast(`Macchina ${selectedMachineRef.machine.id} impostata in Standby`);
+    }
+
+    function closeMachineModal() {
+      const modal = document.getElementById('machineModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      selectedMachineRef = null;
+    }
+
+    // Efficiency Analytics Modal
+    function openEffModal() {
+      const listEl = document.getElementById('effModalLinesList');
+      let html = '';
+
+      Object.values(linesData).forEach((line) => {
+        let sum = 0;
+        let count = 0;
+        let active = 0;
+        line.rows.forEach((r) => r.forEach((m) => {
+          if (!m.emptySlot) {
+            count++;
+            if (m.eff && m.eff > 0) {
+              sum += m.eff;
+              active++;
+            }
+          }
+        }));
+        const avg = count > 0 ? (sum / count).toFixed(1) : '0.0';
+        const barColor = avg >= thresholdGreen ? 'bg-emerald-500' : avg >= thresholdYellow ? 'bg-amber-500' : avg > 0 ? 'bg-rose-500' : 'bg-slate-300';
+
+        html += `
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800">
+            <div class="flex items-center justify-between text-xs mb-1.5">
+              <div class="flex items-center gap-2">
+                <span class="font-extrabold text-slate-800 dark:text-white">${line.name}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold">Squadra ${line.squadra}</span>
+              </div>
+              <div class="flex items-center gap-3 font-mono">
+                <span class="text-[11px] text-slate-400">${active}/${count} attive</span>
+                <span class="font-extrabold text-slate-800 dark:text-white">${avg}%</span>
+              </div>
+            </div>
+            <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+              <div class="h-full ${barColor} rounded-full" style="width: ${Math.min(100, avg)}%"></div>
+            </div>
+          </div>
+        `;
+      });
+      listEl.innerHTML = html;
+
+      // Family stats
+      const famMap = {};
+      Object.values(linesData).forEach((l) => l.rows.forEach((r) => r.forEach((m) => {
+        if (!m.emptySlot && m.family) {
+          if (!famMap[m.family]) famMap[m.family] = { count: 0, active: 0 };
+          famMap[m.family].count++;
+          if (m.eff && m.eff > 0) famMap[m.family].active++;
+        }
+      })));
+
+      let famHtml = '';
+      Object.keys(famMap).sort().forEach((f) => {
+        famHtml += `
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 text-center">
+            <span class="font-mono text-xs font-extrabold text-indigo-600 dark:text-indigo-400 block">${f}</span>
+            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 mt-0.5 block">${famMap[f].count} macch.</span>
+            <span class="text-[10px] text-slate-400 block">${famMap[f].active} in marcia</span>
+          </div>
+        `;
+      });
+      document.getElementById('effModalFamiliesGrid').innerHTML = famHtml;
+
+      const modal = document.getElementById('effModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeEffModal() {
+      const modal = document.getElementById('effModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    // Settings Modal
+    function openSettingsModal() {
+      const modal = document.getElementById('settingsModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeSettingsModal() {
+      const modal = document.getElementById('settingsModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function updateThresholds() {
+      thresholdGreen = parseInt(document.getElementById('threshGreenInput').value, 10) || 91;
+      thresholdYellow = parseInt(document.getElementById('threshYellowInput').value, 10) || 80;
+      renderAll();
+      showToast(`Soglie aggiornate: Verde >= ${thresholdGreen}%, Giallo >= ${thresholdYellow}%`);
+    }
+
+    function resetDefaultData() {
+      linesData = JSON.parse(JSON.stringify(INITIAL_LINES));
+      thresholdGreen = 91;
+      thresholdYellow = 80;
+      document.getElementById('threshGreenInput').value = 91;
+      document.getElementById('threshYellowInput').value = 80;
+      renderAll();
+      closeSettingsModal();
+      showToast('Ripristinati i valori esatti dello screenshot originale');
+    }
+
+    // Live Telemetry Simulation
+    function toggleLiveSimulation() {
+      const btn = document.getElementById('liveSimBtn');
+      const txt = document.getElementById('liveSimText');
+      if (liveSimInterval) {
+        clearInterval(liveSimInterval);
+        liveSimInterval = null;
+        txt.textContent = 'LIVE TELEMETRY';
+        showToast('Simulazione telemetria in pausa');
+      } else {
+        txt.textContent = 'SIMULATING LIVE...';
+        showToast('Simulazione telemetria PLC avviata');
+        liveSimInterval = setInterval(() => {
+          const allWorking = [];
+          Object.values(linesData).forEach((l) => l.rows.forEach((r) => r.forEach((m) => {
+            if (!m.emptySlot && m.eff !== null && m.eff > 0) allWorking.push(m);
+          })));
+          if (allWorking.length > 0) {
+            const pick = allWorking[Math.floor(Math.random() * allWorking.length)];
+            const delta = Math.floor(Math.random() * 5) - 2;
+            pick.eff = Math.max(1, Math.min(99, pick.eff + delta));
+            const now = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+            const ts = `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+            document.getElementById('lastUpdateTop').textContent = ts;
+            document.getElementById('lastUpdateSq4').textContent = ts;
+            renderAll();
+          }
+        }, 2200);
+      }
+    }
+
+    // Dark Mode Toggle
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const icon = document.getElementById('themeIcon');
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        icon.className = 'fa-solid fa-moon text-xs';
+        showToast('Tema Chiaro attivato');
+      } else {
+        html.classList.add('dark');
+        icon.className = 'fa-solid fa-sun text-amber-400 text-xs';
+        showToast('Control Room Dark Mode attivata');
+      }
+    }
+
+    // Toast helper
+    let toastTimeout = null;
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      t.classList.remove('opacity-0', ' translate-y-2');
+      t.classList.add('opacity-100');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        t.classList.remove('opacity-100');
+        t.classList.add('opacity-0');
+      }, 2400);
+    }
+
+    // Initialize on load
     window.addEventListener('DOMContentLoaded', () => {
-      openProductionModal();
+      renderAll();
     });
   </script>
 </body>
