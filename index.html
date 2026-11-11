@@ -148,6 +148,21 @@
       animation: pulseRing 2s infinite;
     }
 
+    /* 2-Second Left-to-Right Efficiency Horizontal Bar Animation */
+    @keyframes sweepEfficiencyBar {
+      0% {
+        width: 0%;
+      }
+      100% {
+        width: var(--target-width, 0%);
+      }
+    }
+    .eff-bar-sweep {
+      width: 0%;
+      animation: sweepEfficiencyBar 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      transition: width 2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
     @media print {
       .no-print { display: none !important; }
       body { overflow: visible !important; height: auto !important; }
@@ -449,7 +464,7 @@
                 <span class="text-[9px] sm:text-[10px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 font-mono shrink-0">69 slots</span>
               </div>
               <div class="w-full max-w-[180px] sm:max-w-[200px] h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-1.5">
-                <div id="barEffAll" class="h-full bg-rose-500 rounded-full transition-all duration-500" style="width: 25.5%"></div>
+                <div id="barEffAll" class="h-full bg-rose-500 rounded-full eff-bar-sweep" style="--target-width: 25.5%"></div>
               </div>
             </div>
           </div>
@@ -472,7 +487,7 @@
                 <span id="workingCountBadge" class="text-[9px] sm:text-[10px] px-1.5 py-0.2 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 font-mono font-semibold shrink-0">19 active</span>
               </div>
               <div class="w-full max-w-[180px] sm:max-w-[200px] h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-1.5">
-                <div id="barEffWorking" class="h-full bg-rose-500 rounded-full transition-all duration-500" style="width: 59.6%"></div>
+                <div id="barEffWorking" class="h-full bg-rose-500 rounded-full eff-bar-sweep" style="--target-width: 59.6%"></div>
               </div>
             </div>
           </div>
@@ -1075,8 +1090,8 @@
                 </div>
               </div>
               ${showBars ? `
-                <div class="w-full h-1 bg-black/5 dark:bg-white/10 rounded-full overflow-hidden mt-1">
-                  <div class="h-full ${getProgressBarColor(status)} rounded-full transition-all duration-300" style="width: ${barWidth}%"></div>
+                <div class="w-full h-1.5 bg-black/5 dark:bg-white/10 rounded-full overflow-hidden mt-1">
+                  <div class="h-full ${getProgressBarColor(status)} rounded-full eff-bar-sweep" style="--target-width: ${barWidth}%"></div>
                 </div>
               ` : ''}
             </div>
@@ -1086,9 +1101,11 @@
         rowsHtml += `<div class="grid grid-cols-5 gap-1 sm:gap-1.5">${cellsHtml}</div>`;
       });
 
+      const lineBarWidth = lineHasAssigned ? Math.min(100, Math.max(0, lineAvgNum.toFixed(1))) : 0;
+
       container.innerHTML = `
         <div class="flex flex-col sm:flex-row items-stretch gap-2 sm:gap-3">
-          <!-- Enlarged Line Window Card: 1) Line Name, 2) Efficiency %, 3) Operator Surname & Name Field -->
+          <!-- Enlarged Line Window Card: 1) Line Name, 2) Efficiency % + 2s Bar, 3) Operator Surname & Name Field -->
           <div
             onclick="editLineOperator('${lineKey}')"
             title="Clicca per modificare l'operatore assegnato alla ${line.name}"
@@ -1100,11 +1117,14 @@
               <i class="fa-solid fa-pen text-[10px] text-slate-400 opacity-70 sm:opacity-0 group-hover:opacity-100 transition"></i>
             </div>
 
-            <!-- 2. Middle: Line Efficiency Percentage underneath Line Name -->
-            <div class="my-1.5 w-full flex justify-center">
+            <!-- 2. Middle: Line Efficiency Percentage + 2s Horizontal Bar underneath Line Name -->
+            <div class="my-1.5 w-full flex flex-col items-center gap-1">
               <span class="inline-block px-3.5 py-0.5 rounded-md border font-mono text-base font-extrabold tracking-tight shadow-2xs ${lineEffBadgeClass}">
                 ${lineEffText}
               </span>
+              <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div class="h-full ${getProgressBarColor(lineStatus)} rounded-full eff-bar-sweep" style="--target-width: ${lineBarWidth}%"></div>
+              </div>
             </div>
 
             <!-- 3. Bottom: Operator Name Field (Surname & Name) underneath Efficiency % -->
@@ -1243,10 +1263,10 @@
       const displayWorking = isInitial ? '59.6' : effWorking.toFixed(1);
 
       document.getElementById('badgeEffAll').textContent = `${displayAll}%`;
-      document.getElementById('barEffAll').style.width = `${Math.min(100, parseFloat(displayAll))}%`;
+      document.getElementById('barEffAll').style.setProperty('--target-width', `${Math.min(100, parseFloat(displayAll))}%`);
 
       document.getElementById('badgeEffWorking').textContent = `${displayWorking}%`;
-      document.getElementById('barEffWorking').style.width = `${Math.min(100, parseFloat(displayWorking))}%`;
+      document.getElementById('barEffWorking').style.setProperty('--target-width', `${Math.min(100, parseFloat(displayWorking))}%`);
       document.getElementById('workingCountBadge').textContent = `${workingMachines} active`;
     }
 
@@ -1402,7 +1422,7 @@
               </div>
             </div>
             <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-              <div class="h-full ${barColor} rounded-full" style="width: ${Math.min(100, avg)}%"></div>
+              <div class="h-full ${barColor} rounded-full eff-bar-sweep" style="--target-width: ${Math.min(100, avg)}%"></div>
             </div>
           </div>
         `;
