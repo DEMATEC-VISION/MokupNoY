@@ -148,19 +148,24 @@
       animation: pulseRing 2s infinite;
     }
 
-    /* 2-Second Left-to-Right Efficiency Horizontal Bar Animation */
+    /* 2-Second Continuous Left-to-Right Efficiency Horizontal Bar Animation */
     @keyframes sweepEfficiencyBar {
       0% {
         width: 0%;
+        opacity: 0.65;
+      }
+      85% {
+        width: var(--target-width, 0%);
+        opacity: 1;
       }
       100% {
         width: var(--target-width, 0%);
+        opacity: 0.9;
       }
     }
     .eff-bar-sweep {
       width: 0%;
-      animation: sweepEfficiencyBar 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-      transition: width 2s cubic-bezier(0.22, 1, 0.36, 1);
+      animation: sweepEfficiencyBar 2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
     }
 
     @media print {
