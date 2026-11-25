@@ -1242,6 +1242,40 @@
       background: #0f172a;
       opacity: 0.45;
     }
+    .l3-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    .l3-table th {
+      text-align: right;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      padding: 6px 6px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+    }
+    .l3-table th:first-child { text-align: left; padding-left: 0; }
+    .l3-table td {
+      padding: 7px 6px;
+      border-bottom: 1px solid var(--border);
+      text-align: right;
+      color: var(--text);
+    }
+    .l3-table td:first-child { text-align: left; padding-left: 0; font-weight: 500; }
+    .l3-table tr:last-child td { border-bottom: none; }
+    .impact-pill {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+    .impact-neg { background: var(--danger-bg); color: var(--danger); }
+    .impact-pos { background: var(--ok-bg); color: var(--ok); }
+    .impact-neutral { background: var(--surface-subtle); color: var(--text-secondary); border: 1px solid var(--border); }
 
     /* Responsive */
     @media (max-width: 1180px) {
@@ -1772,6 +1806,12 @@
           <span class="nav-dot" style="background:var(--ctrl)"></span>
           <span>${t('ctrlName')}</span>
         </button>
+        <div class="nav-sublist" style="margin-bottom:6px">
+          <button class="nav-subitem ${state.view === 'controllo-l3' ? 'active' : ''}" onclick="navigate('controllo-l3')" style="${state.view === 'controllo-l3' ? 'background:rgba(21,128,61,0.28);color:#fff' : ''}">
+            <span>${state.lang === 'it' ? 'KPI Dettaglio (L3)' : 'KPI Detail (L3)'}</span>
+            <span style="font-size:10.5px;color:#86efac">P1</span>
+          </button>
+        </div>
 
         <button class="nav-item ${state.view === 'produzione' ? 'active' : ''}" onclick="navigate('produzione')">
           <span class="nav-dot" style="background:var(--prod)"></span>
@@ -1815,6 +1855,14 @@
 
       if (state.view === 'macro') {
         bc.innerHTML = `<span class="crumb-current">${t('plantLabels')[state.plant]}</span> <span>/</span> <span class="crumb-current">${t('macroNav')}</span>`;
+      } else if (state.view === 'controllo-l3') {
+        bc.innerHTML = `
+          <button class="crumb-btn" onclick="navigate('macro')">${t('macroNav')}</button>
+          <span>/</span>
+          <button class="crumb-btn" onclick="navigate('controllo')">${t('ctrlName')}</button>
+          <span>/</span>
+          <span class="crumb-current">${state.lang === 'it' ? 'KPI Dettaglio (Layer 3)' : 'KPI Detail (Layer 3)'}</span>
+        `;
       } else {
         bc.innerHTML = `
           <button class="crumb-btn" onclick="navigate('macro')">${t('macroNav')}</button>
@@ -2340,7 +2388,10 @@
               <span class="filter-chip">BU: ${state.plant === 'all' ? (it ? 'Tutte' : 'All') : t('plantLabels')[state.plant]}</span>
             </div>
           </div>
-          <button class="btn" onclick="navigate('macro')">${t('backMacroBtn')}</button>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn" onclick="navigate('macro')">${t('backMacroBtn')}</button>
+            <button class="btn btn-primary" onclick="navigate('controllo-l3')">${it ? 'Layer 3 · KPI Dettaglio (Proposta 1) →' : 'Layer 3 · KPI Detail (Proposta 1) →'}</button>
+          </div>
         </div>
 
         <!-- Level 1 Summary Strip (Fatturato, Costi, EBIT, Valore Produzione) -->
@@ -2479,10 +2530,10 @@
         </section>
 
         <!-- 7. KPI PRODUZIONE (% raggiungimento fatturato da tariffa std) -->
-        <section class="coan-card">
+        <section class="coan-card" style="cursor:pointer" onclick="navigate('controllo-l3')">
           <div class="coan-card-head">
             <div class="coan-title"><span class="coan-num">07</span> ${it ? 'KPI Produzione — % raggiungimento fatturato da tariffa std' : 'Production KPI — % Standard Tariff Revenue Achievement'}</div>
-            <span class="filter-chip">Target: 100%</span>
+            <span class="drill-link" style="color:var(--ctrl)">${it ? 'Apri dettaglio KPI (Layer 3)' : 'Open KPI detail (Layer 3)'} →</span>
           </div>
           <div class="hbar-list">
             ${kpiTariffa.map(r => `
@@ -2494,6 +2545,269 @@
                 <span class="tabular" style="text-align:right;font-weight:700">${r.pct}%</span>
               </div>
             `).join('')}
+          </div>
+        </section>
+      `;
+    }
+
+    // =========================================================
+    // LAYER 3: CONTROLLO DI GESTIONE — PROPOSTA 1 (KPI DETTAGLIO)
+    // =========================================================
+    function renderControlloL3View() {
+      const s = PLANT_MULT[state.plant];
+      const it = state.lang === 'it';
+      const fmtEur = (n) => {
+        const val = Math.round(n * s);
+        const sign = val < 0 ? '-' : (val > 0 ? '+' : '');
+        return `${sign}€ ${Math.abs(val).toLocaleString(it ? 'it-IT' : 'en-US')}`;
+      };
+      const fmtVal = (n) => Math.round(n * s).toLocaleString(it ? 'it-IT' : 'en-US');
+
+      const saturazione = [
+        { k: 'Tessitura', c: '95%', t: '100%', d: '-5%', bad: true },
+        { k: 'Confezione', c: '90%', t: '100%', d: '-10%', bad: true },
+        { k: 'Sartoria', c: '85%', t: '100%', d: '-15%', bad: true },
+        { k: 'Tintoria', c: '80%', t: '100%', d: '-20%', bad: true },
+        { k: 'Stiro', c: '75%', t: '100%', d: '-25%', bad: true }
+      ];
+
+      const efficienza = [
+        { k: 'Tessitura · OEE', c: '90%', t: '92%', d: '-2%', bad: true },
+        { k: 'Confezione · OLE', c: '87%', t: '100%', d: '-13%', bad: true },
+        { k: 'Sartoria · OLE', c: '85%', t: '80%', d: '+5%', bad: false },
+        { k: 'Tintoria · OEE', c: '45%', t: '50%', d: '-5%', bad: true },
+        { k: 'Stiro · OLE', c: '80%', t: '70%', d: '+10%', bad: false }
+      ];
+
+      const rilavorazioni = [
+        { k: 'Rammendo', c: '4,0%', t: '2,0%', d: '+2,0%', bad: true },
+        { k: 'Ripresi Tintoria', c: '3,0%', t: '2,0%', d: '+1,0%', bad: true }
+      ];
+
+      const qualita = [
+        { k: 'Sfrido filato', c: '5,0%', t: '2,0%', d: '+3,0%', bad: true },
+        { k: 'Scarto Tessitura', c: '3,0%', t: '2,0%', d: '+1,0%', bad: true },
+        { k: 'Scarto Confezione', c: '2,0%', t: '2,0%', d: '0,0%', bad: false },
+        { k: 'Scarto Tintoria', c: '4,0%', t: '2,0%', d: '+2,0%', bad: true }
+      ];
+
+      const magazzini = [
+        { k: 'Filato', q: 125000, v: 548000 },
+        { k: 'WIP', q: 15425, v: 258000 },
+        { k: 'P. Finiti', q: 258935, v: 1563000 }
+      ];
+
+      const ricambi = [
+        { k: 'Filo separazione', c: 10000, b: 9000, d: 1000 },
+        { k: 'Ricambi', c: 10000, b: 11000, d: -1000 },
+        { k: 'Paraffina', c: 10000, b: 18000, d: -8000 },
+        { k: 'Cucirino', c: 30000, b: 20000, d: 10000 },
+        { k: 'Aghi', c: 50000, b: 35000, d: 15000 },
+        { k: 'Sacc. cala. stiro', c: 10000, b: 10000, d: 0 }
+      ];
+
+      const ebitReparti = [
+        { k: 'Tessitura', v: 120, prod: 740, std: 800 },
+        { k: 'Confezione', v: 350, prod: 250, std: 300 },
+        { k: 'Stiro', v: 120, prod: 150, std: 200 },
+        { k: 'Sartoria', v: 150, prod: 50, std: 70 },
+        { k: 'Altro', v: 50, prod: null, std: null }
+      ];
+
+      const bilanci = [
+        { k: it ? 'Consuntivo' : 'Actual', v: 550 },
+        { k: it ? 'Budget periodo' : 'Period budget', v: 520 },
+        { k: it ? 'Periodo precedente' : 'Prior period', v: 600 },
+        { k: it ? 'Budget annuale' : 'Annual budget', v: 1200 },
+        { k: it ? 'Anno precedente' : 'Prior year', v: 1100 }
+      ];
+
+      const content = document.getElementById('content');
+      content.innerHTML = `
+        <div class="page-header">
+          <div>
+            <div class="page-kicker" style="color:var(--ctrl)">Layer 3 · ${t('ctrlName')} · Proposta 1</div>
+            <h1 class="page-title">${it ? 'KPI Controllo di Gestione' : 'Management Control KPIs'}</h1>
+            <p class="page-subtitle">${it ? 'Dettaglio operativo e impatto economico su saturazione, efficienza, qualità, consumi e margini.' : 'Operational detail & economic impact across saturation, efficiency, quality, consumables & margins.'}</p>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn" onclick="navigate('controllo')">← ${it ? 'Torna a Layer 2 (Proposta 2)' : 'Back to Layer 2 (Proposta 2)'}</button>
+          </div>
+        </div>
+
+        <!-- Row 1: Saturazione · Efficienza Produzione · 2ª Scelta -->
+        <section class="grid-3">
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title">${it ? 'Saturazione' : 'Saturation'}</div>
+              <span class="impact-pill impact-neg tabular">${fmtEur(-425004)}</span>
+            </div>
+            <table class="l3-table">
+              <thead><tr><th>${it ? 'Reparto' : 'Dept'}</th><th>Cons.</th><th>Target</th><th>Delta</th></tr></thead>
+              <tbody>
+                ${saturazione.map(r => `<tr><td>${r.k}</td><td class="tabular">${r.c}</td><td class="tabular">${r.t}</td><td class="tabular" style="color:var(--danger);font-weight:600">${r.d}</td></tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title">${it ? 'Efficienza Produzione' : 'Production Efficiency'}</div>
+              <span class="impact-pill impact-neg tabular">${fmtEur(-125452)}</span>
+            </div>
+            <table class="l3-table">
+              <thead><tr><th>${it ? 'Reparto' : 'Dept'}</th><th>Cons.</th><th>Target</th><th>Delta</th></tr></thead>
+              <tbody>
+                ${efficienza.map(r => `<tr><td>${r.k}</td><td class="tabular">${r.c}</td><td class="tabular">${r.t}</td><td class="tabular" style="color:${r.bad ? 'var(--danger)' : 'var(--ok)'};font-weight:600">${r.d}</td></tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title">${it ? '2ª Scelta' : '2nd Quality'}</div>
+              <span class="impact-pill impact-neg tabular">${fmtEur(-125452)}</span>
+            </div>
+            <table class="l3-table">
+              <thead><tr><th>${it ? 'Indicatore' : 'Metric'}</th><th>Cons.</th><th>Target</th><th>Delta</th></tr></thead>
+              <tbody>
+                <tr><td>${it ? 'Capi' : 'Garments'}</td><td class="tabular">${fmtVal(1500)}</td><td class="tabular">${fmtVal(1300)}</td><td class="tabular" style="color:var(--danger);font-weight:600">+${fmtVal(200)}</td></tr>
+                <tr><td>%</td><td class="tabular">3,0%</td><td class="tabular">2,0%</td><td class="tabular" style="color:var(--danger);font-weight:600">+1,0%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Row 2: Rilavorazioni · Qualità · Magazzini -->
+        <section class="grid-3">
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title">${it ? 'Rilavorazioni' : 'Rework'}</div>
+              <span class="impact-pill impact-neg tabular">${fmtEur(-245128)}</span>
+            </div>
+            <table class="l3-table">
+              <thead><tr><th>${it ? 'Voce' : 'Item'}</th><th>Cons.</th><th>Target</th><th>Delta</th></tr></thead>
+              <tbody>
+                ${rilavorazioni.map(r => `<tr><td>${r.k}</td><td class="tabular">${r.c}</td><td class="tabular">${r.t}</td><td class="tabular" style="color:var(--danger);font-weight:600">${r.d}</td></tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title">${it ? 'Qualità' : 'Quality'}</div>
+              <span class="impact-pill impact-neg tabular">${fmtEur(-245128)}</span>
+            </div>
+            <table class="l3-table">
+              <thead><tr><th>${it ? 'Voce' : 'Item'}</th><th>Cons.</th><th>Target</th><th>Delta</th></tr></thead>
+              <tbody>
+                ${qualita.map(r => `<tr><td>${r.k}</td><td class="tabular">${r.c}</td><td class="tabular">${r.t}</td><td class="tabular" style="color:${r.bad ? 'var(--danger)' : 'var(--ok)'};font-weight:600">${r.d}</td></tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title">${it ? 'Magazzini' : 'Inventory'}</div>
+              <span class="impact-pill impact-neg tabular">${fmtEur(-452875)}</span>
+            </div>
+            <table class="l3-table">
+              <thead><tr><th>${it ? 'Categoria' : 'Category'}</th><th>Q.tà</th><th>${it ? 'Valore' : 'Value'}</th></tr></thead>
+              <tbody>
+                ${magazzini.map(m => `<tr><td>${m.k}</td><td class="tabular">${fmtVal(m.q)}</td><td class="tabular"><strong>€ ${fmtVal(m.v)}</strong></td></tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Row 3: Materiali Consumo / Ricambi · Energie · Margine 1° Livello -->
+        <section class="grid-3">
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title">${it ? 'Mat. Consumo / Ricambi' : 'Consumables & Spares'}</div>
+              <span class="impact-pill impact-neg tabular">${fmtEur(-17000)}</span>
+            </div>
+            <table class="l3-table">
+              <thead><tr><th>${it ? 'Voce' : 'Item'}</th><th>Cons.</th><th>BDG</th><th>Delta</th></tr></thead>
+              <tbody>
+                ${ricambi.map(r => `<tr><td>${r.k}</td><td class="tabular">${fmtVal(r.c)}</td><td class="tabular">${fmtVal(r.b)}</td><td class="tabular" style="color:${r.d > 0 ? 'var(--danger)' : (r.d < 0 ? 'var(--ok)' : 'var(--text-muted)')};font-weight:600">${r.d > 0 ? '+' : ''}${fmtVal(r.d)}</td></tr>`).join('')}
+                <tr style="border-top:1px solid var(--border-strong);font-weight:700"><td><strong>Totale</strong></td><td class="tabular"><strong>${fmtVal(120000)}</strong></td><td class="tabular"><strong>${fmtVal(103000)}</strong></td><td class="tabular" style="color:var(--danger)"><strong>+${fmtVal(17000)}</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title">${it ? 'Consumo Energie' : 'Energy Consumption'}</div>
+              <span class="impact-pill impact-neg tabular">${fmtEur(-245128)}</span>
+            </div>
+            <table class="l3-table">
+              <thead><tr><th>${it ? 'Risorsa' : 'Utility'}</th><th>Cons.</th><th>Target</th><th>Delta</th></tr></thead>
+              <tbody>
+                <tr><td>mc Gas</td><td class="tabular">${fmtVal(1254500)}</td><td class="tabular">${fmtVal(1200000)}</td><td class="tabular" style="color:var(--danger);font-weight:600">+${fmtVal(54500)}</td></tr>
+                <tr><td>kWh Energia elett.</td><td class="tabular">${fmtVal(14147)}</td><td class="tabular">${fmtVal(14000)}</td><td class="tabular" style="color:var(--danger);font-weight:600">+${fmtVal(147)}</td></tr>
+                <tr><td>${it ? 'Giorni lavorati' : 'Working days'}</td><td class="tabular">65</td><td class="tabular">63</td><td class="tabular">+2</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title">${it ? 'Margine 1° Liv. su Spedito' : '1st-Level Shipped Margin'}</div>
+              <span class="impact-pill impact-pos tabular">${fmtEur(245685)}</span>
+            </div>
+            <div style="padding:14px 0 4px">
+              <div class="module-hero-row">
+                <span class="module-hero-val tabular" style="font-size:34px">35,0%</span>
+                <span class="module-hero-delta">+4,0 pt</span>
+              </div>
+              <div class="module-hero-label" style="margin-top:4px">${it ? 'Target margine 1° livello: 31,0%' : '1st-level margin target: 31.0%'}</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Row 4: EBIT per Reparto · Area Bilanci · Portafoglio e Margini -->
+        <section class="grid-3">
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title">${it ? 'EBIT per Reparto' : 'EBIT by Department'}</div>
+              <span class="impact-pill impact-pos tabular">Tot. € ${fmtVal(790)}k</span>
+            </div>
+            <table class="l3-table">
+              <thead><tr><th>${it ? 'Reparto' : 'Dept'}</th><th>EBIT (k€)</th><th>${it ? 'Fatt. vs Std' : 'Rev vs Std'}</th></tr></thead>
+              <tbody>
+                ${ebitReparti.map(e => `<tr><td>${e.k}</td><td class="tabular"><strong>€ ${fmtVal(e.v)}k</strong></td><td class="tabular" style="color:var(--text-muted)">${e.prod ? `${fmtVal(e.prod)} / ${fmtVal(e.std)}` : '—'}</td></tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title">${it ? 'Area Bilanci' : 'Financial Statements'}</div>
+              <span class="impact-pill impact-neutral">k€</span>
+            </div>
+            <table class="l3-table">
+              <thead><tr><th>${it ? 'Periodo' : 'Period'}</th><th>${it ? 'Valore (k€)' : 'Value (k€)'}</th></tr></thead>
+              <tbody>
+                ${bilanci.map(b => `<tr><td>${b.k}</td><td class="tabular"><strong>€ ${fmtVal(b.v)}k</strong></td></tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title">${it ? 'Portafoglio e Margini' : 'Backlog & Margins'}</div>
+              <span class="impact-pill impact-neg tabular">-3,0% vs Tgt</span>
+            </div>
+            <table class="l3-table">
+              <thead><tr><th>${it ? 'Indicatore' : 'Metric'}</th><th>Cons.</th><th>Target</th></tr></thead>
+              <tbody>
+                <tr><td>${it ? 'Capi' : 'Garments'}</td><td class="tabular">${fmtVal(1254500)}</td><td class="tabular">—</td></tr>
+                <tr><td>${it ? 'Valore (k€)' : 'Value (k€)'}</td><td class="tabular">€ ${fmtVal(14147)}k</td><td class="tabular">—</td></tr>
+                <tr><td>${it ? 'Margine (k€)' : 'Margin (k€)'}</td><td class="tabular"><strong>€ ${fmtVal(4951)}k</strong></td><td class="tabular">—</td></tr>
+                <tr><td>% ${it ? 'Margine' : 'Margin'}</td><td class="tabular"><strong>35,0%</strong></td><td class="tabular">38,0%</td></tr>
+              </tbody>
+            </table>
           </div>
         </section>
       `;
@@ -2518,11 +2832,17 @@
         { name: it ? 'Manutenzione' : 'Maintenance', val: 91, delta: '-7 pt', ok: false }
       ];
 
-      const budgetItems = [
-        { name: it ? 'Personale' : 'Payroll', pct: 70, val: Math.round(2621 * s), color: '#6d28d9' },
-        { name: it ? 'Formazione' : 'Training', pct: 18, val: Math.round(674 * s), color: '#3b82f6' },
-        { name: it ? 'Straordinari' : 'Overtime', pct: 12, val: Math.round(449 * s), color: '#f59e0b' }
-      ];
+      const fmtDec = (n) => n.toLocaleString(it ? 'it-IT' : 'en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+      const budgetRows = [
+        { name: it ? 'Personale' : 'Payroll', pct: 70, annual: +(4200 * s).toFixed(1), spent: +(2620.8 * s).toFixed(1), color: '#6d28d9' },
+        { name: it ? 'Formazione' : 'Training', pct: 18, annual: +(350 * s).toFixed(1), spent: +(673.92 * s).toFixed(1), color: '#3b82f6' },
+        { name: it ? 'Straordinari' : 'Overtime', pct: 12, annual: +(250 * s).toFixed(1), spent: +(449.28 * s).toFixed(1), color: '#f59e0b' }
+      ].map(r => ({ ...r, rem: +(r.annual - r.spent).toFixed(1) }));
+      const bgtTotalRow = {
+        annual: +(budgetRows.reduce((a, r) => a + r.annual, 0)).toFixed(1),
+        spent: +(budgetRows.reduce((a, r) => a + r.spent, 0)).toFixed(1),
+        rem: +(budgetRows.reduce((a, r) => a + r.rem, 0)).toFixed(1)
+      };
 
       const kpiRows = [
         { kpi: it ? 'Dipendenti attivi' : 'Active employees', val: fmtNum(headcount), obj: fmtNum(targetHc), trend: '+12', ok: true },
@@ -2581,7 +2901,7 @@
           </div>
         </section>
 
-        <!-- Minimalist Visual Row: Trend Mensile + Copertura & Budget -->
+        <!-- Minimalist Visual Row: Trend Mensile + Copertura Turni -->
         <section class="grid-2">
           <div class="panel">
             <div class="panel-head">
@@ -2597,44 +2917,72 @@
             <div class="chart-wrap" id="hrTrendChart"></div>
           </div>
 
-          <div style="display:flex;flex-direction:column;gap:16px">
-            <div class="panel">
-              <div class="panel-head">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
                 <h3 class="panel-title">${it ? 'Copertura turni per reparto' : 'Shift coverage by department'}</h3>
-                <span class="filter-chip">${it ? 'Obiettivo' : 'Target'} ≥ 98%</span>
+                <div class="panel-sub">${it ? `Complessiva: 96,5% · Turni scoperti: ${uncovered}` : `Overall: 96.5% · Uncovered shifts: ${uncovered}`}</div>
               </div>
-              <div class="hbar-list">
-                ${shiftDepts.map(r => `
-                  <div class="hbar-row">
-                    <span style="font-weight:600">${r.name}</span>
-                    <div class="hbar-track">
-                      <div class="hbar-fill" style="width:${r.val}%;background:${r.ok ? '#15803d' : '#f59e0b'}"></div>
-                      <div class="hbar-target" style="left:98%"></div>
-                    </div>
-                    <span class="tabular" style="text-align:right;font-weight:700;color:${r.ok ? 'var(--ok)' : 'var(--warn)'}">${r.val}%</span>
-                  </div>
-                `).join('')}
-              </div>
+              <span class="filter-chip">${it ? 'Obiettivo' : 'Target'} ≥ 98%</span>
             </div>
-
-            <div class="panel">
-              <div class="panel-head">
-                <h3 class="panel-title">${it ? 'Ripartizione Budget YTD' : 'YTD Budget Breakdown'}</h3>
-                <span class="filter-chip tabular">€ ${fmtNum(bgtUsed)}k</span>
-              </div>
-              <div class="hbar-list">
-                ${budgetItems.map(b => `
-                  <div class="hbar-row" style="grid-template-columns:110px 1fr 92px">
-                    <span style="font-weight:600">${b.name}</span>
-                    <div class="hbar-track">
-                      <div class="hbar-fill" style="width:${b.pct}%;background:${b.color}"></div>
-                    </div>
-                    <span class="tabular" style="text-align:right;font-size:12px;font-weight:600">${b.pct}% · €${fmtNum(b.val)}k</span>
+            <div class="hbar-list" style="margin-top:6px">
+              ${shiftDepts.map(r => `
+                <div class="hbar-row" style="grid-template-columns:120px 1fr 96px">
+                  <span style="font-weight:600">${r.name}</span>
+                  <div class="hbar-track">
+                    <div class="hbar-fill" style="width:${r.val}%;background:${r.ok ? '#15803d' : '#f59e0b'}"></div>
+                    <div class="hbar-target" style="left:98%"></div>
                   </div>
-                `).join('')}
-              </div>
+                  <span class="tabular" style="text-align:right;font-weight:700;color:${r.ok ? 'var(--ok)' : 'var(--warn)'}">${r.val}% <span style="font-size:11px;font-weight:500;color:var(--text-muted)">(${r.delta})</span></span>
+                </div>
+              `).join('')}
             </div>
           </div>
+        </section>
+
+        <!-- Budget Sheet from Cruscotto_HR2.xlsx (Sheet 3: Budget) -->
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3 class="panel-title">${it ? 'Budget YTD — 78% usato' : 'YTD Budget — 78% spent'}</h3>
+              <div class="panel-sub">${it ? 'Soglia: entro ±2% del piano' : 'Threshold: within ±2% of plan'}</div>
+            </div>
+            <span class="status-pill status-ok">${it ? 'RISPETTATO ✓' : 'ON TRACK ✓'}</span>
+          </div>
+
+          <div style="display:flex;height:10px;border-radius:99px;overflow:hidden;gap:2px">
+            ${budgetRows.map(b => `<div style="width:${b.pct}%;background:${b.color}" title="${b.name}: ${b.pct}%"></div>`).join('')}
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>${it ? 'Voce' : 'Category'}</th>
+                <th>${it ? 'Quota del consumato' : 'Share of Spent'}</th>
+                <th>${it ? 'Budget annuo (k€)' : 'Annual Budget (k€)'}</th>
+                <th>${it ? 'Consumato YTD (k€)' : 'Spent YTD (k€)'}</th>
+                <th>${it ? 'Residuo (k€)' : 'Remaining (k€)'}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${budgetRows.map(b => `
+                <tr>
+                  <td style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:${b.color};display:inline-block"></span><strong>${b.name}</strong></td>
+                  <td class="tabular">${b.pct}%</td>
+                  <td class="tabular">€ ${fmtDec(b.annual)}</td>
+                  <td class="tabular">€ ${fmtDec(b.spent)}</td>
+                  <td class="tabular" style="font-weight:700;color:${b.rem < 0 ? 'var(--danger)' : 'var(--ok)'}">${b.rem < 0 ? '-' : '+'}€ ${fmtDec(Math.abs(b.rem))}</td>
+                </tr>
+              `).join('')}
+              <tr style="background:var(--surface-subtle);font-weight:700">
+                <td><strong>${it ? 'Totale' : 'Total'}</strong></td>
+                <td class="tabular"><strong>100%</strong></td>
+                <td class="tabular"><strong>€ ${fmtDec(bgtTotalRow.annual)}</strong></td>
+                <td class="tabular"><strong>€ ${fmtDec(bgtTotalRow.spent)}</strong></td>
+                <td class="tabular" style="color:var(--ok)"><strong>+€ ${fmtDec(bgtTotalRow.rem)}</strong></td>
+              </tr>
+            </tbody>
+          </table>
         </section>
 
         <!-- Compact KPI Status Table from Cruscotto_HR2 -->
@@ -2913,6 +3261,7 @@
       if (state.view === 'macro') renderMacroView();
       else if (state.view === 'produzione') renderProduzioneView();
       else if (state.view === 'controllo') renderControlloView();
+      else if (state.view === 'controllo-l3') renderControlloL3View();
       else if (state.view === 'hr') renderHRView();
       else if (state.view === 'smart') renderSmartView();
     }
