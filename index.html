@@ -1,972 +1,2927 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ONLY YOU - Gantt Produzione Europa</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Only You · Executive &amp; Production Macro Dashboard</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
+    :root {
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --surface-subtle: #f8fafc;
+      --border: #e4e9f0;
+      --border-strong: #d0d8e4;
+      --text: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 6px 18px rgba(15, 23, 42, 0.06);
+      --shadow-lg: 0 16px 36px rgba(15, 23, 42, 0.12);
+
+      /* Module Brand Accents (refined from original app) */
+      --ctrl: #15803d;
+      --ctrl-soft: #ecfdf5;
+      --ctrl-border: #bbf7d0;
+
+      --prod: #d95d2b;
+      --prod-soft: #fff4ed;
+      --prod-border: #fed7aa;
+
+      --hr: #6d28d9;
+      --hr-soft: #f5f3ff;
+      --hr-border: #ddd6fe;
+
+      --smart: #1d6fe2;
+      --smart-soft: #eff6ff;
+      --smart-border: #bfdbfe;
+
+      /* Department Accents */
+      --dept-tessitura: #8c5a44;
+      --dept-confezione: #b4232c;
+      --dept-sartoria: #d95d2b;
+      --dept-stiro: #15803d;
+      --dept-lavanderia: #1d6fe2;
+      --dept-imballo: #7c5643;
+      --dept-report: #6d28d9;
+
+      /* Semantic */
+      --ok: #15803d;
+      --ok-bg: #dcfce7;
+      --warn: #b45309;
+      --warn-bg: #fef3c7;
+      --danger: #b91c1c;
+      --danger-bg: #fee2e2;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --sidebar-w: 262px;
+      --topbar-h: 64px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #d1d5db;
-      color: #333;
-      user-select: none;
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      overflow: hidden;
+      font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-    .gantt-grid {
+
+    .tabular { font-variant-numeric: tabular-nums; }
+
+    /* App Shell */
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: #0f172a;
+      color: #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 40;
+      transition: transform 0.25s ease;
+    }
+
+    .sidebar-brand {
+      height: var(--topbar-h);
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+    .brand-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.04em;
+    }
+    .brand-sub {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+      overflow-y: auto;
+    }
+
+    .nav-section-label {
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #64748b;
+      font-weight: 700;
+      padding: 12px 10px 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: #cbd5e1;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s ease, color 0.15s ease;
+      margin-bottom: 2px;
+    }
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.07);
+      color: #ffffff;
+    }
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.13);
+      color: #ffffff;
+      font-weight: 600;
+    }
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .nav-badge {
+      margin-left: auto;
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #e2e8f0;
+      font-weight: 600;
+    }
+    .nav-badge.warn {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fcd34d;
+    }
+
+    .nav-sublist {
+      margin: 2px 0 8px 18px;
+      padding-left: 12px;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .nav-subitem {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 12.5px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+    }
+    .nav-subitem:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .nav-subitem.active {
+      color: #ffffff;
+      background: rgba(217, 93, 43, 0.22);
+      font-weight: 600;
+    }
+
+    .sidebar-footer {
+      padding: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      border: none;
+      width: 100%;
+      color: inherit;
+      text-align: left;
+    }
+    .user-card:hover { background: rgba(255, 255, 255, 0.09); }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #d95d2b, #6d28d9);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
       display: grid;
-      grid-template-columns: 120px repeat(13, minmax(78px, 1fr));
+      place-items: center;
+      flex-shrink: 0;
     }
-    .custom-scroll::-webkit-scrollbar {
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      margin-left: var(--sidebar-w);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    /* Topbar */
+    .topbar {
+      height: var(--topbar-h);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .crumb-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 13px;
+      cursor: pointer;
+      padding: 3px 6px;
+      border-radius: 6px;
+    }
+    .crumb-btn:hover { background: var(--bg); color: var(--text); }
+    .crumb-current {
+      color: var(--text);
+      font-weight: 600;
+      padding: 3px 6px;
+    }
+
+    .layer-switcher {
+      display: inline-flex;
+      background: var(--bg);
+      padding: 3px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .layer-pill {
+      border: none;
+      background: transparent;
+      padding: 6px 12px;
+      border-radius: 7px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .layer-pill.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: var(--shadow-sm);
+    }
+    .layer-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      color: #334155;
+    }
+    .layer-pill.active .layer-tag {
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .control-select {
+      height: 34px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 0 10px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .control-select:focus { outline: 2px solid #cbd5e1; }
+
+    .lang-toggle {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .lang-btn {
+      border: none;
+      background: transparent;
+      padding: 6px 9px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .lang-btn.active {
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    .live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ok);
+      background: var(--ok-bg);
+      padding: 5px 10px;
+      border-radius: 99px;
+    }
+    .live-dot {
       width: 7px;
       height: 7px;
+      border-radius: 50%;
+      background: var(--ok);
+      animation: pulse 2s infinite;
     }
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background: #9ca3af;
-      border-radius: 3px;
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
     }
-    .custom-scroll::-webkit-scrollbar-track {
-      background: #e5e7eb;
+
+    /* Workspace Content */
+    .content {
+      padding: 24px;
+      max-width: 1480px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
-    .flash-new-row {
-      animation: flashGreen 2.2s cubic-bezier(0.1, 1, 0.1, 1);
+
+    .page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
     }
-    @keyframes flashGreen {
-      0% { background-color: #86efac; }
-      100% { background-color: #f0fdf4; }
+    .page-kicker {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .barcode-laser {
-      animation: laserSweep 1.2s infinite alternate ease-in-out;
+    .page-title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
     }
-    @keyframes laserSweep {
-      0% { top: 10%; opacity: 0.9; }
-      100% { top: 88%; opacity: 0.9; }
+    .page-subtitle {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 14px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      transition: all 0.15s ease;
+    }
+    .btn:hover { background: var(--surface-subtle); border-color: var(--border-strong); }
+    .btn-primary {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+    }
+    .btn-primary:hover { background: #1e293b; }
+
+    /* KPI Strip */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .kpi-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .kpi-value-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .delta {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+    .delta.up { background: var(--ok-bg); color: var(--ok); }
+    .delta.warn { background: var(--warn-bg); color: var(--warn); }
+    .delta.down { background: var(--danger-bg); color: var(--danger); }
+    .kpi-foot {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Layer 1: 4 Principal Modules Grid (Minimalist) */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+    .module-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 28px 22px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .module-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+    .module-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-strong);
+    }
+    .module-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .module-id {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .module-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .module-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .status-dot-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .status-dot-label i {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .status-dot-label.ok i { background: #16a34a; }
+    .status-dot-label.warn { color: var(--warn); }
+    .status-dot-label.warn i { background: #f59e0b; }
+
+    .module-hero {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .module-hero-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .module-hero-val {
+      font-size: 38px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      color: var(--text);
+    }
+    .module-hero-delta {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ok);
+    }
+    .module-hero-delta.muted { color: var(--text-muted); }
+    .module-hero-label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .status-pill {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+    .status-ok { background: var(--ok-bg); color: var(--ok); }
+    .status-warn { background: var(--warn-bg); color: var(--warn); }
+    .status-danger { background: var(--danger-bg); color: var(--danger); }
+
+    .module-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .module-substats {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .substat {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .substat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .substat-val {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .drill-link {
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    /* Two-column Analytics Row */
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1.7fr 1fr;
+      gap: 18px;
+    }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .panel-title {
+      font-size: 15.5px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .panel-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .seg-tabs {
+      display: inline-flex;
+      background: var(--bg);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .seg-tab {
+      border: none;
+      background: transparent;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .seg-tab.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Alert Feed */
+    .alert-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .alert-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 11px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .alert-item:hover {
+      background: #ffffff;
+      border-color: var(--border-strong);
+    }
+    .alert-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .alert-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .alert-meta {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Layer 2: Textile Flow Pipeline */
+    .pipeline-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+      position: relative;
+    }
+    .pipe-step {
+      background: var(--surface-subtle);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.16s ease;
+      position: relative;
+    }
+    .pipe-step:hover {
+      border-color: var(--text);
+      background: #ffffff;
+      transform: translateY(-2px);
+    }
+    .pipe-step.bottleneck {
+      border-color: #f59e0b;
+      background: #fffbeb;
+    }
+    .pipe-num {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .pipe-name {
+      font-size: 14px;
+      font-weight: 700;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .pipe-wip {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+    .pipe-eff {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    /* Layer 2: Department Cards Grid */
+    .dept-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .dept-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+      border-top: 4px solid var(--dept-color);
+    }
+    .dept-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-strong);
+      border-top-color: var(--dept-color);
+    }
+    .dept-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .dept-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .dept-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      color: #ffffff;
+      background: var(--dept-color);
+      flex-shrink: 0;
+    }
+    .dept-name {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .dept-sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .dept-kpis {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .dept-kpi {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 9px 10px;
+    }
+    .dept-kpi-l { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+    .dept-kpi-v { font-size: 16px; font-weight: 700; margin-top: 2px; color: var(--text); }
+
+    .dept-progress-row {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .dept-progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .progress-track {
+      height: 7px;
+      border-radius: 99px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 99px;
+    }
+
+    .dept-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* Data Table for secondary Layer 2 views */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .data-table th {
+      text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-subtle);
+    }
+    .data-table td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: var(--surface-subtle); }
+
+    /* Report Quick Cards */
+    .report-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .report-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface-subtle);
+    }
+    .report-item strong { font-size: 13px; display: block; }
+    .report-item span { font-size: 11.5px; color: var(--text-muted); }
+
+    /* Drill-Down Drawer (Layer 3 preview — organized modules!) */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 60;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+
+    .drawer {
+      position: fixed;
+      top: 0; right: 0; bottom: 0;
+      width: min(560px, 94vw);
+      background: var(--surface);
+      box-shadow: var(--shadow-lg);
+      z-index: 70;
+      transform: translateX(100%);
+      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+
+    .drawer-header {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .drawer-body {
+      padding: 20px 22px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .close-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 18px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      color: var(--text-secondary);
+    }
+    .close-btn:hover { background: var(--bg); color: var(--text); }
+
+    .mod-group {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      background: var(--surface-subtle);
+    }
+    .mod-group-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .mod-chips {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .mod-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 10px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+    .mod-chip:hover {
+      border-color: #0f172a;
+      box-shadow: var(--shadow-sm);
+    }
+    .mod-chip-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .mod-chip-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 11px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      z-index: 90;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: all 0.2s ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* Chart Tooltip */
+    .chart-wrap { position: relative; width: 100%; }
+    .chart-tooltip {
+      position: absolute;
+      background: #0f172a;
+      color: #fff;
+      font-size: 12px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.12s ease;
+      z-index: 20;
+      white-space: nowrap;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Minimalist COAN & HR Layout Helpers */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .filter-chips {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-chip {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 5px 11px;
+      border-radius: 99px;
+    }
+    .coan-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .coan-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .coan-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ctrl);
+      background: var(--ctrl-soft);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+    .coan-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .coan-cols {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      padding-top: 4px;
+    }
+    .coan-col-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .coan-col-val {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 2px;
+    }
+    .coan-deltas {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .hbar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .hbar-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 56px;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+    .hbar-track {
+      height: 10px;
+      border-radius: 99px;
+      background: #e2e8f0;
+      overflow: hidden;
+      position: relative;
+    }
+    .hbar-fill {
+      height: 100%;
+      border-radius: 99px;
+    }
+    .hbar-target {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: #0f172a;
+      opacity: 0.45;
+    }
+
+    /* Responsive */
+    @media (max-width: 1180px) {
+      .kpi-grid, .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .dept-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .pipeline-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .split-grid, .grid-2 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .mobile-menu-btn { display: inline-flex; }
+      .modules-grid { grid-template-columns: 1fr; }
+      .layer-switcher { display: none; }
+    }
+    @media (max-width: 640px) {
+      .kpi-grid, .grid-3, .dept-grid, .pipeline-steps { grid-template-columns: 1fr; }
+      .mini-dept-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .content { padding: 16px; }
     }
   </style>
 </head>
-<body class="flex flex-col h-screen">
-
-  <!-- ========================================================= -->
-  <!-- TOP APPLICATION BAR (1:1 FROM SCREENSHOT 1)               -->
-  <!-- ========================================================= -->
-  <header class="bg-[#e5e7eb] border-b border-gray-400 px-6 py-2.5 flex items-center justify-between shadow-2xs select-none">
-    <div class="flex items-center space-x-8">
-      <button class="text-xs font-bold text-gray-800 hover:text-black tracking-wider flex items-center gap-1.5 px-2 py-0.5 rounded hover:bg-gray-300/60 transition">
-        BACK
-      </button>
-      <div class="text-xs font-bold text-gray-700 tracking-wider uppercase">
-        COMPANY EUROPA
-      </div>
-    </div>
-
-    <!-- Right Side Logo from Screenshot: ONLY YOU -->
-    <div class="flex items-center space-x-2">
-      <!-- Rainbow circle logo -->
-      <div class="w-6 h-6 rounded-full border-2 border-transparent bg-gradient-to-tr from-orange-400 via-pink-500 to-cyan-400 p-[1.5px] flex items-center justify-center">
-        <div class="w-full h-full bg-white rounded-full"></div>
-      </div>
-      <span class="font-extrabold tracking-tight text-gray-800 text-base">ONLY <span class="font-light text-gray-500 text-xs">YOU</span></span>
-    </div>
-  </header>
-
-  <!-- ========================================================= -->
-  <!-- MAIN GANTT WORKSPACE (1:1 FROM SCREENSHOT 1)              -->
-  <!-- ========================================================= -->
-  <main class="flex-1 flex flex-col bg-white overflow-hidden m-2 border border-gray-400 shadow-sm rounded-xs">
-    
-    <!-- Top Tab: Gantt Produzione - Europa -->
-    <div class="bg-[#e5e7eb] border-b border-gray-300 px-3 pt-2 flex items-center justify-between">
-      <div class="flex items-center">
-        <div class="bg-white border-t border-l border-r border-gray-300 px-3.5 py-1.5 text-xs font-bold text-gray-800 rounded-t flex items-center gap-3 shadow-2xs">
-          <span>Gantt Produzione - Europa</span>
-          <i class="fa-solid fa-xmark text-gray-400 hover:text-gray-700 text-[10px] cursor-pointer"></i>
+<body>
+  <div class="app">
+    <!-- Persistent Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <svg class="brand-logo" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="ringGrad" x1="4" y1="4" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#f97316"/>
+              <stop offset="35%" stop-color="#ec4899"/>
+              <stop offset="70%" stop-color="#3b82f6"/>
+              <stop offset="100%" stop-color="#22c55e"/>
+            </linearGradient>
+          </defs>
+          <circle cx="20" cy="20" r="14" stroke="url(#ringGrad)" stroke-width="5.5"/>
+          <circle cx="20" cy="20" r="6" fill="#0f172a"/>
+        </svg>
+        <div class="brand-text">
+          <span class="brand-title">NEW ONLY YOU</span>
+          <span class="brand-sub">Textile MES · Suite</span>
         </div>
       </div>
-      <div class="text-[11px] text-gray-500 flex items-center gap-2 pr-2">
-        <span class="text-gray-400">Suggerimento:</span> Fai clic sull'ordine <strong class="text-gray-700">LINEA 1A</strong> per aprire la schermata di produzione
-      </div>
-    </div>
 
-    <!-- Sub-tab links: Time line / Carico Lavoro -->
-    <div class="px-3 py-1 bg-white border-b border-gray-200 flex items-center gap-5 text-xs font-semibold text-gray-700">
-      <span class="text-blue-600 border-b-2 border-blue-600 pb-1 cursor-pointer">Time line</span>
-      <span class="text-gray-500 hover:text-gray-800 pb-1 cursor-pointer">Carico Lavoro</span>
-    </div>
+      <nav class="sidebar-nav" id="sidebarNav"></nav>
 
-    <!-- Filter & Toolbar (Matching screenshot 1 exactly) -->
-    <div class="px-3 py-1.5 bg-[#f3f4f6] border-b border-gray-300 flex flex-wrap items-center justify-between text-xs gap-2">
-      <div class="flex items-center gap-2">
-        <!-- Navigation controls -->
-        <div class="flex items-center bg-white border border-gray-300 rounded px-1 py-0.5 shadow-2xs">
-          <button class="text-gray-500 hover:text-black px-1"><i class="fa-solid fa-caret-left text-xs"></i></button>
-          <span class="w-2 h-2 rounded-full bg-blue-500 mx-1"></span>
-          <button class="text-gray-500 hover:text-black px-1"><i class="fa-solid fa-caret-right text-xs"></i></button>
-        </div>
-
-        <!-- Confection dropdown -->
-        <select class="bg-white border border-gray-300 rounded px-2 py-0.5 text-gray-700 text-xs">
-          <option>Confection A</option>
-          <option>Confection B</option>
-        </select>
-
-        <!-- Mostra dettagli dropdown -->
-        <select class="bg-white border border-gray-300 rounded px-2 py-0.5 text-gray-700 text-xs">
-          <option>Mostra dettagli</option>
-          <option>Nascondi dettagli</option>
-        </select>
-
-        <!-- Tutti dropdown -->
-        <select class="bg-white border border-gray-300 rounded px-2 py-0.5 text-gray-700 text-xs">
-          <option>Tutti</option>
-          <option>In lavorazione</option>
-        </select>
-
-        <!-- Recalculation Button -->
-        <button onclick="recalculateGantt()" class="bg-[#d94343] hover:bg-[#c23535] text-white px-3 py-0.5 rounded font-bold shadow-2xs transition text-xs">
-          Recalculation
+      <div class="sidebar-footer">
+        <button class="user-card" onclick="showToast(t('rolesToast'))">
+          <div class="avatar">CE</div>
+          <div style="min-width:0">
+            <div style="font-size:12.5px;font-weight:600;color:#fff" id="sidebarRoleLabel">Direzione · Europa</div>
+            <div style="font-size:11px;color:#94a3b8" id="sidebarRoleSub">Gestione Ruoli Utente</div>
+          </div>
         </button>
       </div>
+    </aside>
 
-      <div class="flex items-center gap-2">
-        <button class="bg-white border border-gray-300 px-2 py-0.5 rounded text-gray-700 hover:bg-gray-100">Today</button>
-        <div class="flex items-center border border-gray-300 rounded bg-white overflow-hidden">
-          <button class="px-2 py-0.5 text-gray-600 hover:bg-gray-100 border-r border-gray-200"><i class="fa-solid fa-caret-left text-xs"></i></button>
-          <button class="px-2 py-0.5 text-gray-600 hover:bg-gray-100"><i class="fa-solid fa-caret-right text-xs"></i></button>
+    <!-- Main Workspace -->
+    <div class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+          <div class="breadcrumbs" id="breadcrumbs"></div>
         </div>
 
-        <div class="bg-white border border-gray-300 rounded px-2 py-0.5 text-gray-600 flex items-center gap-1.5 text-xs">
-          <i class="fa-regular fa-calendar text-gray-400"></i>
-          <span>Sunday, October 11, 2026 - Wednesday, November 04, 2026</span>
-        </div>
+        <div class="layer-switcher" id="layerSwitcher"></div>
 
-        <div class="relative">
-          <input type="text" placeholder="Smart filter" class="bg-white border border-gray-300 rounded pl-2 pr-6 py-0.5 text-gray-700 text-xs w-28 focus:w-36 transition-all">
-          <i class="fa-solid fa-magnifying-glass absolute right-2 top-1.5 text-[10px] text-gray-400"></i>
-        </div>
-        <button class="text-gray-500 hover:text-black p-1"><i class="fa-solid fa-rotate text-xs"></i></button>
-      </div>
-    </div>
+        <div class="topbar-right">
+          <select class="control-select" id="plantSelect" onchange="setPlant(this.value)">
+            <option value="all">Company Europa (Tutti)</option>
+            <option value="eu-nord">Europa · Stabilimento Nord</option>
+            <option value="eu-sud">Europa · Stabilimento Sud</option>
+          </select>
 
-    <!-- GANTT TIMELINE GRID -->
-    <div class="flex-1 overflow-x-auto overflow-y-auto bg-white custom-scroll relative">
-      <div class="min-w-[1180px]">
-        
-        <!-- Date Header Row -->
-        <div class="gantt-grid bg-white border-b border-gray-300 text-center text-xs font-bold text-gray-700">
-          <div class="border-r border-gray-300 p-2 text-left bg-gray-50 font-bold uppercase tracking-wider text-[10px] text-gray-500">
-            <!-- Blank top left cell -->
-          </div>
-          <div class="border-r border-gray-200 p-1"><div>20/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>21/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>22/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>23/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>24/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>25/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1 bg-blue-50/40 border-t-2 border-t-blue-500 text-blue-900">
-            <div>26/10/2026</div><div class="text-[10px] text-blue-600 font-bold">00:00</div>
-          </div>
-          <div class="border-r border-gray-200 p-1"><div>27/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>28/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>29/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>30/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="border-r border-gray-200 p-1"><div>31/10/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-          <div class="p-1"><div>01/11/2026</div><div class="text-[10px] text-gray-400 font-normal">00:00</div></div>
-        </div>
+          <select class="control-select" id="periodSelect" onchange="setPeriod(this.value)">
+            <option value="today">Oggi</option>
+            <option value="week">Ultimi 7 gg</option>
+            <option value="month">Ultimo Mese</option>
+          </select>
 
-        <!-- LINEA 1A (Order 26022404 001) -->
-        <div class="gantt-grid border-b border-gray-200 h-14 items-center hover:bg-gray-50/50 transition relative">
-          <div class="border-r border-gray-300 px-3 py-2 font-bold text-xs text-gray-800 bg-white h-full flex items-center">
-            LINEA 1A
+          <div class="lang-toggle">
+            <button class="lang-btn active" id="lang-it" onclick="setLang('it')">IT</button>
+            <button class="lang-btn" id="lang-en" onclick="setLang('en')">EN</button>
           </div>
 
-          <!-- Vertical grid line backgrounds -->
-          <div class="col-span-13 grid grid-cols-13 h-full absolute left-[120px] right-0 pointer-events-none">
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-blue-100 h-full bg-blue-50/15"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="border-r border-gray-100 h-full"></div>
-            <div class="h-full"></div>
-          </div>
-
-          <!-- The Orange Order Bar (Clickable to open Production window) -->
-          <div class="col-span-13 pl-0.5 pr-20 z-10 flex flex-col justify-center">
-            <div onclick="openProductionModal()" title="Fai clic per aprire la schermata di Produzione"
-                 class="relative bg-[#f58220] hover:bg-[#e07519] text-white rounded-xs border border-[#d96b14] cursor-pointer overflow-hidden p-1 shadow-2xs group transition"
-                 style="width: 82%;">
-              
-              <!-- Subtle Blue Border underline matching screenshot -->
-              <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-sky-400"></div>
-
-              <div class="flex items-center justify-between text-xs font-bold px-2">
-                <span class="tracking-wide">26022404 001</span>
-                <span class="text-[10px] opacity-90 font-normal">
-                  Prodotto: <strong id="ganttQtyDisplay" class="font-bold underline">666</strong> / 2099 pz
-                </span>
-              </div>
-            </div>
+          <div class="live-pill">
+            <span class="live-dot"></span>
+            <span id="liveLabel">Live</span>
           </div>
         </div>
+      </header>
 
-        <!-- LINEA 2A -->
-        <div class="gantt-grid border-b border-gray-200 h-12 items-center">
-          <div class="border-r border-gray-300 px-3 py-2 font-bold text-xs text-gray-700 bg-white h-full flex items-center">LINEA 2A</div>
-          <div class="col-span-13"></div>
-        </div>
-
-        <!-- LINEA 3A -->
-        <div class="gantt-grid border-b border-gray-200 h-12 items-center">
-          <div class="border-r border-gray-300 px-3 py-2 font-bold text-xs text-gray-700 bg-white h-full flex items-center">LINEA 3A</div>
-          <div class="col-span-13"></div>
-        </div>
-
-        <!-- LINEA 4A -->
-        <div class="gantt-grid border-b border-gray-200 h-12 items-center">
-          <div class="border-r border-gray-300 px-3 py-2 font-bold text-xs text-gray-700 bg-white h-full flex items-center">LINEA 4A</div>
-          <div class="col-span-13"></div>
-        </div>
-
-        <!-- LINEA 5A (Order 26017829 001) -->
-        <div class="gantt-grid border-b border-gray-200 h-14 items-center relative">
-          <div class="border-r border-gray-300 px-3 py-2 font-bold text-xs text-gray-700 bg-white h-full flex items-center">LINEA 5A</div>
-          
-          <div class="col-span-13 pl-0.5 pr-2 z-10 flex flex-col justify-center">
-            <div class="relative bg-[#f58220] text-white rounded-xs border border-[#d96b14] p-1" style="width: 100%;">
-              <div class="flex items-center justify-end text-xs font-bold pr-3">
-                <span>26017829 001</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </main>
-
-
-  <!-- ========================================================= -->
-  <!-- MODAL: "Production" (1:1 REPLICA OF SCREENSHOT 2)         -->
-  <!-- WITH NEW AUTOMATED BARCODE & SCALE FEATURE BUILT ON TOP   -->
-  <!-- ========================================================= -->
-  <div id="productionWindow" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-    <div class="bg-[#f0f2f5] border border-gray-400 shadow-2xl rounded-xs w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden">
-      
-      <!-- Top Title Bar (Exact from screenshot 2) -->
-      <div class="bg-[#ebeef2] border-b border-gray-300 px-3 py-1.5 flex items-center justify-between select-none">
-        <h2 class="text-sm font-semibold text-gray-800">Production</h2>
-        <button onclick="closeProductionModal()" class="text-gray-500 hover:text-black text-sm px-1.5 py-0.5 rounded hover:bg-gray-300">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <!-- Tabs Bar (Exact from screenshot 2: Produzione / Planning) -->
-      <div class="bg-[#e2e6eb] px-3 pt-1.5 border-b border-gray-300 flex items-center justify-between">
-        <div class="flex items-center gap-1">
-          <div class="bg-white border-t border-l border-r border-gray-300 px-4 py-1.5 text-xs font-semibold text-gray-800 rounded-t shadow-2xs">
-            Produzione
-          </div>
-          <div class="px-4 py-1.5 text-xs text-gray-600 hover:text-black cursor-pointer">
-            Planning
-          </div>
-        </div>
-
-        <!-- NEW FEATURE BADGE ON TOP OF HIS APPLICATION -->
-        <div class="flex items-center gap-2 pb-1">
-          <span class="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Nuova Funzione: Inserimento Automatico da Barcode & Bilancia
-          </span>
-        </div>
-      </div>
-
-      <!-- MAIN MODAL CONTENT: LEFT FORM + CENTER TABLE + RIGHT KPI -->
-      <div class="flex-1 overflow-y-auto p-4 flex flex-col lg:flex-row gap-4 bg-white custom-scroll">
-        
-        <!-- LEFT COLUMN: COMMESSA FORM (Matching Screenshot 2) -->
-        <div class="w-full lg:w-56 space-y-2.5 text-xs shrink-0 border-r border-gray-200 pr-3">
-          <div>
-            <label class="block text-gray-600 mb-0.5">Commessa</label>
-            <input type="text" value="26022404_001" readonly class="w-full border border-gray-300 rounded-xs px-2 py-1 bg-white font-semibold text-gray-800">
-          </div>
-
-          <div>
-            <label class="block text-gray-600 mb-0.5">Articolo</label>
-            <input type="text" value="PL00075" readonly class="w-full border border-gray-300 rounded-xs px-2 py-1 bg-white font-semibold text-gray-800">
-          </div>
-
-          <div class="flex items-center gap-3">
-            <div class="flex-1">
-              <label class="block text-gray-600 mb-0.5">Linea</label>
-              <input type="text" value="1A" readonly class="w-full border border-gray-300 rounded-xs px-2 py-1 bg-white font-semibold text-gray-800">
-            </div>
-            <div>
-              <label class="block text-gray-600 mb-0.5">Abbatimento</label>
-              <span class="text-emerald-600 font-bold text-sm block pt-1">90%</span>
-            </div>
-          </div>
-
-          <div class="pt-1 leading-tight">
-            <div class="font-bold text-gray-900 text-xs">Capi (2099)</div>
-            <div class="font-bold text-gray-900 text-xs">Produzione Giornaliera (235)</div>
-          </div>
-
-          <div>
-            <label class="block text-gray-600 mb-0.5">Data Produzione</label>
-            <div class="relative">
-              <input id="inputDataProduzione" type="text" value="26/10/2026" class="w-full border border-gray-300 rounded-xs px-2 py-1 text-xs">
-              <i class="fa-regular fa-calendar absolute right-2 top-2 text-gray-400"></i>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-gray-600 mb-0.5">Turni</label>
-            <select class="w-full border border-gray-300 rounded-xs px-2 py-1 text-xs bg-white">
-              <option>I</option>
-              <option>II</option>
-            </select>
-          </div>
-
-          <div class="flex items-center gap-4 text-xs text-gray-700 pt-0.5">
-            <label class="flex items-center gap-1.5 cursor-pointer">
-              <input type="radio" name="planType" checked class="text-orange-500"> By date
-            </label>
-            <label class="flex items-center gap-1.5 cursor-pointer">
-              <input type="radio" name="planType"> By hour
-            </label>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-gray-600 text-[11px] mb-0.5">COLORE</label>
-              <select id="selectColore" class="w-full border border-gray-300 rounded-xs px-1.5 py-1 text-xs bg-white">
-                <option>V00006</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-gray-600 text-[11px] mb-0.5">Taglie</label>
-              <select id="selectTaglie" class="w-full border border-gray-300 rounded-xs px-1.5 py-1 text-xs bg-white">
-                <option>M</option>
-                <option>S</option>
-                <option>L</option>
-                <option>XL</option>
-                <option>XXL</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-gray-600 mb-0.5">Quantità</label>
-            <input id="inputQuantita" type="text" placeholder="" class="w-full border border-gray-300 rounded-xs px-2 py-1 text-xs">
-          </div>
-
-          <div>
-            <label class="block text-gray-600 mb-0.5">Numero delle risorse</label>
-            <input type="text" value="3" class="w-full border border-gray-300 rounded-xs px-2 py-1 text-xs bg-white">
-          </div>
-
-          <!-- Buttons at bottom of left panel -->
-          <div class="flex gap-2 pt-1">
-            <button onclick="manualInsertOk()" class="bg-[#0070d2] hover:bg-blue-700 text-white px-4 py-1 rounded-xs text-xs font-semibold shadow-2xs">
-              Ok
-            </button>
-            <button class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-xs text-xs border border-gray-300">
-              Cancel
-            </button>
-          </div>
-
-          <!-- Note about manual mode vs automated mode -->
-          <div class="text-[10px] text-gray-400 italic pt-1 border-t border-gray-200">
-            * In precedenza l'operatore inseriva questi dati manualmente premendo "Ok".
-          </div>
-        </div>
-
-        <!-- CENTER COLUMN: THE PRODUCTION TABLE + AUTOMATION OVERLAY -->
-        <div class="flex-1 flex flex-col min-w-0">
-
-          <!-- ======================================================== -->
-          <!-- NEW BARCODE & SCALE BAR DIRECTLY INTEGRATED IN THE WINDOW -->
-          <!-- ======================================================== -->
-          <div class="mb-3 bg-[#f8fafc] text-gray-800 rounded p-3 border border-gray-300 shadow-2xs">
-            
-            <!-- Top bar with Quick Demo Presets: 1 Good One + 1 Bad One -->
-            <div class="flex flex-wrap items-center justify-between mb-2 pb-2 border-b border-gray-200 gap-2">
-              <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-xs font-bold tracking-wide uppercase text-gray-800">Verifica Barcode & Bilancia:</span>
-              </div>
-
-              <!-- Dedicated One-Click Scenario Buttons requested by user -->
-              <div class="flex items-center gap-2">
-                <span class="text-[10px] text-gray-500 font-semibold uppercase">Simulazioni per il Cliente:</span>
-                <button onclick="runScenarioGood()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
-                  <i class="fa-solid fa-circle-check text-xs"></i> 1. Test Buono (10 pz - Peso OK)
-                </button>
-                <button onclick="runScenarioBad()" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
-                  <i class="fa-solid fa-triangle-exclamation text-xs"></i> 2. Test Anomalia (Manca 1 Capo - Bloccato)
-                </button>
-              </div>
-
-              <span id="scannerStatusText" class="text-[11px] font-mono text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded border border-amber-300">
-                Pronto. Seleziona uno scenario sopra o scansiona.
-              </span>
-            </div>
-
-            <!-- Integrated Barcode Reader & Weight Gate Simulator -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-              
-              <!-- STEP 1: BARCODE SCANNER (WHITE BACKGROUND) -->
-              <div class="md:col-span-4 bg-white p-2.5 rounded border border-gray-300 shadow-2xs flex flex-col justify-between">
-                
-                <!-- Action Button on Top -->
-                <button id="btnScansiona" onclick="executeBarcodeScan()" 
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded font-bold text-xs transition flex items-center justify-center gap-2 shadow-2xs mb-2">
-                  <i class="fa-solid fa-barcode text-sm"></i>
-                  <span class="tracking-wide uppercase">1. SCANSIONA BARCODE</span>
-                </button>
-
-                <div class="flex justify-between items-center text-[10px] text-gray-600 mb-1">
-                  <span class="font-bold text-gray-700">Codice Busta:</span>
-                  <span class="text-emerald-700 font-mono font-bold" id="scannedTagSize">#P-067 • Taglia M (10 Capi)</span>
-                </div>
-                
-                <input id="barcodePayloadInput" type="text" value="ORD:26022404_001|COL:V00006|SZ:M|QTY:10|SN:067" 
-                       class="w-full bg-gray-50 border border-gray-300 rounded px-2 py-1 text-xs text-gray-800 font-mono outline-none text-center focus:bg-white focus:border-blue-500">
-
-                <div class="flex justify-between items-center mt-2 text-[10px]">
-                  <div class="flex gap-1.5 text-gray-500">
-                    <span>Taglia:</span>
-                    <button onclick="setBarcodeSize('S')" class="text-blue-600 hover:underline">S</button>
-                    <button onclick="setBarcodeSize('M')" class="text-blue-600 hover:underline font-bold text-blue-900">M</button>
-                    <button onclick="setBarcodeSize('L')" class="text-blue-600 hover:underline">L</button>
-                  </div>
-                  <button onclick="prepareNextPack()" class="text-amber-700 hover:text-amber-900 flex items-center gap-1 font-semibold">
-                    <i class="fa-solid fa-rotate-right text-[10px]"></i> Prossimo Pacco
-                  </button>
-                </div>
-              </div>
-
-              <!-- STEP 2: SCALE WEIGHT SIMULATION (WHITE BACKGROUND) -->
-              <div class="md:col-span-4 bg-white p-2.5 rounded border border-gray-300 shadow-2xs flex flex-col justify-between">
-                <div class="flex justify-between items-center text-[10px] text-gray-600 mb-1">
-                  <span class="font-bold text-gray-700"><i class="fa-solid fa-weight-scale text-amber-600"></i> FASE 2: Bilancia (Target: 2.500g)</span>
-                  <span id="scaleWeightStatus" class="text-gray-500 font-bold font-mono">In attesa</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span id="scaleDigitalDisplay" class="font-mono text-xl font-black text-emerald-600 bg-gray-50 px-2 py-1 rounded border border-gray-300">
-                    2.508 kg
-                  </span>
-                  <div class="flex flex-col gap-1 flex-1">
-                    <button onclick="simulateWeight(2508)" class="text-[9px] bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 px-1.5 py-0.5 rounded text-left font-semibold">
-                      ✓ Peso Conforme (2.508 kg = 10 pz)
-                    </button>
-                    <button onclick="simulateWeight(2240)" class="text-[9px] bg-red-50 hover:bg-red-100 text-red-800 border border-red-300 px-1.5 py-0.5 rounded text-left font-semibold">
-                      ✗ Peso Errato (2.240 kg = 9 pz!)
-                    </button>
-                  </div>
-                </div>
-                <div id="scaleDetailNote" class="text-[10px] text-gray-500 mt-1.5 italic text-center">
-                  Tolleranza consentita: da 2.450g a 2.550g
-                </div>
-              </div>
-
-              <!-- STEP 3: GREEN VALIDATE BUTTON (ONLY ACTIVE IF BARCODE READ + WEIGHT CORRECT) -->
-              <div class="md:col-span-4 flex flex-col justify-center" onclick="handleValidateAreaClick()">
-                <button id="btnValidateScale" onclick="event.stopPropagation(); validateAndInsertRecord();" disabled
-                        class="w-full bg-gray-100 border border-gray-300 text-gray-400 p-2.5 rounded font-bold text-xs shadow-2xs transition flex flex-col items-center justify-center gap-0.5 cursor-not-allowed">
-                  <div class="flex items-center gap-1.5">
-                    <i id="btnValidateIcon" class="fa-solid fa-lock text-xs"></i>
-                    <span id="btnValidateLabel">VALIDA E INSERISCI</span>
-                  </div>
-                  <span id="btnValidateSubtext" class="text-[9px] font-normal opacity-90">Prima scansiona il barcode</span>
-                </button>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- THE DATA TABLE (Exact Columns from Screenshot 2) -->
-          <div class="flex-1 border border-gray-300 rounded-xs overflow-hidden flex flex-col">
-            <div class="custom-scroll overflow-y-auto max-h-[410px]">
-              <table class="w-full text-left text-xs border-collapse">
-                <thead class="bg-[#f0f2f5] text-gray-800 sticky top-0 border-b border-gray-300 font-semibold select-none">
-                  <tr>
-                    <th class="p-2 border-r border-gray-300">Production date</th>
-                    <th class="p-2 border-r border-gray-300">Start production</th>
-                    <th class="p-2 border-r border-gray-300">End production</th>
-                    <th class="p-2 border-r border-gray-300 text-right">Quantità</th>
-                    <th class="p-2 border-r border-gray-300">COLORE</th>
-                    <th class="p-2">TAGLIE</th>
-                  </tr>
-                </thead>
-                <tbody id="tableBodyRows" class="divide-y divide-gray-200 text-xs text-gray-800 font-mono">
-                  
-                  <!-- Existing rows from the screenshot -->
-                  <tr>
-                    <td class="p-1.5 border-r border-gray-200 font-sans">01/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">01/09/2026 8:30</td>
-                    <td class="p-1.5 border-r border-gray-200">01/09/2026 11:09</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">69</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">XS</td>
-                  </tr>
-                  <tr class="bg-gray-50/50">
-                    <td class="p-1.5 border-r border-gray-200 font-sans">01/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">01/09/2026 8:30</td>
-                    <td class="p-1.5 border-r border-gray-200">01/09/2026 11:31</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">80</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">S</td>
-                  </tr>
-                  <tr>
-                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 8:30</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 9:52</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">41</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">L</td>
-                  </tr>
-                  <tr class="bg-gray-50/50">
-                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 8:30</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 9:52</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">41</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">XL</td>
-                  </tr>
-                  <tr>
-                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 9:52</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 10:00</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">4</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">XS</td>
-                  </tr>
-                  <tr class="bg-gray-50/50">
-                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 9:52</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 11:12</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">30</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">S</td>
-                  </tr>
-                  <tr>
-                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 10:00</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 10:18</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">9</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">M</td>
-                  </tr>
-                  <tr class="bg-gray-50/50">
-                    <td class="p-1.5 border-r border-gray-200 font-sans">02/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 10:18</td>
-                    <td class="p-1.5 border-r border-gray-200">02/09/2026 10:58</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">10</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">XXL</td>
-                  </tr>
-                  <tr>
-                    <td class="p-1.5 border-r border-gray-200 font-sans">11/09/2026</td>
-                    <td class="p-1.5 border-r border-gray-200">11/09/2026 8:30</td>
-                    <td class="p-1.5 border-r border-gray-200">11/09/2026 9:06</td>
-                    <td class="p-1.5 border-r border-gray-200 text-right font-bold">18</td>
-                    <td class="p-1.5 border-r border-gray-200">V00006</td>
-                    <td class="p-1.5">XXL</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- RIGHT COLUMN: TOTALS & KPI (Exact layout from screenshot 2) -->
-        <div class="w-full lg:w-56 flex flex-col justify-between text-xs shrink-0 pl-1">
-          <div class="space-y-4 font-mono text-xs text-gray-800">
-            
-            <div class="space-y-1">
-              <div class="flex justify-between">
-                <span>QTY PIANIFICATA:</span>
-                <strong>2099</strong>
-              </div>
-              <div class="flex justify-between text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded">
-                <span>QTY PRODOTTA:</span>
-                <strong id="kpiQtyProdotta" class="font-extrabold text-sm">666</strong>
-              </div>
-              <div class="flex justify-between text-gray-500">
-                <span>QTY OVER:</span>
-                <strong>0</strong>
-              </div>
-              <div class="flex justify-between text-orange-700 bg-orange-50 px-1 py-0.5 rounded">
-                <span>DIFF:</span>
-                <strong id="kpiQtyDiff" class="font-bold">1433</strong>
-              </div>
-            </div>
-
-            <div class="space-y-1 text-gray-700 pt-2 border-t border-gray-200">
-              <div class="flex justify-between">
-                <span>TOTALE QTY COMMESSA:</span>
-                <strong>2099</strong>
-              </div>
-              <div class="flex justify-between">
-                <span>TOTALE QTY PIANIFICATA:</span>
-                <strong>2099</strong>
-              </div>
-              <div class="flex justify-between">
-                <span>DIFF:</span>
-                <strong>0</strong>
-              </div>
-            </div>
-
-            <div class="pt-2 border-t border-gray-200 font-sans text-xs">
-              <div class="text-gray-700 font-semibold mb-1">Qty pianificata per linie:</div>
-              <div class="flex items-center gap-2">
-                <span>• 1A - <strong>2099</strong></span>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Bottom Button: Chiudi commessa (Exact from screenshot 2) -->
-          <div class="pt-4 text-right">
-            <button onclick="closeProductionModal()" class="bg-[#f0a500] hover:bg-[#d99500] text-black font-bold px-4 py-2 rounded-xs shadow-2xs text-xs">
-              Chiudi commessa
-            </button>
-          </div>
-        </div>
-
-      </div>
-
+      <main class="content" id="content"></main>
     </div>
   </div>
 
-  <!-- Audio Tone Synthesis for Scanner Beep & Scale Chime -->
+  <!-- Layer 3 Drill-Down Drawer -->
+  <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-header">
+      <div>
+        <div class="page-kicker" id="drawerKicker">Layer 3 · Reparto</div>
+        <h2 style="font-size:20px;font-weight:700" id="drawerTitle">Tessitura</h2>
+      </div>
+      <button class="close-btn" onclick="closeDrawer()" aria-label="Chiudi">×</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+
   <script>
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playBeep(type = 'success') {
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
+    // =========================================================
+    // STATE & I18N
+    // =========================================================
+    const state = {
+      view: 'macro', // 'macro' | 'produzione' | 'controllo' | 'hr' | 'smart'
+      plant: 'all',
+      period: 'today',
+      lang: 'it',
+      prodChartMetric: 'output', // 'output' | 'oee' | 'wip'
+      macroChartSeries: 'all',
+      activeDeptDrawer: null
+    };
+
+    const I18N = {
+      it: {
+        layer1: 'Layer 1 · Macro',
+        layer2: 'Layer 2 · Produzione',
+        sidebarL1: 'Layer 1 · Vista Aziendale',
+        sidebarL2: 'Layer 2 · Moduli Principali',
+        sidebarDepts: 'Reparti Produzione',
+        macroNav: 'Macro Dashboard',
+        ctrlName: 'Controllo di Gestione',
+        prodName: 'Produzione',
+        hrName: 'Risorse Umane',
+        smartName: 'Smart Factory',
+        reportName: 'Reportistica',
+        rolesSub: 'Gestione Ruoli Utente',
+        rolesToast: 'Pannello Ruoli & Permessi (sostituisce il vecchio "Assing User Roles").',
+        macroKicker: 'Layer 1 · Executive Macro Dashboard',
+        macroTitle: 'Panoramica Aziendale — Company Europa',
+        macroSub: 'Aggregazione in tempo reale dai 4 moduli principali: Controllo di Gestione, Produzione, Risorse Umane e Smart Factory.',
+        openProdBtn: 'Apri Layer 2 · Produzione →',
+        backMacroBtn: '← Torna a Layer 1',
+        kpiOee: 'Efficienza Globale (OEE)',
+        kpiOutput: 'Produzione Totale',
+        kpiUnitCost: 'Costo Medio per Capo',
+        kpiConnected: 'Macchine & Presenze',
+        pcs: 'capi',
+        target: 'target',
+        vsBudget: 'vs budget',
+        activeMachines: 'macchine attive',
+        attendance: 'presenze',
+        openLayer2: 'Apri Dashboard Layer 2 →',
+        trendTitle: 'Andamento Integrato Multi-Modulo',
+        trendSub: 'Correlazione tra Output Produttivo (capi) ed Efficienza OEE (%)',
+        alertsTitle: 'Segnalazioni & Colli di Bottiglia',
+        alertsSub: 'Eventi prioritari raccolti dai 4 moduli',
+        prodKicker: 'Layer 2 · Dashboard Modulo Produzione',
+        prodTitle: 'Produzione — Vista Macro Reparti',
+        prodSub: 'Monitoraggio unificato di avanzamento, efficienza e code su tutta la filiera tessile.',
+        pipelineTitle: 'Flusso Filiera Tessile (End-to-End WIP)',
+        pipelineSub: 'Clicca un reparto per aprire il dettaglio operativo e i moduli di 3° livello organizzati',
+        deptOutput: 'Output',
+        deptEff: 'Efficienza',
+        deptWip: 'Coda WIP',
+        deptActive: 'Postazioni Attive',
+        deptCompareTitle: 'Confronto Macro Reparti',
+        deptCompareSub: 'Analisi comparativa di produzione, efficienza e carico lavoro',
+        reportsTitle: 'Reportistica Produzione',
+        reportsSub: 'Export rapidi e sintesi direzionali (ex tile Reportistica)',
+        exportBtn: 'Esporta',
+        statusOk: 'Ottimale',
+        statusWarn: 'Attenzione',
+        statusInline: 'In Linea',
+        bottleneckTag: 'Collo di bottiglia',
+        openModules: 'Apri moduli reparto →',
+        drawerNote: 'Vecchi menu riorganizzati in gruppi funzionali con stato live:',
+        periodLabels: { today: 'Oggi', week: 'Ultimi 7 gg', month: 'Ultimo Mese' },
+        plantLabels: { all: 'Company Europa (Tutti)', 'eu-nord': 'Europa · Stabilimento Nord', 'eu-sud': 'Europa · Stabilimento Sud' },
+        ctrlKicker: 'Layer 2 · Controllo di Gestione',
+        ctrlTitle: 'Controllo di Gestione — Costi & Margini',
+        ctrlSub: 'Analisi costi di trasformazione per reparto, scostamenti da budget e marginalità commesse.',
+        hrKicker: 'Layer 2 · Risorse Umane',
+        hrTitle: 'Risorse Umane — Forza Lavoro & Turni',
+        hrSub: 'Copertura turni, presenze per reparto, straordinari e produttività operatori.',
+        smartKicker: 'Layer 2 · Smart Factory (IIoT)',
+        smartTitle: 'Smart Factory — Telemetria & Energia',
+        smartSub: 'Connettività parco macchine, consumi energetici in tempo reale e manutenzione predittiva.'
+      },
+      en: {
+        layer1: 'Layer 1 · Macro',
+        layer2: 'Layer 2 · Production',
+        sidebarL1: 'Layer 1 · Executive View',
+        sidebarL2: 'Layer 2 · Core Modules',
+        sidebarDepts: 'Production Departments',
+        macroNav: 'Macro Dashboard',
+        ctrlName: 'Management Control',
+        prodName: 'Production',
+        hrName: 'Human Resources',
+        smartName: 'Smart Factory',
+        reportName: 'Reporting',
+        rolesSub: 'Assign User Roles',
+        rolesToast: 'User Roles & Permissions panel (cleaned up from legacy "Assing User Roles").',
+        macroKicker: 'Layer 1 · Executive Macro Dashboard',
+        macroTitle: 'Company Overview — Company Europa',
+        macroSub: 'Real-time macro aggregation across all 4 core modules: Management Control, Production, HR, and Smart Factory.',
+        openProdBtn: 'Open Layer 2 · Production →',
+        backMacroBtn: '← Back to Layer 1',
+        kpiOee: 'Global Efficiency (OEE)',
+        kpiOutput: 'Total Output',
+        kpiUnitCost: 'Avg. Cost per Garment',
+        kpiConnected: 'Machines & Workforce',
+        pcs: 'pcs',
+        target: 'target',
+        vsBudget: 'vs budget',
+        activeMachines: 'active machines',
+        attendance: 'attendance',
+        openLayer2: 'Open Layer 2 Dashboard →',
+        trendTitle: 'Cross-Module Performance Trend',
+        trendSub: 'Correlation between Production Output (pcs) and Global OEE (%)',
+        alertsTitle: 'Live Alerts & Bottlenecks',
+        alertsSub: 'Priority events aggregated from all 4 modules',
+        prodKicker: 'Layer 2 · Production Module Dashboard',
+        prodTitle: 'Production — Departmental Macro View',
+        prodSub: 'Unified tracking of throughput, OEE, and WIP across the entire textile value chain.',
+        pipelineTitle: 'End-to-End Textile Value Chain (WIP Flow)',
+        pipelineSub: 'Click any department to open its operational drawer and organized Level-3 modules',
+        deptOutput: 'Output',
+        deptEff: 'Efficiency',
+        deptWip: 'WIP Queue',
+        deptActive: 'Active Units',
+        deptCompareTitle: 'Department Macro Comparison',
+        deptCompareSub: 'Side-by-side comparison of output, efficiency, and WIP load',
+        reportsTitle: 'Production Reporting',
+        reportsSub: 'Quick exports & executive summaries (replaces standalone Reportistica tile)',
+        exportBtn: 'Export',
+        statusOk: 'Optimal',
+        statusWarn: 'Attention',
+        statusInline: 'On Track',
+        bottleneckTag: 'Bottleneck',
+        openModules: 'Open dept modules →',
+        drawerNote: 'Legacy tiles reorganized into logical functional groups with live status:',
+        periodLabels: { today: 'Today', week: 'Last 7 Days', month: 'Last 30 Days' },
+        plantLabels: { all: 'Company Europa (All)', 'eu-nord': 'Europa · North Plant', 'eu-sud': 'Europa · South Plant' },
+        ctrlKicker: 'Layer 2 · Management Control',
+        ctrlTitle: 'Management Control — Costs & Margins',
+        ctrlSub: 'Departmental conversion cost analysis, budget variance, and order margins.',
+        hrKicker: 'Layer 2 · Human Resources',
+        hrTitle: 'Human Resources — Workforce & Shifts',
+        hrSub: 'Shift coverage, departmental attendance, overtime, and operator efficiency.',
+        smartKicker: 'Layer 2 · Smart Factory (IIoT)',
+        smartTitle: 'Smart Factory — Telemetry & Energy',
+        smartSub: 'Connected machine fleet, real-time energy consumption, and predictive maintenance.'
       }
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
+    };
 
-      if (type === 'success') {
-        osc.frequency.setValueAtTime(1760, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.12);
-      } else if (type === 'chime') {
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(1320, audioCtx.currentTime + 0.08);
-        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.28);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.28);
-      } else {
-        osc.frequency.setValueAtTime(220, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.3);
-      }
+    function t(key) { return I18N[state.lang][key] || key; }
+
+    // =========================================================
+    // MOCK DATA ENGINE (scales cleanly by Plant & Period)
+    // =========================================================
+    const PLANT_MULT = { all: 1, 'eu-nord': 0.58, 'eu-sud': 0.42 };
+    const PERIOD_MULT = { today: 1, week: 6.4, month: 25.5 };
+    const PLANT_OEE_OFFSET = { all: 0, 'eu-nord': 1.8, 'eu-sud': -2.1 };
+
+    function scaleInt(base) {
+      return Math.round(base * PLANT_MULT[state.plant] * PERIOD_MULT[state.period]);
+    }
+    function scaleFleet(base) {
+      return Math.max(1, Math.round(base * PLANT_MULT[state.plant]));
+    }
+    function clampPct(v) {
+      return Math.min(99.5, Math.max(52, +(v + PLANT_OEE_OFFSET[state.plant]).toFixed(1)));
+    }
+    function fmtNum(n) {
+      return n.toLocaleString(state.lang === 'it' ? 'it-IT' : 'en-US');
     }
 
-    // STATE VARIABLES
-    const TOTAL_ORDER = 2099;
-    const PACK_SIZE = 10;
-    const TARGET_WEIGHT = 2500;
-    const TOLERANCE = 50;
-
-    let currentQtyProdotta = 666;
-    let currentWeightG = 2508;
-    let selectedSize = 'M';
-    let selectedColor = 'V00006';
-    let currentSerial = 67;
-    let barcodeRead = false;
-    let scannedSerialsSet = new Set(['065', '066']); // Previously registered packets
-
-    function openProductionModal() {
-      document.getElementById('productionWindow').classList.remove('hidden');
+    function getDepartments() {
+      return [
+        {
+          id: 'tessitura',
+          name: 'Tessitura',
+          enName: 'Knitting / Weaving',
+          color: '#8c5a44',
+          icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18"/><path d="M15 4l5 5"/><path d="M5 12c2-3 5-3 7 0s5 3 7 0"/></svg>`,
+          output: scaleInt(3420),
+          target: scaleInt(3600),
+          oee: clampPct(86.4),
+          wip: scaleInt(410),
+          activeUnits: `${scaleFleet(42)}/${scaleFleet(46)}`,
+          unitLabelIt: 'Telai / Macchine',
+          unitLabelEn: 'Knitting Machines',
+          costPerPc: 1.42,
+          workers: scaleFleet(64),
+          energyKwh: scaleInt(1240),
+          status: 'ok',
+          noteIt: '2 macchine in attesa filato · Magazzino Filo 92%',
+          noteEn: '2 machines awaiting yarn · Yarn Stock 92%',
+          spark: [78, 82, 85, 84, 88, 86, 87],
+          // Real reorganized Level-3 modules from Screenshot 3!
+          moduleGroups: [
+            {
+              groupIt: 'Monitoraggio & Piano Macchine (Live)',
+              groupEn: 'Live Floor & Monitoring',
+              items: [
+                { name: 'Sinottico', metaIt: '42/46 macchine attive live', metaEn: '42/46 machines live' },
+                { name: 'Layout Rammendo', metaIt: '112 capi in coda controllo', metaEn: '112 pcs in mending queue' },
+                { name: 'Chronos', metaIt: 'Tempi ciclo & fermi turno', metaEn: 'Cycle times & shift stops' }
+              ]
+            },
+            {
+              groupIt: 'Pianificazione & Scheduling',
+              groupEn: 'Planning & Scheduling',
+              items: [
+                { name: 'Gantt Produzione', metaIt: '18 commesse schedulate', metaEn: '18 scheduled orders' },
+                { name: 'Gantt Rammendo', metaIt: 'Carico postazioni rammendo', metaEn: 'Mending station schedule' },
+                { name: 'Programmazione Macchine', metaIt: 'Assegnazione aghi & finezze', metaEn: 'Machine allocation' },
+                { name: 'Programma Programmatori', metaIt: '6 nuovi campioni CAD', metaEn: '6 new CAD patterns' }
+              ]
+            },
+            {
+              groupIt: 'Qualità & Materiali',
+              groupEn: 'Quality & Materials',
+              items: [
+                { name: 'Controllo Tavolo', metaIt: 'Resa 1ª scelta: 96.8%', metaEn: 'First-pass yield: 96.8%' },
+                { name: 'Magazzino Filo', metaIt: 'Stock 92% · 2 lotti sotto scorta', metaEn: 'Stock 92% · 2 low-stock lots' }
+              ]
+            },
+            {
+              groupIt: 'Report & Analisi Tessitura',
+              groupEn: 'Reports & Analytics',
+              items: [
+                { name: 'Report Tessitura', metaIt: 'Rendimento giornaliero', metaEn: 'Daily knitting report' },
+                { name: 'Rapporti Sinottico', metaIt: 'Storico efficienza macchine', metaEn: 'Machine efficiency log' },
+                { name: 'Rapporti Gantt Prod', metaIt: 'Scostamento piani vs reale', metaEn: 'Plan vs actual variance' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'confezione',
+          name: 'Confezione',
+          enName: 'Garment Assembly',
+          color: '#b4232c',
+          icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 2 2-2 2 2 4-2 3 5-3 2v9H6v-9l-3-2 3-5z"/></svg>`,
+          output: scaleInt(2980),
+          target: scaleInt(3100),
+          oee: clampPct(88.1),
+          wip: scaleInt(640),
+          activeUnits: `${scaleFleet(8)}/${scaleFleet(8)}`,
+          unitLabelIt: 'Linee Attive',
+          unitLabelEn: 'Active Lines',
+          costPerPc: 1.15,
+          workers: scaleFleet(92),
+          energyKwh: scaleInt(610),
+          status: 'ok',
+          noteIt: 'Bilanciamento linee ottimale · Scarto 1.4%',
+          noteEn: 'Optimal line balance · Defect rate 1.4%',
+          spark: [84, 85, 87, 89, 88, 90, 88],
+          moduleGroups: [
+            {
+              groupIt: 'Avanzamento Linee',
+              groupEn: 'Line Tracking',
+              items: [
+                { name: 'Sinottico Confezione', metaIt: '8/8 linee in marcia', metaEn: '8/8 lines running' },
+                { name: 'Bilanciamento Operazioni', metaIt: 'Takt time medio 54s', metaEn: 'Avg takt time 54s' }
+              ]
+            },
+            {
+              groupIt: 'Qualità & Report',
+              groupEn: 'Quality & Reports',
+              items: [
+                { name: 'Controllo Qualità Linea', metaIt: 'Difettosità 1.4%', metaEn: 'Defect rate 1.4%' },
+                { name: 'Report Avanzamento', metaIt: '96.1% target raggiunto', metaEn: '96.1% target reached' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'sartoria',
+          name: 'Sartoria',
+          enName: 'Tailoring',
+          color: '#d95d2b',
+          icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12"/></svg>`,
+          output: scaleInt(1240),
+          target: scaleInt(1320),
+          oee: clampPct(82.5),
+          wip: scaleInt(310),
+          activeUnits: `${scaleFleet(18)}/${scaleFleet(20)}`,
+          unitLabelIt: 'Banchi Sartoria',
+          unitLabelEn: 'Tailoring Benches',
+          costPerPc: 0.94,
+          workers: scaleFleet(38),
+          energyKwh: scaleInt(220),
+          status: 'inline',
+          noteIt: 'Lotti alta moda puntuali al 94%',
+          noteEn: 'High-fashion lots 94% on time',
+          spark: [79, 80, 81, 83, 82, 84, 83],
+          moduleGroups: [
+            {
+              groupIt: 'Operatività Sartoria',
+              groupEn: 'Tailoring Operations',
+              items: [
+                { name: 'Coda Lavorazioni Speciali', metaIt: '310 capi in lavorazione', metaEn: '310 pcs in progress' },
+                { name: 'Tempi & Metodi', metaIt: 'Efficienza 82.5%', metaEn: 'Efficiency 82.5%' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'stiro',
+          name: 'Stiro',
+          enName: 'Ironing / Pressing',
+          color: '#15803d',
+          icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17h16l-2-7H9a5 5 0 0 0-5 5v2z"/><path d="M12 10V7h5"/></svg>`,
+          output: scaleInt(2650),
+          target: scaleInt(3150),
+          oee: clampPct(74.2),
+          wip: scaleInt(890),
+          activeUnits: `${scaleFleet(12)}/${scaleFleet(14)}`,
+          unitLabelIt: 'Presse / Tavoli',
+          unitLabelEn: 'Presses / Tables',
+          costPerPc: 0.48,
+          workers: scaleFleet(28),
+          energyKwh: scaleInt(840),
+          status: 'warn',
+          bottleneck: true,
+          noteIt: 'Collo di bottiglia: 2 presse in fermo vapore (+14% coda)',
+          noteEn: 'Bottleneck: 2 presses on steam maintenance (+14% queue)',
+          spark: [83, 81, 78, 76, 74, 73, 74],
+          moduleGroups: [
+            {
+              groupIt: 'Gestione Reparto Stiro',
+              groupEn: 'Pressing Operations',
+              items: [
+                { name: 'Monitor Presse Vapore', metaIt: '2 unità in manutenzione', metaEn: '2 units under maintenance' },
+                { name: 'Priorità Coda Capi', metaIt: '890 capi in attesa · 3 urgenti', metaEn: '890 pcs queued · 3 urgent' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'lavanderia',
+          name: 'Lavanderia',
+          enName: 'Laundry / Washing',
+          color: '#1d6fe2',
+          icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="13" r="4"/><path d="M8 7h2"/></svg>`,
+          output: scaleInt(2190),
+          target: scaleInt(2250),
+          oee: clampPct(91.0),
+          wip: scaleInt(220),
+          activeUnits: `${scaleFleet(16)}/${scaleFleet(18)}`,
+          unitLabelIt: 'Lavatrici Industriali',
+          unitLabelEn: 'Industrial Washers',
+          costPerPc: 0.36,
+          workers: scaleFleet(22),
+          energyKwh: scaleInt(980),
+          status: 'ok',
+          noteIt: 'Consumo idrico -5.2% · Cicli in linea',
+          noteEn: 'Water usage -5.2% · Cycles on track',
+          spark: [88, 89, 90, 91, 92, 91, 91],
+          moduleGroups: [
+            {
+              groupIt: 'Cicli & Sostenibilità',
+              groupEn: 'Cycles & Sustainability',
+              items: [
+                { name: 'Stato Lotti Lavaggio', metaIt: '16 cicli attivi', metaEn: '16 active batches' },
+                { name: 'Consumi Acqua & Vapore', metaIt: '-5.2% vs media mese', metaEn: '-5.2% vs monthly avg' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'imballo',
+          name: 'Imballo',
+          enName: 'Packing & Dispatch',
+          color: '#7c5643',
+          icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3.27 6.96L12 12l8.73-5.04M12 22V12"/></svg>`,
+          output: scaleInt(2410),
+          target: scaleInt(2500),
+          oee: clampPct(92.4),
+          wip: scaleInt(185),
+          activeUnits: `${scaleFleet(6)}/${scaleFleet(6)}`,
+          unitLabelIt: 'Linee Confezionamento',
+          unitLabelEn: 'Packing Lines',
+          costPerPc: 0.29,
+          workers: scaleFleet(24),
+          energyKwh: scaleInt(190),
+          status: 'ok',
+          noteIt: '38/40 spedizioni pronte · SLA 96.8%',
+          noteEn: '38/40 shipments ready · SLA 96.8%',
+          spark: [90, 91, 92, 91, 93, 92, 93],
+          moduleGroups: [
+            {
+              groupIt: 'Spedizioni & Etichettatura',
+              groupEn: 'Dispatch & Labeling',
+              items: [
+                { name: 'Ordini Pronti Spedizione', metaIt: '38/40 ordini evasi', metaEn: '38/40 orders packed' },
+                { name: 'Etichettatura & Barcode', metaIt: 'Zero errori scansione', metaEn: 'Zero scan errors' }
+              ]
+            }
+          ]
+        }
+      ];
     }
 
-    function closeProductionModal() {
-      document.getElementById('productionWindow').classList.add('hidden');
-    }
+    // =========================================================
+    // NAVIGATION & HEADER RENDERING
+    // =========================================================
+    function renderSidebar() {
+      const depts = getDepartments();
+      const nav = document.getElementById('sidebarNav');
+      nav.innerHTML = `
+        <div class="nav-section-label">${t('sidebarL1')}</div>
+        <button class="nav-item ${state.view === 'macro' ? 'active' : ''}" onclick="navigate('macro')">
+          <span class="nav-dot" style="background:#38bdf8"></span>
+          <span>${t('macroNav')}</span>
+          <span class="nav-badge">4</span>
+        </button>
 
-    function setBarcodeSize(sz) {
-      selectedSize = sz;
-      const snStr = String(currentSerial).padStart(3, '0');
-      document.getElementById('scannedTagSize').textContent = `#P-${snStr} • Taglia ${sz}`;
-      document.getElementById('barcodePayloadInput').value = `ORD:26022404_001|COL:${selectedColor}|SZ:${sz}|QTY:10|SN:${snStr}`;
-      document.getElementById('selectTaglie').value = sz;
-      barcodeRead = false;
-      updateValidationState();
-    }
+        <div class="nav-section-label">${t('sidebarL2')}</div>
+        <button class="nav-item ${state.view === 'controllo' ? 'active' : ''}" onclick="navigate('controllo')">
+          <span class="nav-dot" style="background:var(--ctrl)"></span>
+          <span>${t('ctrlName')}</span>
+        </button>
 
-    function prepareNextPack() {
-      currentSerial++;
-      barcodeRead = false;
-      const snStr = String(currentSerial).padStart(3, '0');
-      document.getElementById('scannedTagSize').textContent = `#P-${snStr} • Taglia ${selectedSize}`;
-      document.getElementById('barcodePayloadInput').value = `ORD:26022404_001|COL:${selectedColor}|SZ:${selectedSize}|QTY:10|SN:${snStr}`;
-      
-      const btnScan = document.getElementById('btnScansiona');
-      btnScan.disabled = false;
-      btnScan.className = "w-full bg-blue-600 hover:bg-blue-500 text-white py-2 px-3 rounded font-bold text-xs transition flex items-center justify-center gap-2 shadow-md mb-2";
-      btnScan.innerHTML = `<i class="fa-solid fa-barcode text-sm"></i> <span class="tracking-wide uppercase">1. SCANSIONA BARCODE</span>`;
+        <button class="nav-item ${state.view === 'produzione' ? 'active' : ''}" onclick="navigate('produzione')">
+          <span class="nav-dot" style="background:var(--prod)"></span>
+          <span>${t('prodName')}</span>
+          <span class="nav-badge warn">1 alert</span>
+        </button>
 
-      const status = document.getElementById('scannerStatusText');
-      status.textContent = `Pacco #P-${snStr} pronto. FASE 1: Clicca Scansiona`;
-      status.className = "text-[11px] font-mono text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded border border-amber-300";
+        <div class="nav-sublist">
+          ${depts.map(d => `
+            <button class="nav-subitem ${state.activeDeptDrawer === d.id ? 'active' : ''}" onclick="openDeptFromSidebar('${d.id}')">
+              <span>${d.name}</span>
+              <span class="tabular" style="font-size:11px;color:${d.status === 'warn' ? '#fcd34d' : '#94a3b8'}">${d.oee}%</span>
+            </button>
+          `).join('')}
+        </div>
 
-      simulateWeight(2508);
-      updateValidationState();
-    }
+        <button class="nav-item ${state.view === 'hr' ? 'active' : ''}" onclick="navigate('hr')">
+          <span class="nav-dot" style="background:var(--hr)"></span>
+          <span>${t('hrName')}</span>
+        </button>
 
-    function simulateWeight(grams) {
-      currentWeightG = grams;
-      const kg = (grams / 1000).toFixed(3);
-      const display = document.getElementById('scaleDigitalDisplay');
-      const status = document.getElementById('scaleWeightStatus');
-
-      display.textContent = `${kg} kg`;
-
-      const isWeightOk = grams >= (TARGET_WEIGHT - TOLERANCE) && grams <= (TARGET_WEIGHT + TOLERANCE);
-      if (isWeightOk) {
-        display.className = "font-mono text-xl font-black text-emerald-600 bg-gray-50 px-2 py-1 rounded border border-gray-300";
-        status.textContent = `${grams}g (CONFORME)`;
-        status.className = "text-emerald-700 font-bold font-mono";
-      } else {
-        playBeep('error');
-        display.className = "font-mono text-xl font-black text-red-600 bg-red-50 px-2 py-1 rounded border border-red-300";
-        status.textContent = `${grams}g (ANOMALIA)`;
-        status.className = "text-red-700 font-bold font-mono";
-      }
-
-      updateValidationState();
-    }
-
-    // SCENARIO DEMO 1: BUONO (10 PEZZI CONFORMI A BARCODE E BILANCIA)
-    function runScenarioGood() {
-      if (scannedSerialsSet.has(String(currentSerial).padStart(3, '0'))) {
-        prepareNextPack();
-      }
-      simulateWeight(2508);
-      executeBarcodeScan();
-
-      const note = document.getElementById('scaleDetailNote');
-      note.innerHTML = `<strong class="text-emerald-700">✓ SCENARIO CONFORME:</strong> 10 pezzi rilevati (2.508 kg). Pulsante verde abilitato per l'inserimento.`;
-
-      const status = document.getElementById('scannerStatusText');
-      status.textContent = `✓ TEST BUONO: Barcode e Bilancia perfettamente allineati (10 pz). Clicca il pulsante verde!`;
-      status.className = "text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-300 font-bold";
-    }
-
-    // SCENARIO DEMO 2: ANOMALIA / MISMATCH (BARCODE DA 10 PZ MA BILANCIA RILEVA SOLO 9 PZ)
-    function runScenarioBad() {
-      if (scannedSerialsSet.has(String(currentSerial).padStart(3, '0'))) {
-        prepareNextPack();
-      }
-      simulateWeight(2240); // 9 capi
-      executeBarcodeScan();
-
-      const note = document.getElementById('scaleDetailNote');
-      note.innerHTML = `<strong class="text-red-700">✗ SCENARIO ANOMALIA:</strong> Il barcode richiede 10 capi (~2.500g), ma la bilancia ne rileva solo 9 (2.240 kg)!`;
-
-      const status = document.getElementById('scannerStatusText');
-      status.textContent = `✗ TEST ANOMALIA: Mismatch peso! Barcode 10pz ≠ Bilancia 9pz (2.240kg). Inserimento BLOCCATO!`;
-      status.className = "text-[11px] font-mono text-red-700 bg-red-50 px-2.5 py-0.5 rounded border border-red-300 font-bold animate-pulse";
-    }
-
-    // FASE 1: Scansione Barcode (Legge i dati dal barcode MA NON inserisce la riga nel database!)
-    function executeBarcodeScan() {
-      const snStr = String(currentSerial).padStart(3, '0');
-
-      // Controllo anti-duplicato se il barcode è già stato consumato
-      if (scannedSerialsSet.has(snStr)) {
-        playBeep('error');
-        const status = document.getElementById('scannerStatusText');
-        status.textContent = `✗ DUPLICATO BLOCCATO: Pacco #P-${snStr} già registrato!`;
-        status.className = "text-[11px] font-mono text-red-700 bg-red-50 px-2.5 py-0.5 rounded border border-red-300 animate-pulse font-bold";
-        return;
-      }
-
-      playBeep('success');
-      barcodeRead = true;
-
-      // Compila automaticamente la form a sinistra per mostrare che non serve digitare
-      document.getElementById('inputDataProduzione').value = "26/10/2026";
-      document.getElementById('selectColore').value = selectedColor;
-      document.getElementById('selectTaglie').value = selectedSize;
-      document.getElementById('inputQuantita').value = PACK_SIZE;
-
-      // Disabilita pulsante scansiona per evitare letture ripetute dello stesso collo
-      const btnScan = document.getElementById('btnScansiona');
-      btnScan.disabled = true;
-      btnScan.className = "w-full bg-gray-100 text-gray-500 py-2 px-3 rounded font-bold text-xs transition flex items-center justify-center gap-2 mb-2 cursor-not-allowed border border-gray-300";
-      btnScan.innerHTML = `<i class="fa-solid fa-check text-emerald-600"></i> <span class="tracking-wide uppercase text-emerald-700">BARCODE ACQUISITO</span>`;
-
-      const status = document.getElementById('scannerStatusText');
-      status.textContent = `✓ Barcode #P-${snStr} acquisito. FASE 2: Convalida su Bilancia`;
-      status.className = "text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-300";
-
-      updateValidationState();
-    }
-
-    // Aggiorna lo stato del pulsante di convalida bilancia (DIVENTA VERDE SOLO SE PESO OK)
-    function updateValidationState() {
-      const btn = document.getElementById('btnValidateScale');
-      const icon = document.getElementById('btnValidateIcon');
-      const label = document.getElementById('btnValidateLabel');
-      const subtext = document.getElementById('btnValidateSubtext');
-
-      const isWeightOk = currentWeightG >= (TARGET_WEIGHT - TOLERANCE) && currentWeightG <= (TARGET_WEIGHT + TOLERANCE);
-
-      if (!barcodeRead) {
-        btn.disabled = true;
-        btn.className = "w-full bg-gray-100 border border-gray-300 text-gray-400 p-2.5 rounded font-bold text-xs shadow-2xs transition flex flex-col items-center justify-center gap-0.5 cursor-not-allowed";
-        icon.className = "fa-solid fa-lock text-xs";
-        label.textContent = "VALIDA E INSERISCI";
-        subtext.textContent = "Prima scansiona il barcode (Fase 1)";
-      } else if (barcodeRead && !isWeightOk) {
-        // Peso errato: pulsante rosso/disabilitato, impossibile inserire!
-        btn.disabled = true;
-        btn.className = "w-full bg-red-50 border border-red-300 text-red-700 p-2.5 rounded font-bold text-xs shadow-2xs transition flex flex-col items-center justify-center gap-0.5 cursor-not-allowed";
-        icon.className = "fa-solid fa-triangle-exclamation text-xs text-red-600";
-        label.textContent = "PESO NON CONFORME";
-        subtext.textContent = `Atteso 2.500g (Rilevato: ${currentWeightG}g)`;
-      } else if (barcodeRead && isWeightOk) {
-        // Barcode letto E peso perfetto: PULSANTE VERDE ABILITATO!
-        btn.disabled = false;
-        btn.className = "w-full bg-emerald-600 hover:bg-emerald-700 text-white p-2.5 rounded font-extrabold text-xs shadow-md transition flex flex-col items-center justify-center gap-0.5 cursor-pointer border border-emerald-600 ring-2 ring-emerald-400/40 animate-pulse";
-        icon.className = "fa-solid fa-circle-check text-xs text-white";
-        label.textContent = "✓ CONVALIDA E INSERISCI (+10 PZ)";
-        subtext.textContent = `Peso OK (${currentWeightG}g) • Clicca per registrare`;
-      }
-    }
-
-    function handleValidateAreaClick() {
-      const btn = document.getElementById('btnValidateScale');
-      if (btn.disabled) {
-        validateAndInsertRecord();
-      }
-    }
-
-    // FASE 2: Convalida su Bilancia (L'INSERIMENTO AVVIENE SOLO QUI, UNA SOLA VOLTA!)
-    function validateAndInsertRecord() {
-      const isWeightOk = currentWeightG >= (TARGET_WEIGHT - TOLERANCE) && currentWeightG <= (TARGET_WEIGHT + TOLERANCE);
-
-      if (!barcodeRead) {
-        playBeep('error');
-        alert("Attenzione: Effettua prima la scansione del codice a barre (Fase 1).");
-        return;
-      }
-
-      if (!isWeightOk) {
-        playBeep('error');
-        alert(`BLOCCO DI SICUREZZA PRODUZIONE!\n\nIl barcode specifica una busta da 10 pezzi (~2.500g).\nIl peso rilevato dalla bilancia è di ${currentWeightG}g (mancano pezzi!).\n\nL'inserimento nella tabella di produzione è BLOCCATO finché il peso non è conforme.`);
-        return;
-      }
-
-      const snStr = String(currentSerial).padStart(3, '0');
-
-      if (scannedSerialsSet.has(snStr)) {
-        playBeep('error');
-        alert("Pacco già registrato! Impossibile duplicare l'inserimento.");
-        return;
-      }
-
-      // Convalida confermata!
-      playBeep('chime');
-      scannedSerialsSet.add(snStr);
-      currentQtyProdotta += PACK_SIZE;
-
-      // Inserisce la riga nella tabella di produzione
-      insertProductionTableRow(selectedColor, selectedSize, PACK_SIZE, currentWeightG, snStr);
-
-      // Aggiorna KPI e Gantt
-      updateTotals();
-
-      // Disabilita immediatamente per bloccare click multipli
-      barcodeRead = false;
-      const btn = document.getElementById('btnValidateScale');
-      btn.disabled = true;
-      btn.className = "w-full bg-gray-100 border border-gray-300 text-gray-500 p-2.5 rounded font-bold text-xs shadow-2xs transition flex flex-col items-center justify-center gap-0.5 cursor-not-allowed";
-      document.getElementById('btnValidateIcon').className = "fa-solid fa-check-double text-xs text-emerald-600";
-      document.getElementById('btnValidateLabel').textContent = `PACCO #P-${snStr} REGISTRATO!`;
-      document.getElementById('btnValidateSubtext').textContent = "+10 capi inseriti • Duplicati bloccati";
-
-      const status = document.getElementById('scannerStatusText');
-      status.textContent = `✓ Inserito pacco #P-${snStr} (+10pz). Preparazione prossimo pacco...`;
-      status.className = "text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-300";
-
-      // Prepara il prossimo pacco
-      setTimeout(() => {
-        prepareNextPack();
-      }, 3000);
-    }
-
-    function manualInsertOk() {
-      const q = parseInt(document.getElementById('inputQuantita').value) || 10;
-      const col = document.getElementById('selectColore').value;
-      const sz = document.getElementById('selectTaglie').value;
-      
-      currentQtyProdotta += q;
-      insertProductionTableRow(col, sz, q, null);
-      updateTotals();
-      playBeep('success');
-    }
-
-    function insertProductionTableRow(col, sz, q, weight) {
-      const tbody = document.getElementById('tableBodyRows');
-      const now = new Date();
-      const dateStr = "26/10/2026";
-      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const fullTime = `${dateStr} ${timeStr}`;
-
-      const tr = document.createElement('tr');
-      tr.className = "flash-new-row font-mono text-xs text-gray-800";
-      tr.innerHTML = `
-        <td class="p-1.5 border-r border-gray-200 font-sans font-bold text-emerald-800">${dateStr}</td>
-        <td class="p-1.5 border-r border-gray-200">${fullTime}</td>
-        <td class="p-1.5 border-r border-gray-200">${fullTime}</td>
-        <td class="p-1.5 border-r border-gray-200 text-right font-black text-emerald-700 bg-emerald-100/50">+${q}</td>
-        <td class="p-1.5 border-r border-gray-200">${col}</td>
-        <td class="p-1.5 font-bold">${sz} ${weight ? `<span class="text-[9px] bg-emerald-200 text-emerald-900 px-1 rounded ml-1 font-sans">AUTO (${weight}g)</span>` : ''}</td>
+        <button class="nav-item ${state.view === 'smart' ? 'active' : ''}" onclick="navigate('smart')">
+          <span class="nav-dot" style="background:var(--smart)"></span>
+          <span>${t('smartName')}</span>
+        </button>
       `;
-      tbody.insertBefore(tr, tbody.firstChild);
+
+      document.getElementById('sidebarRoleSub').textContent = t('rolesSub');
     }
 
-    function updateTotals() {
-      const diff = TOTAL_ORDER - currentQtyProdotta;
-      document.getElementById('kpiQtyProdotta').textContent = currentQtyProdotta;
-      document.getElementById('kpiQtyDiff').textContent = diff;
-      document.getElementById('ganttQtyDisplay').textContent = currentQtyProdotta;
+    function renderTopbar() {
+      const bc = document.getElementById('breadcrumbs');
+      const plantText = t('plantLabels')[state.plant].split(' ')[0] + ' Europa';
+      const viewMap = {
+        macro: t('macroNav'),
+        produzione: t('prodName'),
+        controllo: t('ctrlName'),
+        hr: t('hrName'),
+        smart: t('smartName')
+      };
+
+      if (state.view === 'macro') {
+        bc.innerHTML = `<span class="crumb-current">${t('plantLabels')[state.plant]}</span> <span>/</span> <span class="crumb-current">${t('macroNav')}</span>`;
+      } else {
+        bc.innerHTML = `
+          <button class="crumb-btn" onclick="navigate('macro')">${t('macroNav')}</button>
+          <span>/</span>
+          <span class="crumb-current">${viewMap[state.view]}</span>
+        `;
+      }
+
+      const switcher = document.getElementById('layerSwitcher');
+      switcher.innerHTML = `
+        <button class="layer-pill ${state.view === 'macro' ? 'active' : ''}" onclick="navigate('macro')">
+          <span class="layer-tag">L1</span> ${t('macroNav')}
+        </button>
+        <button class="layer-pill ${state.view !== 'macro' ? 'active' : ''}" onclick="navigate('produzione')">
+          <span class="layer-tag">L2</span> ${t('prodName')} (${state.lang === 'it' ? 'Reparti' : 'Depts'})
+        </button>
+      `;
+
+      // Sync dropdown option text with language
+      const pSel = document.getElementById('plantSelect');
+      pSel.options[0].text = t('plantLabels').all;
+      pSel.options[1].text = t('plantLabels')['eu-nord'];
+      pSel.options[2].text = t('plantLabels')['eu-sud'];
+
+      const tSel = document.getElementById('periodSelect');
+      tSel.options[0].text = t('periodLabels').today;
+      tSel.options[1].text = t('periodLabels').week;
+      tSel.options[2].text = t('periodLabels').month;
     }
 
-    function recalculateGantt() {
-      playBeep('success');
-      alert(`Ricalcolo completato con successo!\nCommessa 26022404_001 su LINEA 1A aggiornata con ${currentQtyProdotta} capi prodotti convalidati.`);
+    // =========================================================
+    // SVG SPARKLINE HELPER
+    // =========================================================
+    function sparklineSVG(values, color, width = 96, height = 28) {
+      const min = Math.min(...values) - 3;
+      const max = Math.max(...values) + 3;
+      const step = width / (values.length - 1);
+      const pts = values.map((v, i) => {
+        const x = +(i * step).toFixed(1);
+        const y = +(height - ((v - min) / (max - min)) * (height - 4) - 2).toFixed(1);
+        return `${x},${y}`;
+      });
+      return `
+        <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" aria-hidden="true">
+          <polyline points="${pts.join(' ')}" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="${pts[pts.length - 1].split(',')[0]}" cy="${pts[pts.length - 1].split(',')[1]}" r="3" fill="${color}"/>
+        </svg>
+      `;
     }
 
-    // Open the modal by default so the client sees the exact production window right away
-    window.addEventListener('DOMContentLoaded', () => {
-      openProductionModal();
-    });
+    // =========================================================
+    // LAYER 1: MACRO EXECUTIVE DASHBOARD
+    // =========================================================
+    function renderMacroView() {
+      const depts = getDepartments();
+      const totalOutput = depts.reduce((a, d) => a + d.output, 0);
+      const totalTarget = depts.reduce((a, d) => a + d.target, 0);
+      const avgOee = +(depts.reduce((a, d) => a + d.oee, 0) / depts.length).toFixed(1);
+      const pctTarget = Math.round((totalOutput / totalTarget) * 100);
+      const activeMach = scaleFleet(118);
+      const totalMach = scaleFleet(126);
+      const totalEnergy = depts.reduce((a, d) => a + d.energyKwh, 0);
+
+      // Cruscotto COAN (Proposta 2 - Level 1)
+      const coanScale = PLANT_MULT[state.plant];
+      const fmtM = (n) => '€ ' + (n * coanScale).toFixed(1).replace('.', ',') + ' M';
+
+      // Cruscotto HR / HR2 (Novembre 2026)
+      const hrHeadcount = scaleFleet(1248);
+      const hrTarget = scaleFleet(1250);
+      const hrUncovered = Math.max(1, scaleFleet(14));
+
+      const content = document.getElementById('content');
+      content.innerHTML = `
+        <div class="page-header" style="margin-bottom:4px">
+          <div>
+            <h1 class="page-title">${t('plantLabels')[state.plant]}</h1>
+            <p class="page-subtitle">${state.lang === 'it' ? 'Vista macro · Seleziona un modulo per il dettaglio operativo' : 'Macro overview · Select a module for operational details'}</p>
+          </div>
+        </div>
+
+        <!-- Minimalist 4 Principal Modules Grid -->
+        <section class="modules-grid">
+          <!-- 1. CONTROLLO DI GESTIONE (Cruscotto COAN · Proposta 2 Level 1) -->
+          <article class="module-card" style="--accent:var(--ctrl);--accent-soft:var(--ctrl-soft)" onclick="navigate('controllo')">
+            <div class="module-head">
+              <div class="module-id">
+                <div class="module-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <h2 class="module-title">${t('ctrlName')}</h2>
+              </div>
+              <span class="status-dot-label ok"><i></i>Q1 YTD · 2026</span>
+            </div>
+
+            <div class="module-hero">
+              <div class="module-hero-row">
+                <span class="module-hero-val tabular">${fmtM(12.4)}</span>
+                <span class="module-hero-delta">+8% Bgt</span>
+                <span class="module-hero-delta muted">· -8% PY</span>
+              </div>
+              <span class="module-hero-label">${state.lang === 'it' ? 'Fatturato' : 'Revenue'}</span>
+            </div>
+
+            <div class="module-footer">
+              <div class="module-substats">
+                <div class="substat">
+                  <span class="substat-label">${state.lang === 'it' ? 'Costi' : 'Costs'}</span>
+                  <span class="substat-val tabular">${fmtM(10.4)}</span>
+                </div>
+                <div class="substat">
+                  <span class="substat-label">EBIT (22,5%)</span>
+                  <span class="substat-val tabular">${fmtM(1.4)}</span>
+                </div>
+                <div class="substat">
+                  <span class="substat-label">${state.lang === 'it' ? 'Valore Prod.' : 'Prod. Value'}</span>
+                  <span class="substat-val tabular">${fmtM(12.4)}</span>
+                </div>
+              </div>
+              <span class="drill-link">${state.lang === 'it' ? 'Apri' : 'Open'} →</span>
+            </div>
+          </article>
+
+          <!-- 2. PRODUZIONE -->
+          <article class="module-card" style="--accent:var(--prod);--accent-soft:var(--prod-soft)" onclick="navigate('produzione')">
+            <div class="module-head">
+              <div class="module-id">
+                <div class="module-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20M4 20V9l6 4V9l6 4V5h4v15"/></svg>
+                </div>
+                <h2 class="module-title">${t('prodName')}</h2>
+              </div>
+              <span class="status-dot-label warn"><i></i>1 alert</span>
+            </div>
+
+            <div class="module-hero">
+              <div class="module-hero-row">
+                <span class="module-hero-val tabular">${fmtNum(totalOutput)}</span>
+                <span class="module-hero-delta muted tabular">${pctTarget}% ${t('target')}</span>
+              </div>
+              <span class="module-hero-label">${state.lang === 'it' ? 'Capi prodotti' : 'Garments produced'} (${t('periodLabels')[state.period].toLowerCase()})</span>
+            </div>
+
+            <div class="module-footer">
+              <div class="module-substats">
+                <div class="substat">
+                  <span class="substat-label">OEE</span>
+                  <span class="substat-val tabular">${avgOee}%</span>
+                </div>
+                <div class="substat">
+                  <span class="substat-label">${state.lang === 'it' ? 'Reparti' : 'Depts'}</span>
+                  <span class="substat-val tabular">6</span>
+                </div>
+              </div>
+              <span class="drill-link">${state.lang === 'it' ? 'Reparti' : 'Departments'} →</span>
+            </div>
+          </article>
+
+          <!-- 3. RISORSE UMANE (Cruscotto HR / HR2 - Level 1) -->
+          <article class="module-card" style="--accent:var(--hr);--accent-soft:var(--hr-soft)" onclick="navigate('hr')">
+            <div class="module-head">
+              <div class="module-id">
+                <div class="module-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <h2 class="module-title">${t('hrName')}</h2>
+              </div>
+              <span class="status-dot-label warn"><i></i>${state.lang === 'it' ? '2 attenzione' : '2 alerts'}</span>
+            </div>
+
+            <div class="module-hero">
+              <div class="module-hero-row">
+                <span class="module-hero-val tabular">${fmtNum(hrHeadcount)}</span>
+                <span class="module-hero-delta">+12</span>
+                <span class="module-hero-delta muted tabular">· ob. ${fmtNum(hrTarget)}</span>
+              </div>
+              <span class="module-hero-label">${state.lang === 'it' ? 'Dipendenti attivi' : 'Active employees'}</span>
+            </div>
+
+            <div class="module-footer">
+              <div class="module-substats">
+                <div class="substat">
+                  <span class="substat-label">${state.lang === 'it' ? 'Assenteismo' : 'Absenteeism'}</span>
+                  <span class="substat-val tabular">4,2%</span>
+                </div>
+                <div class="substat">
+                  <span class="substat-label">Turnover</span>
+                  <span class="substat-val tabular" style="color:var(--warn)">11,8%</span>
+                </div>
+                <div class="substat">
+                  <span class="substat-label">${state.lang === 'it' ? 'Turni' : 'Shifts'}</span>
+                  <span class="substat-val tabular">96,5%</span>
+                </div>
+                <div class="substat">
+                  <span class="substat-label">Budget</span>
+                  <span class="substat-val tabular">78%</span>
+                </div>
+              </div>
+              <span class="drill-link">${state.lang === 'it' ? 'Apri' : 'Open'} →</span>
+            </div>
+          </article>
+
+          <!-- 4. SMART FACTORY -->
+          <article class="module-card" style="--accent:var(--smart);--accent-soft:var(--smart-soft)" onclick="navigate('smart')">
+            <div class="module-head">
+              <div class="module-id">
+                <div class="module-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>
+                </div>
+                <h2 class="module-title">${t('smartName')}</h2>
+              </div>
+              <span class="status-dot-label ok"><i></i>Online</span>
+            </div>
+
+            <div class="module-hero">
+              <div class="module-hero-row">
+                <span class="module-hero-val tabular">${activeMach}<span style="font-size:22px;color:var(--text-muted);font-weight:500">/${totalMach}</span></span>
+                <span class="module-hero-delta">93.6%</span>
+              </div>
+              <span class="module-hero-label">${state.lang === 'it' ? 'Macchine connesse attive' : 'Connected machines active'}</span>
+            </div>
+
+            <div class="module-footer">
+              <div class="module-substats">
+                <div class="substat">
+                  <span class="substat-label">${state.lang === 'it' ? 'Energia' : 'Energy'}</span>
+                  <span class="substat-val tabular">${fmtNum(totalEnergy)} kWh</span>
+                </div>
+                <div class="substat">
+                  <span class="substat-label">${state.lang === 'it' ? 'Anomalie' : 'Alerts'}</span>
+                  <span class="substat-val tabular">2</span>
+                </div>
+              </div>
+              <span class="drill-link">${state.lang === 'it' ? 'Apri' : 'Open'} →</span>
+            </div>
+          </article>
+        </section>
+      `;
+    }
+
+    // =========================================================
+    // LAYER 2: PRODUZIONE — DEPARTMENTAL MACRO DASHBOARD
+    // =========================================================
+    function renderProduzioneView() {
+      const depts = getDepartments();
+      const totalOutput = depts.reduce((a, d) => a + d.output, 0);
+      const totalTarget = depts.reduce((a, d) => a + d.target, 0);
+      const totalWip = depts.reduce((a, d) => a + d.wip, 0);
+      const avgOee = +(depts.reduce((a, d) => a + d.oee, 0) / depts.length).toFixed(1);
+
+      const content = document.getElementById('content');
+      content.innerHTML = `
+        <div class="page-header">
+          <div>
+            <div class="page-kicker" style="color:var(--prod)">${t('prodKicker')}</div>
+            <h1 class="page-title">${t('prodTitle')}</h1>
+            <p class="page-subtitle">${t('prodSub')}</p>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn" onclick="navigate('macro')">${t('backMacroBtn')}</button>
+            <button class="btn btn-primary" onclick="openDeptDrawer('tessitura')">${state.lang === 'it' ? 'Esplora Moduli Tessitura (12) →' : 'Explore Knitting Modules (12) →'}</button>
+          </div>
+        </div>
+
+        <!-- Layer 2 Production KPIs -->
+        <section class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-top"><span>${state.lang === 'it' ? 'Avanzamento Totale Reparti' : 'Total Dept Output'}</span></div>
+            <div class="kpi-value-row">
+              <span class="kpi-value tabular">${fmtNum(totalOutput)}</span>
+              <span class="delta up tabular">${Math.round(totalOutput / totalTarget * 100)}%</span>
+            </div>
+            <div class="kpi-foot tabular">${t('target')}: ${fmtNum(totalTarget)} ${t('pcs')}</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span>OEE ${state.lang === 'it' ? 'Medio Filiera' : 'Chain Average'}</span></div>
+            <div class="kpi-value-row">
+              <span class="kpi-value tabular">${avgOee}%</span>
+              <span class="delta up">+1.8%</span>
+            </div>
+            <div class="kpi-foot">${state.lang === 'it' ? 'Top: Imballo (92.4%) · Min: Stiro (74.2%)' : 'Top: Packing (92.4%) · Min: Pressing (74.2%)'}</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span>${state.lang === 'it' ? 'WIP Totale in Filiera' : 'Total Chain WIP'}</span></div>
+            <div class="kpi-value-row">
+              <span class="kpi-value tabular">${fmtNum(totalWip)}</span>
+              <span class="delta warn">${state.lang === 'it' ? 'Picco su Stiro' : 'Peak at Pressing'}</span>
+            </div>
+            <div class="kpi-foot">${state.lang === 'it' ? 'Capi in coda tra i 6 reparti' : 'Garments queued across 6 depts'}</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span>${state.lang === 'it' ? 'Puntualità & Qualità' : 'OTD & Quality'}</span></div>
+            <div class="kpi-value-row">
+              <span class="kpi-value tabular">95.4%</span>
+              <span class="delta up">97.2% 1ª sc.</span>
+            </div>
+            <div class="kpi-foot">${state.lang === 'it' ? '48 ordini attivi · 2 urgenti' : '48 active orders · 2 rush'}</div>
+          </div>
+        </section>
+
+        <!-- End-to-End Textile Flow Pipeline -->
+        <section class="pipeline-wrap">
+          <div class="panel-head">
+            <div>
+              <h3 class="panel-title">${t('pipelineTitle')}</h3>
+              <div class="panel-sub">${t('pipelineSub')}</div>
+            </div>
+            <span class="status-pill status-warn">${state.lang === 'it' ? '1 Collo di bottiglia rilevato: Stiro' : '1 Bottleneck detected: Pressing'}</span>
+          </div>
+          <div class="pipeline-steps">
+            ${depts.map((d, idx) => `
+              <div class="pipe-step ${d.bottleneck ? 'bottleneck' : ''}" onclick="openDeptDrawer('${d.id}')">
+                <div class="pipe-num">0${idx + 1} · ${d.bottleneck ? t('bottleneckTag') : (state.lang === 'it' ? 'Fase' : 'Stage')}</div>
+                <div class="pipe-name">
+                  <span>${d.name}</span>
+                  <span style="width:9px;height:9px;border-radius:50%;background:${d.status === 'warn' ? '#f59e0b' : '#16a34a'}"></span>
+                </div>
+                <div class="pipe-wip tabular">WIP: <strong>${fmtNum(d.wip)}</strong> ${t('pcs')}</div>
+                <div class="pipe-eff tabular">
+                  <span style="color:${d.color}">OEE ${d.oee}%</span>
+                  <span>→</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+
+        <!-- 6 Departmental Macro Cards -->
+        <section class="dept-grid">
+          ${depts.map(d => {
+            const pct = Math.min(100, Math.round((d.output / d.target) * 100));
+            const statusClass = d.status === 'warn' ? 'status-warn' : 'status-ok';
+            const statusText = d.status === 'warn' ? t('statusWarn') : (d.status === 'inline' ? t('statusInline') : t('statusOk'));
+            return `
+              <article class="dept-card" style="--dept-color:${d.color}" onclick="openDeptDrawer('${d.id}')">
+                <div class="dept-head">
+                  <div class="dept-title-wrap">
+                    <div class="dept-icon">${d.icon}</div>
+                    <div>
+                      <div class="dept-name">${d.name}</div>
+                      <div class="dept-sub">${state.lang === 'it' ? d.unitLabelIt : d.enName}</div>
+                    </div>
+                  </div>
+                  <span class="status-pill ${statusClass}">${statusText}</span>
+                </div>
+
+                <div class="dept-kpis">
+                  <div class="dept-kpi">
+                    <div class="dept-kpi-l">${t('deptOutput')}</div>
+                    <div class="dept-kpi-v tabular">${fmtNum(d.output)} <span style="font-size:11px;font-weight:500;color:var(--text-muted)">${t('pcs')}</span></div>
+                  </div>
+                  <div class="dept-kpi">
+                    <div class="dept-kpi-l">${t('deptEff')} (OEE)</div>
+                    <div class="dept-kpi-v tabular" style="color:${d.status === 'warn' ? 'var(--warn)' : 'var(--text)'}">${d.oee}%</div>
+                  </div>
+                  <div class="dept-kpi">
+                    <div class="dept-kpi-l">${t('deptWip')}</div>
+                    <div class="dept-kpi-v tabular">${fmtNum(d.wip)}</div>
+                  </div>
+                  <div class="dept-kpi">
+                    <div class="dept-kpi-l">${t('deptActive')}</div>
+                    <div class="dept-kpi-v tabular">${d.activeUnits}</div>
+                  </div>
+                </div>
+
+                <div class="dept-progress-row">
+                  <div class="dept-progress-label">
+                    <span>${state.lang === 'it' ? 'Avanzamento Target' : 'Target Progress'}</span>
+                    <span class="tabular">${pct}% (${fmtNum(d.target)})</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill" style="width:${pct}%;background:${d.status === 'warn' ? '#f59e0b' : d.color}"></div>
+                  </div>
+                </div>
+
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                  <span style="font-size:12px;color:var(--text-secondary)">${state.lang === 'it' ? d.noteIt : d.noteEn}</span>
+                  ${sparklineSVG(d.spark, d.status === 'warn' ? '#d97706' : d.color, 68, 22)}
+                </div>
+
+                <div class="dept-foot">
+                  <span style="font-weight:600;color:var(--text-muted)">${d.id === 'tessitura' ? '12 ' + (state.lang === 'it' ? 'moduli organizzati' : 'organized modules') : (state.lang === 'it' ? 'Dettaglio operativo' : 'Operational detail')}</span>
+                  <span style="color:${d.color};font-weight:700">${t('openModules')}</span>
+                </div>
+              </article>
+            `;
+          }).join('')}
+        </section>
+
+        <!-- Bottom Row: Comparison Chart + Reportistica Panel -->
+        <section class="split-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3 class="panel-title">${t('deptCompareTitle')}</h3>
+                <div class="panel-sub">${t('deptCompareSub')}</div>
+              </div>
+              <div class="seg-tabs">
+                <button class="seg-tab ${state.prodChartMetric === 'output' ? 'active' : ''}" onclick="setProdMetric('output', this)">${t('deptOutput')}</button>
+                <button class="seg-tab ${state.prodChartMetric === 'oee' ? 'active' : ''}" onclick="setProdMetric('oee', this)">OEE %</button>
+                <button class="seg-tab ${state.prodChartMetric === 'wip' ? 'active' : ''}" onclick="setProdMetric('wip', this)">WIP</button>
+              </div>
+            </div>
+            <div class="chart-wrap" id="prodCompareChart"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3 class="panel-title">${t('reportsTitle')}</h3>
+                <div class="panel-sub">${t('reportsSub')}</div>
+              </div>
+              <span class="status-pill" style="background:var(--hr-soft);color:var(--hr)">PDF / XLSX</span>
+            </div>
+            <div class="report-list">
+              <div class="report-item">
+                <div>
+                  <strong>${state.lang === 'it' ? 'Report Giornaliero Produzione' : 'Daily Production Summary'}</strong>
+                  <span>${state.lang === 'it' ? 'Output, OEE e scarti dei 6 reparti' : 'Output, OEE & defects across 6 depts'}</span>
+                </div>
+                <button class="btn" onclick="showToast('${state.lang === 'it' ? 'Esportazione Report Produzione (XLSX) avviata...' : 'Exporting Production Report (XLSX)...'}')">${t('exportBtn')}</button>
+              </div>
+              <div class="report-item">
+                <div>
+                  <strong>${state.lang === 'it' ? 'Report Sinottico & Gantt Tessitura' : 'Knitting Synoptic & Gantt Report'}</strong>
+                  <span>${state.lang === 'it' ? 'Consolida Rapporti Sinottico + Gantt Prod' : 'Consolidates Synoptic + Gantt reports'}</span>
+                </div>
+                <button class="btn" onclick="showToast('${state.lang === 'it' ? 'Esportazione Report Tessitura (PDF) avviata...' : 'Exporting Knitting Report (PDF)...'}')">${t('exportBtn')}</button>
+              </div>
+              <div class="report-item">
+                <div>
+                  <strong>${state.lang === 'it' ? 'Analisi Colli di Bottiglia & WIP' : 'Bottleneck & WIP Aging Report'}</strong>
+                  <span>${state.lang === 'it' ? 'Focus code Stiro & tempi attraversamento' : 'Pressing queue & lead-time focus'}</span>
+                </div>
+                <button class="btn" onclick="showToast('${state.lang === 'it' ? 'Esportazione Analisi WIP (PDF) avviata...' : 'Exporting WIP Analysis (PDF)...'}')">${t('exportBtn')}</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+
+      renderProdCompareChart();
+    }
+
+    function renderProdCompareChart() {
+      const container = document.getElementById('prodCompareChart');
+      if (!container) return;
+      const depts = getDepartments();
+      const metric = state.prodChartMetric;
+      const values = depts.map(d => metric === 'output' ? d.output : (metric === 'oee' ? d.oee : d.wip));
+      const maxVal = metric === 'oee' ? 100 : Math.max(...values) * 1.18;
+
+      const W = 640, H = 220, padL = 48, padR = 20, padT = 18, padB = 34;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+      const stepX = plotW / depts.length;
+
+      const grid = [0, 0.25, 0.5, 0.75, 1].map(f => {
+        const y = padT + plotH - f * plotH;
+        const v = Math.round(maxVal * f);
+        return `
+          <line x1="${padL}" y1="${y.toFixed(1)}" x2="${W - padR}" y2="${y.toFixed(1)}" stroke="#e2e8f0" stroke-dasharray="3 3"/>
+          <text x="${padL - 8}" y="${(y + 4).toFixed(1)}" text-anchor="end" font-size="10.5" fill="#94a3b8">${metric === 'oee' ? v + '%' : (v >= 1000 ? (v/1000).toFixed(1) + 'k' : v)}</text>
+        `;
+      }).join('');
+
+      const bars = depts.map((d, i) => {
+        const v = values[i];
+        const bw = stepX * 0.52;
+        const x = padL + i * stepX + (stepX - bw) / 2;
+        const h = (v / maxVal) * plotH;
+        const y = padT + plotH - h;
+        const fill = d.bottleneck && metric !== 'output' ? '#f59e0b' : d.color;
+        const tipVal = metric === 'oee' ? `${v}%` : `${fmtNum(v)} ${t('pcs')}`;
+        return `
+          <g style="cursor:pointer" onclick="openDeptDrawer('${d.id}')"
+             onmouseenter="showChartTip(event, 'prodTip', '${d.name}: ${tipVal}')"
+             onmouseleave="hideChartTip('prodTip')">
+            <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="7" fill="${fill}" opacity="0.9"/>
+            <text x="${(x + bw / 2).toFixed(1)}" y="${(y - 6).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="#0f172a">${metric === 'oee' ? v + '%' : fmtNum(v)}</text>
+            <text x="${(x + bw / 2).toFixed(1)}" y="${H - 10}" text-anchor="middle" font-size="11" font-weight="600" fill="#475569">${d.name}</text>
+          </g>
+        `;
+      }).join('');
+
+      container.innerHTML = `
+        <div class="chart-tooltip" id="prodTip"></div>
+        <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
+          ${grid}
+          ${bars}
+        </svg>
+      `;
+    }
+
+    // =========================================================
+    // OTHER LAYER 2 VIEWS (so every module card works live!)
+    // =========================================================
+    function renderControlloView() {
+      const s = PLANT_MULT[state.plant];
+      const fmtM = (n) => '€ ' + (n * s).toFixed(1).replace('.', ',') + ' M';
+      const it = state.lang === 'it';
+      const dipCons = Math.round(152 * s);
+      const dipBgt = Math.round(145 * s);
+      const dipPy = Math.round(132 * s);
+
+      const kpiTariffa = [
+        { name: 'Tessitura', pct: 80, color: '#8c5a44' },
+        { name: 'Confezione', pct: 75, color: '#b4232c' },
+        { name: 'Stiro', pct: 65, color: '#15803d' },
+        { name: 'Sartoria', pct: 50, color: '#d95d2b' },
+        { name: it ? 'TOTALE' : 'TOTAL', pct: 66, color: '#0f172a', bold: true }
+      ];
+
+      const content = document.getElementById('content');
+      content.innerHTML = `
+        <div class="page-header">
+          <div>
+            <div class="page-kicker" style="color:var(--ctrl)">${t('ctrlKicker')} · Proposta 2</div>
+            <h1 class="page-title">${t('ctrlName')}</h1>
+            <div class="filter-chips" style="margin-top:8px">
+              <span class="filter-chip">${it ? 'Anno' : 'Year'}: 2026</span>
+              <span class="filter-chip">${it ? 'Periodo' : 'Period'}: Q1 YTD</span>
+              <span class="filter-chip">BU: ${state.plant === 'all' ? (it ? 'Tutte' : 'All') : t('plantLabels')[state.plant]}</span>
+            </div>
+          </div>
+          <button class="btn" onclick="navigate('macro')">${t('backMacroBtn')}</button>
+        </div>
+
+        <!-- Level 1 Summary Strip (Fatturato, Costi, EBIT, Valore Produzione) -->
+        <section class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-top"><span>${it ? 'Fatturato' : 'Revenue'}</span></div>
+            <div class="kpi-value-row"><span class="kpi-value tabular">${fmtM(12.4)}</span><span class="delta up">+8% Bgt</span></div>
+            <div class="kpi-foot">-8% vs PY</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span>${it ? 'Costi' : 'Costs'}</span></div>
+            <div class="kpi-value-row"><span class="kpi-value tabular">${fmtM(10.4)}</span><span class="delta warn">+1% Bgt</span></div>
+            <div class="kpi-foot">-2% vs PY</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span>EBIT</span><span class="tabular" style="color:var(--ctrl)">22,5%</span></div>
+            <div class="kpi-value-row"><span class="kpi-value tabular">${fmtM(1.4)}</span><span class="delta up">+3% Bgt</span></div>
+            <div class="kpi-foot">+2% vs PY</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span>${it ? 'Valore Produzione' : 'Production Value'}</span></div>
+            <div class="kpi-value-row"><span class="kpi-value tabular">${fmtM(12.4)}</span><span class="delta up">+8% Bgt</span></div>
+            <div class="kpi-foot">-8% vs PY</div>
+          </div>
+        </section>
+
+        <!-- Proposta 2 · Level 2 Blocks (1 & 2) -->
+        <section class="grid-2">
+          <!-- 1. PORTAFOGLIO ORDINI -->
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title"><span class="coan-num">01</span> ${it ? 'Portafoglio Ordini' : 'Order Backlog'}</div>
+            </div>
+            <div class="coan-cols" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+              <div>
+                <div class="coan-col-label">${it ? 'Valore Portafoglio' : 'Backlog Value'}</div>
+                <div class="coan-col-val tabular" style="font-size:26px">${fmtM(12.4)}</div>
+              </div>
+              <div>
+                <div class="coan-col-label">${it ? 'Margine Lordo' : 'Gross Margin'}</div>
+                <div class="coan-col-val tabular" style="font-size:26px">${fmtM(1.4)} <span style="font-size:14px;color:var(--ctrl)">(45%)</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. CONTO ECONOMICO / BUDGET / PY -->
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title"><span class="coan-num">02</span> ${it ? 'Conto Economico / Budget / PY' : 'P&L / Budget / PY'}</div>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>${it ? 'Voce' : 'Line Item'}</th>
+                  <th>${it ? 'Consuntivo' : 'Actual'}</th>
+                  <th>vs Budget</th>
+                  <th>vs PY</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>${it ? 'Fatturato' : 'Revenue'}</strong></td><td class="tabular">${fmtM(12.4)}</td><td><span class="delta up">+8%</span></td><td class="tabular">-8%</td></tr>
+                <tr><td><strong>${it ? 'Valore Produzione' : 'Prod. Value'}</strong></td><td class="tabular">${fmtM(12.4)}</td><td><span class="delta up">+8%</span></td><td class="tabular">-8%</td></tr>
+                <tr><td><strong>${it ? 'Costi' : 'Costs'}</strong></td><td class="tabular">${fmtM(10.4)}</td><td><span class="delta warn">+1%</span></td><td class="tabular">-2%</td></tr>
+                <tr><td><strong>EBIT (22,5%)</strong></td><td class="tabular"><strong>${fmtM(1.4)}</strong></td><td><span class="delta up">+3%</span></td><td class="tabular" style="color:var(--ok)">+2%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Proposta 2 · Level 2 Blocks (3, 4, 5, 6) -->
+        <section class="grid-2">
+          <!-- 3. ANALISI FATTURATO -->
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title"><span class="coan-num">03</span> ${it ? 'Analisi Fatturato' : 'Revenue Analysis'}</div>
+            </div>
+            <div class="coan-cols">
+              <div><div class="coan-col-label">${it ? 'Consuntivo' : 'Actual'}</div><div class="coan-col-val tabular">${fmtM(12.4)}</div></div>
+              <div><div class="coan-col-label">Budget</div><div class="coan-col-val tabular">${fmtM(11.8)}</div></div>
+              <div><div class="coan-col-label">PY</div><div class="coan-col-val tabular">${fmtM(12.7)}</div></div>
+            </div>
+            <div class="coan-deltas">
+              <span style="color:var(--ok)">+5% vs Budget</span>
+              <span style="color:var(--text-muted)">-2% vs PY</span>
+            </div>
+          </div>
+
+          <!-- 4. ANALISI COSTI -->
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title"><span class="coan-num">04</span> ${it ? 'Analisi Costi' : 'Cost Analysis'}</div>
+            </div>
+            <div class="coan-cols">
+              <div><div class="coan-col-label">${it ? 'Consuntivo' : 'Actual'}</div><div class="coan-col-val tabular">${fmtM(10.4)}</div></div>
+              <div><div class="coan-col-label">Budget</div><div class="coan-col-val tabular">${fmtM(9.9)}</div></div>
+              <div><div class="coan-col-label">PY</div><div class="coan-col-val tabular">${fmtM(10.6)}</div></div>
+            </div>
+            <div class="coan-deltas">
+              <span style="color:var(--warn)">+5% vs Budget</span>
+              <span style="color:var(--ok)">-2% vs PY</span>
+            </div>
+          </div>
+
+          <!-- 5. MATERIALI CONSUMO REPARTI -->
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title"><span class="coan-num">05</span> ${it ? 'Materiali Consumo Reparti' : 'Department Consumables'}</div>
+            </div>
+            <div class="coan-cols">
+              <div><div class="coan-col-label">${it ? 'Consuntivo' : 'Actual'}</div><div class="coan-col-val tabular">${fmtM(4.2)}</div></div>
+              <div><div class="coan-col-label">Budget</div><div class="coan-col-val tabular">${fmtM(4.0)}</div></div>
+              <div><div class="coan-col-label">PY</div><div class="coan-col-val tabular">${fmtM(4.3)}</div></div>
+            </div>
+            <div class="coan-deltas">
+              <span style="color:var(--warn)">+5% vs Budget</span>
+              <span style="color:var(--ok)">-2% vs PY</span>
+            </div>
+          </div>
+
+          <!-- 6. COSTO DEL PERSONALE -->
+          <div class="coan-card">
+            <div class="coan-card-head">
+              <div class="coan-title"><span class="coan-num">06</span> ${it ? 'Costo del Personale' : 'Personnel Cost'}</div>
+              <span class="filter-chip tabular">${it ? 'Nr Dip.' : 'Headcount'}: <strong>${dipCons}</strong> · Bgt ${dipBgt} · PY ${dipPy}</span>
+            </div>
+            <div class="coan-cols">
+              <div><div class="coan-col-label">${it ? 'Consuntivo' : 'Actual'}</div><div class="coan-col-val tabular">${fmtM(3.8)}</div></div>
+              <div><div class="coan-col-label">Budget</div><div class="coan-col-val tabular">${fmtM(3.6)}</div></div>
+              <div><div class="coan-col-label">PY</div><div class="coan-col-val tabular">${fmtM(3.9)}</div></div>
+            </div>
+            <div class="coan-deltas">
+              <span style="color:var(--warn)">+5% vs Budget</span>
+              <span style="color:var(--ok)">-2% vs PY</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. KPI PRODUZIONE (% raggiungimento fatturato da tariffa std) -->
+        <section class="coan-card">
+          <div class="coan-card-head">
+            <div class="coan-title"><span class="coan-num">07</span> ${it ? 'KPI Produzione — % raggiungimento fatturato da tariffa std' : 'Production KPI — % Standard Tariff Revenue Achievement'}</div>
+            <span class="filter-chip">Target: 100%</span>
+          </div>
+          <div class="hbar-list">
+            ${kpiTariffa.map(r => `
+              <div class="hbar-row" style="${r.bold ? 'padding-top:8px;border-top:1px solid var(--border);font-weight:700' : ''}">
+                <span>${r.name}</span>
+                <div class="hbar-track">
+                  <div class="hbar-fill" style="width:${r.pct}%;background:${r.color}"></div>
+                </div>
+                <span class="tabular" style="text-align:right;font-weight:700">${r.pct}%</span>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderHRView() {
+      const s = PLANT_MULT[state.plant];
+      const it = state.lang === 'it';
+      const headcount = scaleFleet(1248);
+      const targetHc = scaleFleet(1250);
+      const maternity = Math.max(1, scaleFleet(23));
+      const uncovered = Math.max(1, scaleFleet(14));
+      const totalShifts = scaleFleet(1430);
+      const bgtTotal = Math.round(4800 * s);
+      const bgtUsed = Math.round(3744 * s);
+      const bgtRem = bgtTotal - bgtUsed;
+
+      const shiftDepts = [
+        { name: it ? 'Qualità' : 'Quality', val: 100, delta: '+2 pt', ok: true },
+        { name: it ? 'Logistica' : 'Logistics', val: 99, delta: '+1 pt', ok: true },
+        { name: it ? 'Produzione' : 'Production', val: 96, delta: '-2 pt', ok: false },
+        { name: it ? 'Manutenzione' : 'Maintenance', val: 91, delta: '-7 pt', ok: false }
+      ];
+
+      const budgetItems = [
+        { name: it ? 'Personale' : 'Payroll', pct: 70, val: Math.round(2621 * s), color: '#6d28d9' },
+        { name: it ? 'Formazione' : 'Training', pct: 18, val: Math.round(674 * s), color: '#3b82f6' },
+        { name: it ? 'Straordinari' : 'Overtime', pct: 12, val: Math.round(449 * s), color: '#f59e0b' }
+      ];
+
+      const kpiRows = [
+        { kpi: it ? 'Dipendenti attivi' : 'Active employees', val: fmtNum(headcount), obj: fmtNum(targetHc), trend: '+12', ok: true },
+        { kpi: it ? 'Assenteismo' : 'Absenteeism', val: '4,2%', obj: '≤ 5,0%', trend: '-0,3 pt', ok: true },
+        { kpi: it ? 'Turnover volontario' : 'Voluntary turnover', val: '8,1%', obj: '≤ 7,5%', trend: '+0,4 pt', ok: false },
+        { kpi: it ? 'Maternità (attive)' : 'Maternity (active)', val: String(maternity), obj: '—', trend: '+2', ok: true },
+        { kpi: it ? 'Budget consumato' : 'Budget spent', val: '78%', obj: it ? 'entro ±2%' : 'within ±2%', trend: 'on track', ok: true },
+        { kpi: it ? 'Copertura turni' : 'Shift coverage', val: '96,5%', obj: '≥ 98%', trend: '-1,2 pt', ok: false }
+      ];
+
+      const content = document.getElementById('content');
+      content.innerHTML = `
+        <div class="page-header">
+          <div>
+            <div class="page-kicker" style="color:var(--hr)">${t('hrKicker')} · ${it ? 'Sintesi CEO' : 'CEO Summary'}</div>
+            <h1 class="page-title">${t('hrName')}</h1>
+            <div class="filter-chips" style="margin-top:8px">
+              <span class="filter-chip">${it ? 'Novembre 2026' : 'November 2026'}</span>
+              <span class="filter-chip">${it ? 'Budget YTD: Rispettato' : 'YTD Budget: On Track'}</span>
+            </div>
+          </div>
+          <button class="btn" onclick="navigate('macro')">${t('backMacroBtn')}</button>
+        </div>
+
+        <!-- 6 Core HR KPIs from Cruscotto_HR & Cruscotto_HR2 -->
+        <section class="grid-3">
+          <div class="kpi-card">
+            <div class="kpi-top"><span>${it ? 'Dipendenti' : 'Employees'}</span></div>
+            <div class="kpi-value-row"><span class="kpi-value tabular">${fmtNum(headcount)}</span><span class="delta up">+12</span></div>
+            <div class="kpi-foot">${it ? 'Obiettivo' : 'Target'}: ${fmtNum(targetHc)}</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span>${it ? 'Assenteismo' : 'Absenteeism'}</span></div>
+            <div class="kpi-value-row"><span class="kpi-value tabular">4,2%</span><span class="delta up">-0,3 pt</span></div>
+            <div class="kpi-foot">${it ? 'Obiettivo' : 'Target'}: ≤ 5,0%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span>Turnover</span></div>
+            <div class="kpi-value-row"><span class="kpi-value tabular">11,8%</span><span class="delta warn">+0,6 pt</span></div>
+            <div class="kpi-foot">${it ? 'Volontario 8,1% · Ob. ≤ 11,0%' : 'Voluntary 8.1% · Target ≤ 11.0%'}</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span>${it ? 'Maternità' : 'Maternity'}</span></div>
+            <div class="kpi-value-row"><span class="kpi-value tabular">${maternity}</span><span class="delta up">100% ${it ? 'cop.' : 'cov.'}</span></div>
+            <div class="kpi-foot">${it ? '4 rientri a dicembre' : '4 returning in December'}</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span>Budget YTD</span></div>
+            <div class="kpi-value-row"><span class="kpi-value tabular">78%</span><span class="delta up">${it ? 'Rispettato' : 'On Track'}</span></div>
+            <div class="kpi-foot tabular">€ ${fmtNum(bgtUsed)}k / € ${fmtNum(bgtTotal)}k (${it ? 'res.' : 'rem.'} € ${fmtNum(bgtRem)}k)</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span>${it ? 'Copertura turni' : 'Shift coverage'}</span></div>
+            <div class="kpi-value-row"><span class="kpi-value tabular">96,5%</span><span class="delta warn">-1,2 pt</span></div>
+            <div class="kpi-foot tabular">${it ? 'Turni scoperti' : 'Uncovered shifts'}: <strong>${uncovered}</strong> / ${fmtNum(totalShifts)} (ob. ≥ 98%)</div>
+          </div>
+        </section>
+
+        <!-- Minimalist Visual Row: Trend Mensile + Copertura & Budget -->
+        <section class="grid-2">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3 class="panel-title">${it ? 'Trend mensile · Assenteismo & Turnover (%)' : 'Monthly Trend · Absenteeism & Turnover (%)'}</h3>
+                <div class="panel-sub">${it ? 'Gen – Nov 2026 · Target assenteismo 5,0%' : 'Jan – Nov 2026 · Absenteeism target 5.0%'}</div>
+              </div>
+              <div style="display:flex;gap:12px;font-size:12px;font-weight:600;color:var(--text-secondary)">
+                <span style="display:inline-flex;align-items:center;gap:5px"><i style="width:10px;height:3px;background:#6d28d9;display:inline-block"></i> ${it ? 'Assenteismo' : 'Absenteeism'}</span>
+                <span style="display:inline-flex;align-items:center;gap:5px"><i style="width:10px;height:3px;background:#d95d2b;display:inline-block"></i> Turnover</span>
+              </div>
+            </div>
+            <div class="chart-wrap" id="hrTrendChart"></div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="panel">
+              <div class="panel-head">
+                <h3 class="panel-title">${it ? 'Copertura turni per reparto' : 'Shift coverage by department'}</h3>
+                <span class="filter-chip">${it ? 'Obiettivo' : 'Target'} ≥ 98%</span>
+              </div>
+              <div class="hbar-list">
+                ${shiftDepts.map(r => `
+                  <div class="hbar-row">
+                    <span style="font-weight:600">${r.name}</span>
+                    <div class="hbar-track">
+                      <div class="hbar-fill" style="width:${r.val}%;background:${r.ok ? '#15803d' : '#f59e0b'}"></div>
+                      <div class="hbar-target" style="left:98%"></div>
+                    </div>
+                    <span class="tabular" style="text-align:right;font-weight:700;color:${r.ok ? 'var(--ok)' : 'var(--warn)'}">${r.val}%</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <h3 class="panel-title">${it ? 'Ripartizione Budget YTD' : 'YTD Budget Breakdown'}</h3>
+                <span class="filter-chip tabular">€ ${fmtNum(bgtUsed)}k</span>
+              </div>
+              <div class="hbar-list">
+                ${budgetItems.map(b => `
+                  <div class="hbar-row" style="grid-template-columns:110px 1fr 92px">
+                    <span style="font-weight:600">${b.name}</span>
+                    <div class="hbar-track">
+                      <div class="hbar-fill" style="width:${b.pct}%;background:${b.color}"></div>
+                    </div>
+                    <span class="tabular" style="text-align:right;font-size:12px;font-weight:600">${b.pct}% · €${fmtNum(b.val)}k</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Compact KPI Status Table from Cruscotto_HR2 -->
+        <section class="panel">
+          <div class="panel-head">
+            <h3 class="panel-title">${it ? 'KPI principali e stato' : 'Key KPIs & Status'}</h3>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>KPI</th>
+                <th>${it ? 'Valore' : 'Value'}</th>
+                <th>${it ? 'Obiettivo' : 'Target'}</th>
+                <th>Trend</th>
+                <th>${it ? 'Stato' : 'Status'}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${kpiRows.map(r => `
+                <tr>
+                  <td><strong>${r.kpi}</strong></td>
+                  <td class="tabular"><strong>${r.val}</strong></td>
+                  <td class="tabular">${r.obj}</td>
+                  <td class="tabular">${r.trend}</td>
+                  <td><span class="status-pill ${r.ok ? 'status-ok' : 'status-warn'}">${r.ok ? 'OK' : (it ? 'Attenzione' : 'Attention')}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </section>
+      `;
+
+      renderHRTrendChart();
+    }
+
+    function renderHRTrendChart() {
+      const container = document.getElementById('hrTrendChart');
+      if (!container) return;
+      const months = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov'];
+      const ass = [4.6, 4.7, 5.0, 4.8, 4.7, 4.6, 4.5, 4.6, 4.5, 4.4, 4.2];
+      const turn = [10.5, 11.0, 11.4, 11.6, 11.9, 12.2, 12.0, 12.3, 12.5, 11.8, 12.3];
+
+      const W = 540, H = 220, padL = 38, padR = 16, padT = 18, padB = 30;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+      const maxY = 14;
+      const xAt = (i) => padL + (i / (months.length - 1)) * plotW;
+      const yAt = (v) => padT + plotH - (v / maxY) * plotH;
+
+      const grid = [0, 5, 10, 14].map(v => {
+        const y = yAt(v).toFixed(1);
+        return `
+          <line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="${v === 5 ? '#94a3b8' : '#e2e8f0'}" stroke-dasharray="${v === 5 ? '5 4' : '3 3'}"/>
+          <text x="${padL - 8}" y="${(+y + 4).toFixed(1)}" text-anchor="end" font-size="10.5" fill="#94a3b8">${v}%</text>
+        `;
+      }).join('');
+
+      const assPts = ass.map((v, i) => `${xAt(i).toFixed(1)},${yAt(v).toFixed(1)}`).join(' ');
+      const turnPts = turn.map((v, i) => `${xAt(i).toFixed(1)},${yAt(v).toFixed(1)}`).join(' ');
+
+      const dots = months.map((m, i) => `
+        <circle cx="${xAt(i).toFixed(1)}" cy="${yAt(ass[i]).toFixed(1)}" r="3.8" fill="#fff" stroke="#6d28d9" stroke-width="2.2"
+          onmouseenter="showChartTip(event, 'hrTip', '${m} · Assenteismo: ${ass[i]}% · Turnover: ${turn[i]}%')"
+          onmouseleave="hideChartTip('hrTip')" style="cursor:pointer"/>
+        <circle cx="${xAt(i).toFixed(1)}" cy="${yAt(turn[i]).toFixed(1)}" r="3.8" fill="#fff" stroke="#d95d2b" stroke-width="2.2"
+          onmouseenter="showChartTip(event, 'hrTip', '${m} · Assenteismo: ${ass[i]}% · Turnover: ${turn[i]}%')"
+          onmouseleave="hideChartTip('hrTip')" style="cursor:pointer"/>
+        <text x="${xAt(i).toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="10.5" fill="#64748b">${m}</text>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="chart-tooltip" id="hrTip"></div>
+        <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
+          ${grid}
+          <polyline points="${assPts}" fill="none" stroke="#6d28d9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="${turnPts}" fill="none" stroke="#d95d2b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          ${dots}
+        </svg>
+      `;
+    }
+
+    function renderSmartView() {
+      const depts = getDepartments();
+      const totalKwh = depts.reduce((a, d) => a + d.energyKwh, 0);
+      const content = document.getElementById('content');
+      content.innerHTML = `
+        <div class="page-header">
+          <div>
+            <div class="page-kicker" style="color:var(--smart)">${t('smartKicker')}</div>
+            <h1 class="page-title">${t('smartTitle')}</h1>
+            <p class="page-subtitle">${t('smartSub')}</p>
+          </div>
+          <button class="btn" onclick="navigate('macro')">${t('backMacroBtn')}</button>
+        </div>
+
+        <section class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-top"><span>${state.lang === 'it' ? 'Macchine Connesse IoT' : 'Connected IoT Fleet'}</span></div>
+            <div class="kpi-value-row"><span class="kpi-value tabular">${scaleFleet(118)}/${scaleFleet(126)}</span><span class="delta up">93.6%</span></div>
+            <div class="kpi-foot">${state.lang === 'it' ? 'Telemetria attiva in tempo reale' : 'Real-time telemetry active'}</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span>${state.lang === 'it' ? 'Consumo Energetico' : 'Energy Consumption'}</span></div>
+            <div class="kpi-value-row"><span class="kpi-value tabular">${fmtNum(totalKwh)}</span><span class="delta up">-4.2%</span></div>
+            <div class="kpi-foot">kWh (${t('periodLabels')[state.period]})</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span>${state.lang === 'it' ? 'Intensità Energetica' : 'Energy Intensity'}</span></div>
+            <div class="kpi-value-row"><span class="kpi-value tabular">0.28</span><span class="delta up">kWh/capo</span></div>
+            <div class="kpi-foot">Target: 0.31 kWh/capo</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span>${state.lang === 'it' ? 'Alert Manutenzione' : 'Predictive Alerts'}</span></div>
+            <div class="kpi-value-row"><span class="kpi-value tabular">2</span><span class="delta warn">${state.lang === 'it' ? 'Stiro · Vapore' : 'Pressing · Steam'}</span></div>
+            <div class="kpi-foot">${state.lang === 'it' ? 'Intervento pianificato' : 'Scheduled service'}</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h3 class="panel-title">${state.lang === 'it' ? 'Telemetria & Consumi per Reparto' : 'Telemetry & Energy by Department'}</h3>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>${state.lang === 'it' ? 'Reparto' : 'Department'}</th>
+                <th>${state.lang === 'it' ? 'Unità Attive' : 'Active Units'}</th>
+                <th>${state.lang === 'it' ? 'Consumo (kWh)' : 'Energy (kWh)'}</th>
+                <th>${state.lang === 'it' ? 'Stato Sensori' : 'Sensor Health'}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${depts.map(d => `
+                <tr>
+                  <td><strong>${d.name}</strong></td>
+                  <td class="tabular">${d.activeUnits}</td>
+                  <td class="tabular">${fmtNum(d.energyKwh)} kWh</td>
+                  <td><span class="status-pill ${d.bottleneck ? 'status-warn' : 'status-ok'}">${d.bottleneck ? (state.lang === 'it' ? '2 Alert Vapore' : '2 Steam Alerts') : 'Online 100%'}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </section>
+      `;
+    }
+
+    // =========================================================
+    // LAYER 3 DRILL-DOWN DRAWER (shows how legacy tiles become organized)
+    // =========================================================
+    function openDeptDrawer(deptId) {
+      const dept = getDepartments().find(d => d.id === deptId);
+      if (!dept) return;
+      state.activeDeptDrawer = deptId;
+      renderSidebar();
+
+      document.getElementById('drawerKicker').textContent = `Layer 3 · ${t('prodName')} / ${dept.name}`;
+      document.getElementById('drawerTitle').textContent = `${dept.name} — ${state.lang === 'it' ? 'Macro Dati & Moduli' : 'Macro Data & Modules'}`;
+
+      const body = document.getElementById('drawerBody');
+      body.innerHTML = `
+        <div class="dept-kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+          <div class="dept-kpi">
+            <div class="dept-kpi-l">${t('deptOutput')}</div>
+            <div class="dept-kpi-v tabular">${fmtNum(dept.output)}</div>
+          </div>
+          <div class="dept-kpi">
+            <div class="dept-kpi-l">OEE</div>
+            <div class="dept-kpi-v tabular" style="color:${dept.status === 'warn' ? 'var(--warn)' : dept.color}">${dept.oee}%</div>
+          </div>
+          <div class="dept-kpi">
+            <div class="dept-kpi-l">WIP</div>
+            <div class="dept-kpi-v tabular">${fmtNum(dept.wip)}</div>
+          </div>
+        </div>
+
+        <div style="font-size:12.5px;color:var(--text-secondary);background:var(--surface-subtle);border-left:3px solid ${dept.color};padding:10px 12px;border-radius:8px">
+          ${state.lang === 'it' ? dept.noteIt : dept.noteEn}
+        </div>
+
+        <div style="font-size:12.5px;font-weight:600;color:var(--text-muted)">${t('drawerNote')}</div>
+
+        ${dept.moduleGroups.map(g => `
+          <div class="mod-group">
+            <div class="mod-group-title">${state.lang === 'it' ? g.groupIt : g.groupEn}</div>
+            <div class="mod-chips">
+              ${g.items.map(item => `
+                <button class="mod-chip" onclick="showToast('${dept.name} → ${item.name} (${state.lang === 'it' ? 'modulo operativo collegato' : 'linked operational module'})')">
+                  <span class="mod-chip-name">${item.name}</span>
+                  <span class="mod-chip-meta">${state.lang === 'it' ? item.metaIt : item.metaEn}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
+      `;
+
+      document.getElementById('drawerBackdrop').classList.add('open');
+      document.getElementById('drawer').classList.add('open');
+      document.getElementById('drawer').setAttribute('aria-hidden', 'false');
+    }
+
+    function openDeptFromSidebar(deptId) {
+      if (state.view !== 'produzione') {
+        state.view = 'produzione';
+        render();
+      }
+      openDeptDrawer(deptId);
+      document.getElementById('sidebar').classList.remove('open');
+    }
+
+    function closeDrawer() {
+      state.activeDeptDrawer = null;
+      document.getElementById('drawerBackdrop').classList.remove('open');
+      document.getElementById('drawer').classList.remove('open');
+      document.getElementById('drawer').setAttribute('aria-hidden', 'true');
+      renderSidebar();
+    }
+
+    // =========================================================
+    // INTERACTIONS & HELPERS
+    // =========================================================
+    function navigate(view) {
+      state.view = view;
+      closeDrawer();
+      document.getElementById('sidebar').classList.remove('open');
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setPlant(val) { state.plant = val; render(); }
+    function setPeriod(val) { state.period = val; render(); }
+    function setProdMetric(m, btn) {
+      state.prodChartMetric = m;
+      renderProdCompareChart();
+      document.querySelectorAll('.seg-tab').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    function setLang(lang) {
+      state.lang = lang;
+      document.getElementById('lang-it').classList.toggle('active', lang === 'it');
+      document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+      render();
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+    }
+
+    function showChartTip(evt, tipId, text) {
+      const tip = document.getElementById(tipId);
+      if (!tip) return;
+      const rect = tip.parentElement.getBoundingClientRect();
+      tip.textContent = text;
+      tip.style.left = Math.min(rect.width - 190, Math.max(8, evt.clientX - rect.left + 12)) + 'px';
+      tip.style.top = Math.max(8, evt.clientY - rect.top - 36) + 'px';
+      tip.style.opacity = '1';
+    }
+    function hideChartTip(tipId) {
+      const tip = document.getElementById(tipId);
+      if (tip) tip.style.opacity = '0';
+    }
+
+    let toastTimer;
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+    }
+
+    function render() {
+      renderSidebar();
+      renderTopbar();
+      if (state.view === 'macro') renderMacroView();
+      else if (state.view === 'produzione') renderProduzioneView();
+      else if (state.view === 'controllo') renderControlloView();
+      else if (state.view === 'hr') renderHRView();
+      else if (state.view === 'smart') renderSmartView();
+    }
+
+    // Escape closes drawer
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+
+    // Initial render
+    render();
   </script>
 </body>
 </html>
